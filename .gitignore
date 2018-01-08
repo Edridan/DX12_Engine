@@ -5,7 +5,10 @@
 *.slo
 *.lo
 *.o
-*.obj
+
+# Visual Studio files
+*.tlog
+*.db
 
 # Precompiled Headers
 *.gch
