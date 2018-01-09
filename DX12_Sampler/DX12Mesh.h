@@ -6,7 +6,7 @@
 #include <DirectXMath.h>
 
 #include "DX12Shader.h"
-#include "DX12ConstantBufferArea.h"
+#include "DX12ConstantBuffer.h"
 
 // Struct
 struct Vertex
@@ -38,7 +38,6 @@ public:
 
 	// Management
 	void		Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineState*  i_Pso);
-	void		Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineState*  i_Pso, DX12ConstantBufferArea & i_ConstantBufferArea);
 
 	// Get/Set
 	const D3D12_INPUT_LAYOUT_DESC & GetInputLayoutDesc() const;

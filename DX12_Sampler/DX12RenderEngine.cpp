@@ -40,16 +40,16 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	hr = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
 	if (FAILED(hr))
 	{
-		return false;
+		DX12RenderEngine::GetInstance().PopUpError(L"Error when creating the DXGIFactory1");
+		return E_FAIL;
 	}
 
 	IDXGIAdapter1* adapter; // adapters are the graphics card (this includes the embedded graphics on the motherboard)
 
 	int adapterIndex = 0; // we'll start looking for directx 12  compatible graphics devices starting at index 0
-
 	bool adapterFound = false; // set this to true when a good one was found
-
 							   // find first hardware gpu that supports d3d 12
+
 	while (dxgiFactory->EnumAdapters1(adapterIndex, &adapter) != DXGI_ERROR_NOT_FOUND)
 	{
 		DXGI_ADAPTER_DESC1 desc;
@@ -57,11 +57,10 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 		if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 		{
-			// we dont want a software m_Device
-			continue;
+			continue;	// we dont want a software m_Device
 		}
 
-		// we want a m_Device that is compatible with direct3d 12 (feature level 11 or higher)
+		// we want a device that is compatible with direct3d 12 (feature level 11 or higher)
 		hr = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr);
 		if (SUCCEEDED(hr))
 		{
@@ -69,12 +68,13 @@ HRESULT DX12RenderEngine::InitializeDX12()
 			break;
 		}
 
-		adapterIndex++;
+		++adapterIndex;
 	}
 
 	if (!adapterFound)
 	{
-		return false;
+		DX12RenderEngine::GetInstance().PopUpError(L"Error : Device compatible with DX12 not found");
+		return E_FAIL;
 	}
 
 	// Create the m_Device
@@ -85,10 +85,11 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	);
 	if (FAILED(hr))
 	{
-		return false;
+		DX12RenderEngine::GetInstance().PopUpError(L"Error : D3D12CreateDevice");
+		return E_FAIL;
 	}
 
-	// -- Create a direct command queue -- //
+	// -- Create command queue -- //
 
 	D3D12_COMMAND_QUEUE_DESC cqDesc = {};
 	cqDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
@@ -97,7 +98,8 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	hr = m_Device->CreateCommandQueue(&cqDesc, IID_PPV_ARGS(&m_CommandQueue)); // create the command queue
 	if (FAILED(hr))
 	{
-		return false;
+		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateCommandQueue");
+		return E_FAIL;
 	}
 
 	// -- Create the Swap Chain (double/tripple buffering) -- //
@@ -111,7 +113,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1; // multisample count (no multisampling, so we just put 1, since we still need 1 sample)
 
-						  // Describe and create the swap chain.
+	// Describe and create the swap chain.
 	m_SwapChainDesc = {};
 	m_SwapChainDesc.BufferCount = m_FrameBufferCount; // number of buffers we have
 	m_SwapChainDesc.BufferDesc = backBufferDesc; // our back buffer description
@@ -123,14 +125,20 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	IDXGISwapChain* tempSwapChain;
 
-	dxgiFactory->CreateSwapChain(
+	hr = dxgiFactory->CreateSwapChain(
 		m_CommandQueue, // the queue will be flushed once the swap chain is created
 		&m_SwapChainDesc, // give it the swap chain description we created above
 		&tempSwapChain // store the created swap chain in a temp IDXGISwapChain interface
 	);
 
-	m_SwapChain = static_cast<IDXGISwapChain3*>(tempSwapChain);
+	if (FAILED(hr))
+	{
+		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateSwapChain");
+		return E_FAIL;
+	}
 
+	// retreive the swapchain
+	m_SwapChain = static_cast<IDXGISwapChain3*>(tempSwapChain);
 	m_FrameIndex = m_SwapChain->GetCurrentBackBufferIndex();
 
 	// -- Create the Back Buffers (render target views) Descriptor Heap -- //
@@ -140,13 +148,14 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	rtvHeapDesc.NumDescriptors = m_FrameBufferCount; // number of descriptors for this heap.
 	rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // this heap is a render target view heap
 
-													   // This heap will not be directly referenced by the shaders (not shader visible), as this will store the output from the pipeline
-													   // otherwise we would set the heap's flag to D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE
+	// This heap will not be directly referenced by the shaders (not shader visible), as this will store the output from the pipeline
+	// otherwise we would set the heap's flag to D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE
 	rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	hr = m_Device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_RtvDescriptorHeap));
 	if (FAILED(hr))
 	{
-		return false;
+		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateDescriptorHeap");
+		return E_FAIL;
 	}
 
 	// get the size of a descriptor in this heap (this is a rtv heap, so only rtv descriptors should be stored in it.
@@ -166,7 +175,8 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		hr = m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_RenderTargets[i]));
 		if (FAILED(hr))
 		{
-			return false;
+			DX12RenderEngine::GetInstance().PopUpError(L"Error : m_SwapChain->GetBuffer");
+			return E_FAIL;
 		}
 
 		// the we "create" a render target view which binds the swap chain buffer (ID3D12Resource[n]) to the rtv handle
@@ -183,7 +193,8 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		hr = m_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocator[i]));
 		if (FAILED(hr))
 		{
-			return false;
+			DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateCommandAllocator");
+			return E_FAIL;
 		}
 	}
 
@@ -193,18 +204,19 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	hr = m_Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocator[m_FrameIndex], NULL, IID_PPV_ARGS(&m_CommandList));
 	if (FAILED(hr))
 	{
-		return false;
+		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateCommandList");
+		return E_FAIL;
 	}
 
 	// -- Create a Fence & Fence Event -- //
 
-	// create the fences
 	for (int i = 0; i < m_FrameBufferCount; i++)
 	{
 		hr = m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fences[i]));
 		if (FAILED(hr))
 		{
-			return false;
+			DX12RenderEngine::GetInstance().PopUpError(L"Error : Fences -> CreateFence");
+			return E_FAIL;
 		}
 		m_FenceValue[i] = 0; // set the initial m_Fences value to 0
 	}
@@ -213,30 +225,23 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_FenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	if (m_FenceEvent == nullptr)
 	{
-		return false;
+		DX12RenderEngine::GetInstance().PopUpError(L"Error : Fences -> CreateEvent");
+		return E_FAIL;
 	}
 
-	// create default root signature
+	// -- Create default root -- //
 
-	// create a descriptor range (descriptor table) and fill it out
-	// this is a range of descriptors inside a descriptor heap
-	D3D12_DESCRIPTOR_RANGE  descriptorTableRanges[1]; // only one range right now
-	descriptorTableRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV; // this is a range of constant buffer views (descriptors)
-	descriptorTableRanges[0].NumDescriptors = 1; // we only have one constant buffer, so the range is only 1
-	descriptorTableRanges[0].BaseShaderRegister = 0; // start index of the shader registers in the range
-	descriptorTableRanges[0].RegisterSpace = 0; // space 0. can usually be zero
-	descriptorTableRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
+	// create the root descriptor : where to find the data for this root parameter
+	D3D12_ROOT_DESCRIPTOR rootDescriptor;
+	rootDescriptor.RegisterSpace = 0;
+	rootDescriptor.ShaderRegister = 0;
 
-	// create a root descriptor, which explains where to find the data for this root parameter
-	D3D12_ROOT_DESCRIPTOR rootCBVDescriptor;
-	rootCBVDescriptor.RegisterSpace = 0;
-	rootCBVDescriptor.ShaderRegister = 0;
-
-	// create a root parameter and fill it out
+	// create the default root parameter and fill it out
+	// this paramater is the model view projection matrix
 	D3D12_ROOT_PARAMETER  rootParameters[1]; // only one parameter right now
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
-	rootParameters[0].Descriptor = rootCBVDescriptor; // this is the root descriptor for this root parameter
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; // our pixel shader will be the only shader accessing this parameter for now
+	rootParameters[0].Descriptor = rootDescriptor; // this is the root descriptor for this root parameter
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
 	rootSignatureDesc.Init(_countof(rootParameters), // we have 1 root parameter
@@ -248,95 +253,23 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS);
-
+	
 	ID3DBlob* signature;
 	hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, nullptr);
 	if (FAILED(hr))
 	{
-		return false;
+		DX12RenderEngine::GetInstance().PopUpError(L"Error : D3D12SerializeRootSignature");
+		return E_FAIL;
 	}
 
 	hr = m_Device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
 	if (FAILED(hr))
 	{
-		return false;
+		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateRootSignature");
+		return E_FAIL;
 	}
 
-	ZeroMemory(&m_ConstantBufferGPUAdress, sizeof(m_ConstantBufferGPUAdress));
 
-	// create resource heap
-	for (int i = 0; i < m_FrameBufferCount; ++i)
-	{
-		// create constant buffer upload heap
-		hr = m_Device->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // this heap will be used to upload the constant buffer data
-			D3D12_HEAP_FLAG_NONE, // no flags
-			&CD3DX12_RESOURCE_DESC::Buffer(m_ConstantBufferHeapSize * 64), // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
-			D3D12_RESOURCE_STATE_GENERIC_READ, // will be data that is read from so we keep it in the generic read state
-			nullptr, // we do not have use an optimized clear value for constant buffers
-			IID_PPV_ARGS(&m_ConstantBufferUploadHeap[i]));
-
-		m_ConstantBufferUploadHeap[i]->SetName(L"Constant Buffer Upload Resource Heap");
-
-
-		CD3DX12_RANGE readRange(0, 0);    // We do not intend to read from this resource on the CPU. (so end is less than or equal to begin)
-
-		hr = m_ConstantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_ConstantBufferGPUAdress[i]));
-
-		if (FAILED(hr))
-		{
-			DX12RenderEngine::GetInstance().PopUpError(L"Error during the mapping constant buffer");
-		}
-	}
-
-	// initialize m_ConstantBufferReservedAddress table
-	for (int i = 0; i < m_ConstantBufferHeapSize; i++)
-	{
-		m_ConstantBufferReservedAddress[i] = false;
-	}
-
-	// Fill out the Viewport
-	m_Viewport.TopLeftX = 0;
-	m_Viewport.TopLeftY = 0;
-	m_Viewport.Width = m_Window.GetWidth();
-	m_Viewport.Height = m_Window.GetHeight();
-	m_Viewport.MinDepth = 0.0f;
-	m_Viewport.MaxDepth = 1.0f;
-
-	// Fill out a scissor rect
-	m_ScissorRect.left = 0;
-	m_ScissorRect.top = 0;
-	m_ScissorRect.right = m_Window.GetWidth();
-	m_ScissorRect.bottom = m_Window.GetHeight();
-
-	// Load default pso and shader
-	m_DefaultPixelShader = new DX12Shader(DX12Shader::ePixel, L"PixelShader.hlsl");
-	m_DefaultVertexShader = new DX12Shader(DX12Shader::eVertex, L"VertexShader.hlsl");
-
-	// Create default pso
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC defaultPipelineDesc = {};
-
-	defaultPipelineDesc.InputLayout = DX12Mesh::s_DefaultInputLayout; // the structure describing our input layout
-	defaultPipelineDesc.pRootSignature = m_RootSignature; // the root signature that describes the input data this pso needs
-	defaultPipelineDesc.VS = m_DefaultPixelShader->GetByteCode(); // structure describing where to find the vertex shader bytecode and how large it is
-	defaultPipelineDesc.PS = m_DefaultPixelShader->GetByteCode(); // same as VS but for pixel shader
-	defaultPipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // type of topology we are drawing
-	defaultPipelineDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // format of the render target
-	defaultPipelineDesc.SampleDesc = m_SwapChainDesc.SampleDesc; // must be the same sample description as the swapchain and depth/stencil buffer
-	defaultPipelineDesc.SampleMask = 0xffffffff; // sample mask has to do with multi-sampling. 0xffffffff means point sampling is done
-	defaultPipelineDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // a default rasterizer state.
-	defaultPipelineDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
-	defaultPipelineDesc.NumRenderTargets = 1; // we are only binding one render target
-	defaultPipelineDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
-
-	// Create the default pipeline state object
-	hr = m_Device->CreateGraphicsPipelineState(&defaultPipelineDesc, IID_PPV_ARGS(&m_DefaultPipelineState));
-
-	if (FAILED(hr))
-	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error during default graphics pipeline state creation");
-		return false;
-	}
 
 	return true;
 }
@@ -379,18 +312,19 @@ HRESULT DX12RenderEngine::PrepareForRender()
 	// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
 	m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTargets[m_FrameIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
-	//// here we again get the handle to our current render target view so we can set it as the render target in the output merger stage of the pipeline
+	// here we again get the handle to our current render target view so we can set it as the render target in the output merger stage of the pipeline
 	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_FrameIndex, m_RtvDescriptorSize);
 
-	//// set the render target for the output merger stage (the output of the pipeline)
+	// set the render target for the output merger stage (the output of the pipeline)
 	m_CommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
-	//// Clear the render target by using the ClearRenderTargetView command
+	// Clear the render target by using the ClearRenderTargetView command
 	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	m_CommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
-	m_CommandList->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport()); // set the viewports
-	m_CommandList->RSSetScissorRects(1, &DX12RenderEngine::GetInstance().GetScissor()); // set the scissor rects
+	// Setting up the command list
+	m_CommandList->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
+	m_CommandList->RSSetScissorRects(1, &DX12RenderEngine::GetInstance().GetScissor());
 }
 
 HRESULT DX12RenderEngine::Render()
@@ -526,6 +460,11 @@ int DX12RenderEngine::GetFrameIndex() const
 	return m_FrameIndex;
 }
 
+int DX12RenderEngine::GetFrameBufferCount() const
+{
+	return m_FrameBufferCount;
+}
+
 D3D12_RECT & DX12RenderEngine::GetScissor()
 {
 	return m_ScissorRect;
@@ -656,3 +595,92 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 	// increment m_FenceValue for next frame
 	m_FenceValue[m_FrameIndex]++;
 }
+
+// to delete
+
+/*	ZeroMemory(&m_ConstantBufferGPUAdress, sizeof(m_ConstantBufferGPUAdress));
+
+	for (int i = 0; i < m_FrameBufferCount; ++i)
+	{
+		D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+		heapDesc.NumDescriptors = 1;
+		heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		hr = m_Device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_MainDescriptorHeap[i]));
+		if (FAILED(hr))
+		{
+			DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateDescriptorHeap");
+		}
+	}
+
+	// create resource heap
+	for (int i = 0; i < m_FrameBufferCount; ++i)
+	{
+		CD3DX12_RANGE readRange(0, 0);    // We do not intend to read from this resource on the CPU. (so end is less than or equal to begin)
+
+		// create constant buffer upload heap
+		hr = m_Device->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // this heap will be used to upload the constant buffer data
+			D3D12_HEAP_FLAG_NONE, // no flags
+			&CD3DX12_RESOURCE_DESC::Buffer(m_ConstantBufferHeapSize * 64), // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
+			D3D12_RESOURCE_STATE_GENERIC_READ, // will be data that is read from so we keep it in the generic read state
+			nullptr, // we do not have use an optimized clear value for constant buffers
+			IID_PPV_ARGS(&m_ConstantBufferUploadHeap[i]));
+
+		m_ConstantBufferUploadHeap[i]->SetName(L"Constant Buffer Upload Resource Heap");
+		hr = m_ConstantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_ConstantBufferGPUAdress[i]));
+
+		if (FAILED(hr))
+		{
+			DX12RenderEngine::GetInstance().PopUpError(L"Error Map constant buffer");
+		}
+	}
+
+	// initialize m_ConstantBufferReservedAddress table
+	for (int i = 0; i < m_ConstantBufferHeapSize; i++)
+	{
+		m_ConstantBufferReservedAddress[i] = false;
+	}
+
+	// Fill out the Viewport
+	m_Viewport.TopLeftX = 0;
+	m_Viewport.TopLeftY = 0;
+	m_Viewport.Width = m_Window.GetWidth();
+	m_Viewport.Height = m_Window.GetHeight();
+	m_Viewport.MinDepth = 0.0f;
+	m_Viewport.MaxDepth = 1.0f;
+
+	// Fill out a scissor rect
+	m_ScissorRect.left = 0;
+	m_ScissorRect.top = 0;
+	m_ScissorRect.right = m_Window.GetWidth();
+	m_ScissorRect.bottom = m_Window.GetHeight();
+
+	// Load default pso and shader
+	m_DefaultPixelShader = new DX12Shader(DX12Shader::ePixel, L"PixelShader.hlsl");
+	m_DefaultVertexShader = new DX12Shader(DX12Shader::eVertex, L"VertexShader.hlsl");
+
+	// Create default pso
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC defaultPipelineDesc = {};
+
+	defaultPipelineDesc.InputLayout = DX12Mesh::s_DefaultInputLayout; // the structure describing our input layout
+	defaultPipelineDesc.pRootSignature = m_RootSignature; // the root signature that describes the input data this pso needs
+	defaultPipelineDesc.VS = m_DefaultPixelShader->GetByteCode(); // structure describing where to find the vertex shader bytecode and how large it is
+	defaultPipelineDesc.PS = m_DefaultPixelShader->GetByteCode(); // same as VS but for pixel shader
+	defaultPipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // type of topology we are drawing
+	defaultPipelineDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // format of the render target
+	defaultPipelineDesc.SampleDesc = m_SwapChainDesc.SampleDesc; // must be the same sample description as the swapchain and depth/stencil buffer
+	defaultPipelineDesc.SampleMask = 0xffffffff; // sample mask has to do with multi-sampling. 0xffffffff means point sampling is done
+	defaultPipelineDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // a default rasterizer state.
+	defaultPipelineDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
+	defaultPipelineDesc.NumRenderTargets = 1; // we are only binding one render target
+	defaultPipelineDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
+
+	// Create the default pipeline state object
+	hr = m_Device->CreateGraphicsPipelineState(&defaultPipelineDesc, IID_PPV_ARGS(&m_DefaultPipelineState));
+
+	if (FAILED(hr))
+	{
+		DX12RenderEngine::GetInstance().PopUpError(L"Error during default graphics pipeline state creation");
+		return false;
+		}*/

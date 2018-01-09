@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "DX12Mesh.h"
-#include "DX12ConstantBufferArea.h"
+#include "DX12ConstantBuffer.h"
 
 class GameScene;
 
@@ -46,7 +46,7 @@ private:
 	DX12Mesh *				m_Mesh;
 	ID3D12PipelineState *	m_PipelineState;
 	ConstantBufferPerObject	m_ConstantBuffer;
-	DX12ConstantBufferArea	m_ConstantBufferArea;
+	//DX12ConstantBufferElement	m_ConstantBufferArea;
 
 	GameScene * const	m_Scene;
 

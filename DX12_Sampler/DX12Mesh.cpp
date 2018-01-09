@@ -10,7 +10,7 @@
 const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_DefaultInputElement[] =
 {
 	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 };
 
 // fill out the default input layout description structure
@@ -363,31 +363,7 @@ void DX12Mesh::Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineStat
 	}
 	else
 	{
-		i_CommandList->DrawInstanced(count, 1, 0, 0); // finally draw 3 vertices (draw the triangle)
-	}
-}
-
-void DX12Mesh::Draw(ID3D12GraphicsCommandList * i_CommandList, ID3D12PipelineState * i_Pso, DX12ConstantBufferArea & i_ConstantBufferArea)
-{
-	const UINT count = m_HaveIndex ? m_IndexCount : m_VerticesCount;
-
-	//i_CommandList->SetGraphicsRootConstantBufferView(0, constantBufferUploadHeaps[frameIndex]->GetGPUVirtualAddress() + ConstantBufferPerObjectAlignedSize);
-	i_CommandList->SetGraphicsRootSignature(DX12RenderEngine::GetInstance().GetRootSignature()); // set the root signature
-	i_CommandList->SetPipelineState(i_Pso);
-
-	i_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
-	i_CommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView); // set the vertex buffer (using the vertex buffer view)
-
-	i_CommandList->SetGraphicsRootConstantBufferView(0, i_ConstantBufferArea.GetVirtualConstantBufferAddress());
-
-	if (m_HaveIndex)
-	{
-		i_CommandList->IASetIndexBuffer(&m_IndexBufferView);
-		i_CommandList->DrawIndexedInstanced(count, 1, 0, 0, 0);
-	}
-	else
-	{
-		i_CommandList->DrawInstanced(count, 1, 0, 0); // finally draw 3 vertices (draw the triangle)
+		i_CommandList->DrawInstanced(count, 1, 0, 0); 
 	}
 }
 

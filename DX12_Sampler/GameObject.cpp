@@ -14,11 +14,6 @@ GameObject::GameObject(GameScene * const i_Scene)
 
 GameObject::~GameObject()
 {
-	// Remove the constant area buffer
-	if (m_ConstantBufferArea.IsMapped())
-	{
-		m_ConstantBufferArea.UnmapGPUAddress();
-	}
 }
 
 void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
@@ -33,10 +28,9 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 		XMMATRIX mvpMatrix = GetWorldTransform() * viewMat * projMat; // create mvp matrix
 
 		XMStoreFloat4x4(&m_ConstantBuffer.m_ModelViewProjMat, mvpMatrix);
-		m_ConstantBufferArea.CpyConstantBuffer(m_ConstantBuffer);
 
 		// draw
-		m_Mesh->Draw(i_CommandList, m_PipelineState, m_ConstantBufferArea);
+		m_Mesh->Draw(i_CommandList, m_PipelineState);
 	}
 
 	auto itr = m_Child.begin();
@@ -55,7 +49,7 @@ void GameObject::SetMesh(DX12Mesh * i_Mesh, ID3D12PipelineState * i_PipelineStat
 	if (i_Mesh)
 	{
 		// map gpu address if necessary
-		m_ConstantBufferArea.MapGPUAddress();
+		//m_ConstantBufferArea.MapGPUAddress();
 	}
 }
 

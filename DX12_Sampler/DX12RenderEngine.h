@@ -7,18 +7,9 @@
 #include <Windows.h>
 #include <DirectXMath.h>
 
+#include "DX12Utils.h"
 #include "DX12Window.h"
 #include "DX12Shader.h"
-
-typedef UINT64 ADDRESS_ID;
-
-#define ENABLE_DEBUG_BREAK 1
-
-#if (ENABLE_DEBUG_BREAK)
-#define DEBUG_BREAK		__debugbreak()
-#else
-#define DEBUG_BREAK		void(0)
-#endif
 
 enum PiplineStateFlags
 {
@@ -63,6 +54,7 @@ public:
 
 	// Get/Set
 	int								GetFrameIndex() const;
+	int								GetFrameBufferCount() const;
 	D3D12_RECT &					GetScissor();
 	D3D12_VIEWPORT &				GetViewport();
 	IDXGISwapChain3 *				SwapChain() const;
@@ -101,14 +93,14 @@ private:
 	IDXGISwapChain3*			m_SwapChain; // swapchain used to switch between render targets
 	DXGI_SWAP_CHAIN_DESC		m_SwapChainDesc;	// swapchain description used for create default pso
 	ID3D12CommandQueue*			m_CommandQueue; // container for command lists
-	ID3D12DescriptorHeap*		m_RtvDescriptorHeap; // a descriptor heap to hold resources like the render targets
+	ID3D12DescriptorHeap*		m_RtvDescriptorHeap; // render target view descriptor
 	ID3D12Resource*				m_RenderTargets[FRAME_BUFFER_COUNT]; // number of render targets equal to buffer count
 	ID3D12CommandAllocator*		m_CommandAllocator[FRAME_BUFFER_COUNT]; // we want enough allocators for each buffer * number of threads (we only have one thread)
 	ID3D12GraphicsCommandList*	m_CommandList; // a command list we can record commands into, then execute them to render the frame
 	ID3D12Fence*				m_Fences[FRAME_BUFFER_COUNT];		// an object that is locked while our command list is being executed by the gpu. We need as many as we have allocators (more if we want to know when the gpu is finished with an asset)
 	HANDLE						m_FenceEvent; // a handle to an event when our fence is unlocked by the gpu
 	UINT64						m_FenceValue[FRAME_BUFFER_COUNT]; // this value is incremented each frame. each fence will have its own value
-	int							m_FrameIndex; // current rtv we are on
+	int							m_FrameIndex; // current render target view we are on
 	int							m_RtvDescriptorSize; // size of the rtv descriptor on the device (all front and back buffers will be the same size)
 	ID3D12RootSignature*		m_RootSignature; // root signature defines data shaders will access
 
@@ -117,14 +109,14 @@ private:
 	ID3D12DescriptorHeap*		m_DepthStencilDescriptorHeap; // This is a heap for our depth/stencil buffer descriptor
 
 	// Descriptor heap
-	ID3D12DescriptorHeap *		m_MainDescriptorHeap[FRAME_BUFFER_COUNT];
 
 	// Constant buffer
 	#define  CONSTANT_BUFFER_HEAP_SIZE			128
 	UINT						m_ConstantBufferHeapSize = CONSTANT_BUFFER_HEAP_SIZE;
+	ID3D12DescriptorHeap *		m_MainDescriptorHeap[FRAME_BUFFER_COUNT];
 	ID3D12Resource *			m_ConstantBufferUploadHeap[FRAME_BUFFER_COUNT];	// memory where constant buffers for each frame will be placed
 	UINT8 *						m_ConstantBufferGPUAdress[FRAME_BUFFER_COUNT];	// pointer for each of the resource buffer constant heap
-	bool						m_ConstantBufferReservedAddress[CONSTANT_BUFFER_HEAP_SIZE];
+	bool						m_ConstantBufferReservedAddress[CONSTANT_BUFFER_HEAP_SIZE];	// internal constant buffer management
 
 	// Shader
 	DX12Shader *				m_DefaultPixelShader;
