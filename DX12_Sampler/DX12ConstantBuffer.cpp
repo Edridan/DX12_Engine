@@ -5,11 +5,10 @@ DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize
 	,m_ElementSize(i_BufferSize)
 {
 	// allocate and intialize available blocks
-	m_AvailableBlock = new bool[i_BufferSize];
-
+	m_ConstantBufferReservedAddress = new bool[i_BufferSize];
 	for (int i = 0; i < i_BufferSize; ++i)
 	{
-		m_AvailableBlock[i] = true;
+		m_ConstantBufferReservedAddress[i] = false;
 	}
 }
 
@@ -21,7 +20,7 @@ DX12ConstantBuffer::~DX12ConstantBuffer()
 	}
 
 	// Delete the array
-	delete[] m_AvailableBlock;
+	delete[] m_ConstantBufferReservedAddress;
 }
 
 ADDRESS_ID DX12ConstantBuffer::ReserveVirtualAddress()
@@ -46,14 +45,14 @@ ADDRESS_ID DX12ConstantBuffer::ReserveVirtualAddress()
 		return -1;	// error address
 
 					// erase before used data and push null data to the constant buffer
-	ConstantBufferPerObject constantBuffer;
-	ZeroMemory(&constantBuffer, sizeof(constantBuffer));
+	//ConstantBuffer constantBuffer;
+	//ZeroMemory(&constantBuffer, sizeof(constantBuffer));
 
-	for (int i = 0; i < frameBufferCount; ++i)
-	{
-		// constant buffer new data
-		memcpy(m_ConstantBufferGPUAdress[i] + (address * m_ElementSize), &constantBuffer, sizeof(constantBuffer));
-	}
+	//for (int i = 0; i < frameBufferCount; ++i)
+	//{
+	//	// constant buffer new data
+	//	memcpy(m_ConstantBufferGPUAdress[i] + (address * m_ElementSize), &constantBuffer, sizeof(constantBuffer));
+	//}
 
 	return address;
 }

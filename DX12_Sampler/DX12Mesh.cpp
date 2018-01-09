@@ -10,7 +10,7 @@
 const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_DefaultInputElement[] =
 {
 	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, (sizeof(float) * 3), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 };
 
 // fill out the default input layout description structure
@@ -165,7 +165,7 @@ DX12Mesh::DX12Mesh(Vertex * i_Vertices, UINT i_VerticeCount)
 
 	// we are now creating a command with the command list to copy the data from
 	// the upload heap to the default heap
-	UINT size = UpdateSubresources(commandList, m_VertexBuffer, vBufferUploadHeap, 0, 0, 1, &vertexData);
+	UINT64 size = UpdateSubresources(commandList, m_VertexBuffer, vBufferUploadHeap, 0, 0, 1, &vertexData);
 
 	if (size != vBufferSize)
 	{
@@ -261,7 +261,7 @@ DX12Mesh::DX12Mesh(Vertex * i_Vertices, UINT i_VerticeCount, DWORD * i_Indices, 
 
 										 // we are now creating a command with the command list to copy the data from
 										 // the upload heap to the default heap
-	UINT size = UpdateSubresources(commandList, m_VertexBuffer, vBufferUploadHeap, 0, 0, 1, &vertexData);
+	UINT64 size = UpdateSubresources(commandList, m_VertexBuffer, vBufferUploadHeap, 0, 0, 1, &vertexData);
 
 	if (size != vBufferSize)
 	{
@@ -347,6 +347,11 @@ DX12Mesh::~DX12Mesh()
 
 void DX12Mesh::Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineState * i_Pso)
 {
+	if (i_Pso == nullptr)
+	{
+		return;
+	}
+
 	const UINT count = m_HaveIndex ? m_IndexCount : m_VerticesCount;
 
 	//i_CommandList->SetGraphicsRootConstantBufferView(0, constantBufferUploadHeaps[frameIndex]->GetGPUVirtualAddress() + ConstantBufferPerObjectAlignedSize);

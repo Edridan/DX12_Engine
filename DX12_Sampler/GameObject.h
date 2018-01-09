@@ -45,8 +45,7 @@ private:
 	// rendering pipeline stuff
 	DX12Mesh *				m_Mesh;
 	ID3D12PipelineState *	m_PipelineState;
-	ConstantBufferPerObject	m_ConstantBuffer;
-	//DX12ConstantBufferElement	m_ConstantBufferArea;
+	ADDRESS_ID				m_ConstBuffer;
 
 	GameScene * const	m_Scene;
 

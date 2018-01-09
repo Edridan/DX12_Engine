@@ -17,17 +17,16 @@ enum PiplineStateFlags
 	eTextured			= 1 << 0,
 };
 
-// Default constant buffer
-struct ConstantBufferPerObject
-{
-	DirectX::XMFLOAT4X4	m_ModelViewProjMat;
-};
-
-
 // Render engine implementation
 class DX12RenderEngine
 {
 public:
+	// Constant buffer definition
+	struct DefaultConstantBuffer
+	{
+		DirectX::XMFLOAT4X4		m_Model;
+	};
+
 	// Singleton
 	static DX12RenderEngine &	GetInstance();
 	static void					Create(HINSTANCE & i_HInstance);
@@ -42,8 +41,9 @@ public:
 	// fences
 	HRESULT						IncrementFence();
 	// constant buffer allocation
-	ADDRESS_ID					ReserveConstantBufferVirtualAddress();	// return ID
+	ADDRESS_ID					ReserveConstantBufferVirtualAddress();
 	void						ReleaseConstantBufferVirtualAddress(ADDRESS_ID i_Address);
+	void						UpdateConstantBuffer(ADDRESS_ID i_Address, DefaultConstantBuffer & i_ConstantBuffer);
 	UINT8 *						GetConstantBufferGPUAddress(ADDRESS_ID i_Address) const;
 	D3D12_GPU_VIRTUAL_ADDRESS	GetConstantBufferUploadVirtualAddress(ADDRESS_ID i_Address) const;
 	// pipeline state management
@@ -102,16 +102,16 @@ private:
 	UINT64						m_FenceValue[FRAME_BUFFER_COUNT]; // this value is incremented each frame. each fence will have its own value
 	int							m_FrameIndex; // current render target view we are on
 	int							m_RtvDescriptorSize; // size of the rtv descriptor on the device (all front and back buffers will be the same size)
-	ID3D12RootSignature*		m_RootSignature; // root signature defines data shaders will access
+
+	// Debug
+	ID3D12Debug *				m_DebugController;
 
 	// Depth buffer
 	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial
 	ID3D12DescriptorHeap*		m_DepthStencilDescriptorHeap; // This is a heap for our depth/stencil buffer descriptor
 
-	// Descriptor heap
-
 	// Constant buffer
-	#define  CONSTANT_BUFFER_HEAP_SIZE			128
+	#define  CONSTANT_BUFFER_HEAP_SIZE			32
 	UINT						m_ConstantBufferHeapSize = CONSTANT_BUFFER_HEAP_SIZE;
 	ID3D12DescriptorHeap *		m_MainDescriptorHeap[FRAME_BUFFER_COUNT];
 	ID3D12Resource *			m_ConstantBufferUploadHeap[FRAME_BUFFER_COUNT];	// memory where constant buffers for each frame will be placed
@@ -123,7 +123,8 @@ private:
 	DX12Shader *				m_DefaultVertexShader;
 
 	// Pipeline state
-	ID3D12PipelineState *		m_DefaultPipelineState;
+	ID3D12PipelineState *		m_DefaultPipelineState;	// pipeline state that define all rendering process
+	ID3D12RootSignature*		m_DefaultRootSignature; // root signature defines data shaders will access
 
 	// Render
 	D3D12_VIEWPORT				m_Viewport; // area that output from rasterizer will be stretched to.

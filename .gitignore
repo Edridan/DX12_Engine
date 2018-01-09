@@ -10,10 +10,14 @@
 *.tlog
 *.db
 *.opendb
+*.TMP
+.vs/DX12_Sampler/v14/.suo
 
-# Compilation
+
+# Compilation files
 DX12_Sampler/x64/Debug/*
 x64/Debug/*
+
 
 # Precompiled Headers
 *.gch

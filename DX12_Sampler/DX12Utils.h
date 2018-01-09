@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <DirectXMath.h>
 
 // release and delete macros
 #define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
