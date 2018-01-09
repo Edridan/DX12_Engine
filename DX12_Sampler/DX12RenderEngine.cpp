@@ -522,6 +522,10 @@ void DX12RenderEngine::UpdateConstantBuffer(ADDRESS_ID i_Address, DefaultConstan
 		// copy data to the constant buffer
 		memcpy(m_ConstantBufferGPUAdress[m_FrameIndex] + (i_Address * ConstantBufferPerObjectAlignedSize), &i_ConstantBuffer, sizeof(DefaultConstantBuffer));
 	}
+	else
+	{
+		DX12RenderEngine::GetInstance().PopUpError(L"Error trying to update non reserved address");
+	}
 }
 
 UINT8 * DX12RenderEngine::GetConstantBufferGPUAddress(ADDRESS_ID i_Address) const
@@ -718,48 +722,3 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 
 	return S_OK;
 }
-
-// to delete
-
-/*	ZeroMemory(&m_ConstantBufferGPUAdress, sizeof(m_ConstantBufferGPUAdress));
-
-	for (int i = 0; i < m_FrameBufferCount; ++i)
-	{
-		D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-		heapDesc.NumDescriptors = 1;
-		heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		hr = m_Device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_MainDescriptorHeap[i]));
-		if (FAILED(hr))
-		{
-			DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateDescriptorHeap");
-		}
-	}
-
-	// create resource heap
-	for (int i = 0; i < m_FrameBufferCount; ++i)
-	{
-		CD3DX12_RANGE readRange(0, 0);    // We do not intend to read from this resource on the CPU. (so end is less than or equal to begin)
-
-		// create constant buffer upload heap
-		hr = m_Device->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // this heap will be used to upload the constant buffer data
-			D3D12_HEAP_FLAG_NONE, // no flags
-			&CD3DX12_RESOURCE_DESC::Buffer(m_ConstantBufferHeapSize * 64), // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
-			D3D12_RESOURCE_STATE_GENERIC_READ, // will be data that is read from so we keep it in the generic read state
-			nullptr, // we do not have use an optimized clear value for constant buffers
-			IID_PPV_ARGS(&m_ConstantBufferUploadHeap[i]));
-
-		m_ConstantBufferUploadHeap[i]->SetName(L"Constant Buffer Upload Resource Heap");
-		hr = m_ConstantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_ConstantBufferGPUAdress[i]));
-
-		if (FAILED(hr))
-		{
-			DX12RenderEngine::GetInstance().PopUpError(L"Error Map constant buffer");
-		}
-	}
-
-
-
-	
-*/
