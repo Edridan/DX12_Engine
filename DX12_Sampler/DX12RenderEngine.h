@@ -11,6 +11,9 @@
 #include "DX12Window.h"
 #include "DX12Shader.h"
 
+// define
+#define DEBUG_DX12_ENABLE		1
+
 enum PiplineStateFlags
 {
 	eDefault			= 0 << 0,
@@ -63,6 +66,8 @@ public:
 	ID3D12RootSignature*			GetRootSignature() const;
 	ID3D12CommandQueue*				GetCommandQueue() const;
 	const DXGI_SWAP_CHAIN_DESC &	GetSwapChainDesc() const;
+	bool							IsDX12DebugEnabled() const;
+
 
 	// Error management
 	void			PopUpError(const wchar_t * i_Message);

@@ -88,6 +88,19 @@ bool GameScene::DeleteGameObject(GameObject * i_GameObject, bool i_DeleteChild)
 	return false;
 }
 
+void GameScene::UpdateScene(float i_ElapsedTime) const
+{
+	auto itr = m_RootGameObjects.begin();
+
+	while (itr != m_RootGameObjects.end())
+	{
+		GameObject * gameObject = (*itr);
+		gameObject->Update(i_ElapsedTime);
+
+		++itr;
+	}
+}
+
 void GameScene::RenderScene() const
 {
 	// Render stuff here

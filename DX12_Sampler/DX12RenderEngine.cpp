@@ -5,6 +5,11 @@
 #include "d3dx12.h"
 #include "DX12Mesh.h"
 
+
+#if (DEBUG_DX12_ENABLE) && defined(_DEBUG)
+#define DX12_DEBUG
+#endif
+
 // Static definition implementation
 DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
 const int DX12RenderEngine::ConstantBufferPerObjectAlignedSize = (sizeof(DefaultConstantBuffer) + 255) & ~255;
@@ -36,7 +41,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	// -- Debug -- //
 
-#ifdef _DEBUG
+#ifdef DX12_DEBUG
 	hr = D3D12GetDebugInterface(IID_PPV_ARGS(&m_DebugController));
 
 	if (FAILED(hr))
@@ -526,7 +531,7 @@ UINT8 * DX12RenderEngine::GetConstantBufferGPUAddress(ADDRESS_ID i_Address) cons
 
 D3D12_GPU_VIRTUAL_ADDRESS DX12RenderEngine::GetConstantBufferUploadVirtualAddress(ADDRESS_ID i_Address) const
 {
-	if (m_ConstantBufferReservedAddress[i_Address] == false)
+	if (m_ConstantBufferReservedAddress[i_Address] == false || (i_Address == UnavailableAdressId))
 	{
 		DX12RenderEngine::GetInstance().PopUpError(L"Error using a non reserved address for constant buffer");
 	}
@@ -610,6 +615,15 @@ ID3D12CommandQueue * DX12RenderEngine::GetCommandQueue() const
 const DXGI_SWAP_CHAIN_DESC & DX12RenderEngine::GetSwapChainDesc() const
 {
 	return m_SwapChainDesc;
+}
+
+bool DX12RenderEngine::IsDX12DebugEnabled() const
+{
+#ifdef DX12_DEBUG
+	return true;
+#else
+	return false;
+#endif
 }
 
 DX12Window & DX12RenderEngine::GetWindow()

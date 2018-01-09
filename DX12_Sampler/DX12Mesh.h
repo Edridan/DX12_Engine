@@ -38,6 +38,7 @@ public:
 
 	// Management
 	void		Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineState*  i_Pso);
+	void		Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineState*  i_Pso, D3D12_GPU_VIRTUAL_ADDRESS i_ConstantBufferAddress);
 
 	// Get/Set
 	const D3D12_INPUT_LAYOUT_DESC & GetInputLayoutDesc() const;

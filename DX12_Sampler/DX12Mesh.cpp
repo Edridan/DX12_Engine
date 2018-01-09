@@ -345,10 +345,11 @@ DX12Mesh::~DX12Mesh()
 	}
 }
 
-void DX12Mesh::Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineState * i_Pso)
+inline void DX12Mesh::Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineState * i_Pso)
 {
 	if (i_Pso == nullptr)
 	{
+		DX12RenderEngine::GetInstance().PopUpError(L"Try to draw a mesh without specifying Pipeline State Object");
 		return;
 	}
 
@@ -370,6 +371,15 @@ void DX12Mesh::Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineStat
 	{
 		i_CommandList->DrawInstanced(count, 1, 0, 0); 
 	}
+}
+
+void DX12Mesh::Draw(ID3D12GraphicsCommandList * i_CommandList, ID3D12PipelineState * i_Pso, D3D12_GPU_VIRTUAL_ADDRESS i_ConstantBufferAddress)
+{
+	// setup the graphic root constant buffer
+	i_CommandList->SetGraphicsRootConstantBufferView(0, i_ConstantBufferAddress);
+
+	// draw the buffer
+	Draw(i_CommandList, i_Pso);
 }
 
 const D3D12_INPUT_LAYOUT_DESC & DX12Mesh::GetInputLayoutDesc() const

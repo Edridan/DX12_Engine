@@ -17,21 +17,30 @@ GameObject::~GameObject()
 {
 }
 
+void GameObject::Update(float i_ElapsedTime)
+{
+
+}
+
 void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 {
 	if (NeedRendering())
 	{
+		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
 		// update the model view transform matrix
+		DX12RenderEngine::DefaultConstantBuffer constantBuffer;
 		DX12Camera & cam = m_Scene->GetMainCamera();
 
 		XMMATRIX viewMat = XMLoadFloat4x4(&cam.GetViewMatrix()); // load view matrix
 		XMMATRIX projMat = XMLoadFloat4x4(&cam.GetProjMatrix()); // load projection matrix
 		XMMATRIX mvpMatrix = GetWorldTransform() * viewMat * projMat; // create mvp matrix
 
-		//XMStoreFloat4x4(&m_ConstantBuffer.m_ModelViewProjMat, mvpMatrix);
+		XMStoreFloat4x4(&constantBuffer.m_Model, mvpMatrix);
+		DX12RenderEngine::GetInstance().UpdateConstantBuffer(m_ConstBuffer, constantBuffer);
 
 		// draw
-		m_Mesh->Draw(i_CommandList, m_PipelineState);
+		m_Mesh->Draw(i_CommandList, m_PipelineState, render.GetConstantBufferUploadVirtualAddress(m_ConstBuffer));
 	}
 
 	auto itr = m_Child.begin();
@@ -47,7 +56,7 @@ void GameObject::SetMesh(DX12Mesh * i_Mesh, ID3D12PipelineState * i_PipelineStat
 	m_Mesh = i_Mesh;
 	m_PipelineState = i_PipelineState;
 
-	if (i_Mesh && m_ConstBuffer != ((ADDRESS_ID)-1))
+	if (i_Mesh && (m_ConstBuffer == UnavailableAdressId))
 	{
 		// map gpu const buffer address if necessary
 		m_ConstBuffer = DX12RenderEngine::GetInstance().ReserveConstantBufferVirtualAddress();

@@ -18,3 +18,5 @@
 
 // Type definition
 typedef UINT64 ADDRESS_ID;
+
+const ADDRESS_ID UnavailableAdressId = ((ADDRESS_ID)-1);
