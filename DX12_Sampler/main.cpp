@@ -45,6 +45,7 @@ int WINAPI WinMain(HINSTANCE hInstance,    //Main windows function
 		renderEngine.PrepareForRender();
 
 		// Render stuff here
+		game.UpdateScene(0.f);
 		game.RenderScene();
 
 		// Execute command list

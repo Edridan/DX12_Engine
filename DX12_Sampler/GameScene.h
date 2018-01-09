@@ -17,7 +17,7 @@ public:
 	bool				DeleteGameObject(GameObject * i_GameObject, bool i_DeleteChild = true);
 
 	// Render scene
-	void				UpdateScene(float i_ElapsedTime) const;
+	void				UpdateScene(float i_ElapsedTime);
 	void				RenderScene() const;
 	DX12Camera &		GetMainCamera();
 

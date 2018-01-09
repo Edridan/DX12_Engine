@@ -376,10 +376,33 @@ inline void DX12Mesh::Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12Pipel
 void DX12Mesh::Draw(ID3D12GraphicsCommandList * i_CommandList, ID3D12PipelineState * i_Pso, D3D12_GPU_VIRTUAL_ADDRESS i_ConstantBufferAddress)
 {
 	// setup the graphic root constant buffer
+
+	if (i_Pso == nullptr)
+	{
+		DX12RenderEngine::GetInstance().PopUpError(L"Try to draw a mesh without specifying Pipeline State Object");
+		return;
+	}
+
+	const UINT count = m_HaveIndex ? m_IndexCount : m_VerticesCount;
+
+	//i_CommandList->SetGraphicsRootConstantBufferView(0, constantBufferUploadHeaps[frameIndex]->GetGPUVirtualAddress() + ConstantBufferPerObjectAlignedSize);
+	i_CommandList->SetGraphicsRootSignature(DX12RenderEngine::GetInstance().GetRootSignature()); // set the root signature
 	i_CommandList->SetGraphicsRootConstantBufferView(0, i_ConstantBufferAddress);
 
-	// draw the buffer
-	Draw(i_CommandList, i_Pso);
+	i_CommandList->SetPipelineState(i_Pso);
+
+	i_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
+	i_CommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView); // set the vertex buffer (using the vertex buffer view)
+
+	if (m_HaveIndex)
+	{
+		i_CommandList->IASetIndexBuffer(&m_IndexBufferView);
+		i_CommandList->DrawIndexedInstanced(count, 1, 0, 0, 0);
+	}
+	else
+	{
+		i_CommandList->DrawInstanced(count, 1, 0, 0);
+	}
 }
 
 const D3D12_INPUT_LAYOUT_DESC & DX12Mesh::GetInputLayoutDesc() const

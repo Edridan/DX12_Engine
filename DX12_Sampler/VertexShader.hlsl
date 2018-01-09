@@ -18,15 +18,7 @@ cbuffer ConstantBuffer : register(b0)
 VS_OUTPUT main(VS_INPUT input)
 {
 	VS_OUTPUT output;
-	float4 pos = input.pos;
-	
-	// model view projection calculation
-	/*pos = mul(pos, model);
-	pos = mul(pos, view);
-	pos = mul(pos, projection);*/
-
-	output.pos = pos;
+	output.pos = mul(input.pos, wvpMat);
 	output.color = input.color;
-	
 	return output;
 }

@@ -88,8 +88,11 @@ bool GameScene::DeleteGameObject(GameObject * i_GameObject, bool i_DeleteChild)
 	return false;
 }
 
-void GameScene::UpdateScene(float i_ElapsedTime) const
+void GameScene::UpdateScene(float i_ElapsedTime)
 {
+	// Update camera
+	m_Camera.Update();
+
 	auto itr = m_RootGameObjects.begin();
 
 	while (itr != m_RootGameObjects.end())
