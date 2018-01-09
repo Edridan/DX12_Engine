@@ -9,6 +9,11 @@
 # Visual Studio files
 *.tlog
 *.db
+*.opendb
+
+# Compilation
+DX12_Sampler/x64/Debug/*
+x64/Debug/*
 
 # Precompiled Headers
 *.gch
@@ -33,3 +38,5 @@
 *.exe
 *.out
 *.app
+
+
