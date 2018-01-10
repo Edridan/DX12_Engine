@@ -35,7 +35,9 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 		XMMATRIX projMat = XMLoadFloat4x4(&cam.GetProjMatrix()); // load projection matrix
 		XMMATRIX mvpMatrix = GetWorldTransform() * viewMat * projMat; // create mvp matrix
 
-		XMStoreFloat4x4(&constantBuffer.m_Model, mvpMatrix);
+		// update data into the const buffer
+		XMStoreFloat4x4(&constantBuffer.m_Transform, mvpMatrix);
+
 		DX12RenderEngine::GetInstance().UpdateConstantBuffer(m_ConstBuffer, constantBuffer);
 
 		// draw

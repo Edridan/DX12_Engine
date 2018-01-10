@@ -10,15 +10,20 @@ struct VS_OUTPUT
 	float4 color: COLOR;
 };
 
+// b0 buffer
 cbuffer ConstantBuffer : register(b0)
 {
-	float4x4 wvpMat;
+	float4x4 transform;
 };
 
 VS_OUTPUT main(VS_INPUT input)
 {
 	VS_OUTPUT output;
-	output.pos = mul(input.pos, wvpMat);
+	float4 pos = input.pos;
+
+	// Transform the vertex position into projected space.
+	output.pos = mul(input.pos, transform);
 	output.color = input.color;
+	
 	return output;
 }

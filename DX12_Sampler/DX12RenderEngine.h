@@ -27,7 +27,7 @@ public:
 	// Constant buffer definition
 	struct DefaultConstantBuffer
 	{
-		DirectX::XMFLOAT4X4		m_Model;
+		DirectX::XMFLOAT4X4		m_Transform;
 	};
 
 	// Singleton

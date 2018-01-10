@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "d3dx12.h"
 #include "DX12Mesh.h"
+#include "resource.h"	// default icon resource
 
 
 #if (DEBUG_DX12_ENABLE) && defined(_DEBUG)
@@ -363,8 +364,8 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	m_Viewport.TopLeftX = 0;
 	m_Viewport.TopLeftY = 0;
-	m_Viewport.Width = m_Window.GetWidth();
-	m_Viewport.Height = m_Window.GetHeight();
+	m_Viewport.Width = (FLOAT)m_Window.GetWidth();
+	m_Viewport.Height = (FLOAT)m_Window.GetHeight();
 	m_Viewport.MinDepth = 0.0f;
 	m_Viewport.MaxDepth = 1.0f;
 
@@ -649,7 +650,7 @@ void DX12RenderEngine::UpdateWindow()
 }
 
 DX12RenderEngine::DX12RenderEngine(HINSTANCE & i_HInstance)
-	:m_Window(i_HInstance, L"DX12 Engine", L"DX12 Engine", 1600, 900)
+	:m_Window(i_HInstance, L"DX12 Engine", L"DX12 Engine", 1600, 900, DX12Window::Icon((LPWSTR)IDI_ICON1, 32, 32))
 {
 }
 

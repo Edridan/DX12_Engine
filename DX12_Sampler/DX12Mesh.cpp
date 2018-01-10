@@ -99,6 +99,11 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	return returnMesh;
 }
 
+DX12Mesh * DX12Mesh::LoadMesh(const char * i_Filename)
+{
+	return nullptr;
+}
+
 // Mesh implementation
 
 DX12Mesh::DX12Mesh(Vertex * i_Vertices, UINT i_VerticeCount)

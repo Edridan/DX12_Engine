@@ -2,32 +2,59 @@
 #include <DirectXMath.h>
 
 #include "d3dx12.h"
+#include "resource.h"
+
 
 struct Vertex {
 	DirectX::XMFLOAT3 pos;
 };
 
-DX12Window::DX12Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_t * i_WindowTitle, UINT i_Width, UINT i_Height)
+
+DX12Window::DX12Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_t * i_WindowTitle, UINT i_Width, UINT i_Height, Icon i_Icon)
 	:m_hInstance(i_hInstance)
 	,m_Hwnd(nullptr)
 	,m_Width(i_Width)
 	,m_Height(i_Height)
 	,m_Fullscreen(false)
+	,m_Icon(nullptr)
 {
-
 	// Window class definition
-	m_WindowClassX.cbSize = sizeof(WNDCLASSEX);
-	m_WindowClassX.style = CS_HREDRAW | CS_VREDRAW;
-	m_WindowClassX.lpfnWndProc = DX12Window::WndProc;
-	m_WindowClassX.cbClsExtra = NULL;
-	m_WindowClassX.cbWndExtra = NULL;
-	m_WindowClassX.hInstance = m_hInstance;
-	m_WindowClassX.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	m_WindowClassX.hCursor = LoadCursor(NULL, IDC_ARROW);
-	m_WindowClassX.hbrBackground = (HBRUSH)(COLOR_WINDOW + 2);
-	m_WindowClassX.lpszMenuName = NULL;
-	m_WindowClassX.lpszClassName = i_WindowName;
-	m_WindowClassX.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+	m_WindowClassX.cbSize			= sizeof(WNDCLASSEX);
+	m_WindowClassX.style			= CS_HREDRAW | CS_VREDRAW;
+	m_WindowClassX.lpfnWndProc		= DX12Window::WndProc;
+	m_WindowClassX.cbClsExtra		= NULL;
+	m_WindowClassX.cbWndExtra		= NULL;
+	m_WindowClassX.hInstance		= m_hInstance;
+	m_WindowClassX.hCursor			= LoadCursor(NULL, IDC_ARROW);
+	m_WindowClassX.hbrBackground	= (HBRUSH)(COLOR_WINDOW + 2);
+	m_WindowClassX.lpszMenuName		= NULL;
+	m_WindowClassX.lpszClassName	= i_WindowName;
+
+	if (i_Icon.m_Resource != NULL)
+	{
+		// load icon
+		m_Icon = LoadIcon(m_hInstance, MAKEINTRESOURCE(i_Icon.m_Resource));
+
+		if (m_Icon)
+		{
+			m_WindowClassX.hIconSm = m_Icon;
+			m_WindowClassX.hIcon = m_Icon;
+		}
+		else
+		{
+			MessageBox(NULL, L"Error loading icon",
+				L"Error", MB_OK | MB_ICONERROR);
+		}
+	}
+
+
+	// Setup icon
+	if (m_Icon == NULL)
+	{
+		m_WindowClassX.hIconSm	= LoadIcon(NULL, IDI_APPLICATION);
+		m_WindowClassX.hIcon	= LoadIcon(NULL, IDI_APPLICATION);
+
+	}
 
 	// Error handler
 	if (!RegisterClassEx(&m_WindowClassX))

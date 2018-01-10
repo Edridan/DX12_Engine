@@ -11,7 +11,7 @@ GameScene::GameScene()
 	,m_RootGameObjects()
 {
 	// create default camera
-	m_Camera.m_Position = XMFLOAT4(0.f, 0.f, -1.f, 0.f);
+	m_Camera.m_Position = XMFLOAT4(1.f, 0.f, -1.f, 0.f);
 	m_Camera.m_Target = XMFLOAT4(0.f, 0.f, 0.f, 0.f);
 	m_Camera.m_Up = XMFLOAT4(0.f, 1.f, 0.f, 0.f);
 }

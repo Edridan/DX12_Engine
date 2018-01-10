@@ -25,6 +25,15 @@
     <Filter Include="Header Files\Game">
       <UniqueIdentifier>{a372c1ad-bd63-4c6c-8d80-d13987fbd013}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders">
+      <UniqueIdentifier>{b7083b0a-8f2e-463d-a8c5-e40542779e02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Icon">
+      <UniqueIdentifier>{d718eeac-b874-4504-8c31-94cf00d632ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Resources">
+      <UniqueIdentifier>{f4ebb7aa-5008-4d7f-b491-e636c752ce80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DX12Camera.cpp">
@@ -55,7 +64,7 @@
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Transform.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,13 +101,26 @@
     <ClInclude Include="Transform.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="VertexShader.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
     <FxCompile Include="PixelShader.hlsl">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico">
+      <Filter>Resource Files\Icon</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DX12_Sampler.rc">
+      <Filter>Resource Files\Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

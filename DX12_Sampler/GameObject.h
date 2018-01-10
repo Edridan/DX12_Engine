@@ -39,8 +39,8 @@ private:
 	GameObject(GameScene * const i_Scene);
 	~GameObject();
 
-	void		Update(float i_ElapsedTime);
-	void		Render(ID3D12GraphicsCommandList* i_CommandList);
+	virtual void	Update(float i_ElapsedTime);
+	void			Render(ID3D12GraphicsCommandList* i_CommandList);
 
 	// game object attributes
 	// rendering pipeline stuff
