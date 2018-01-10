@@ -8,6 +8,7 @@
 // Game
 #include "GameScene.h"
 #include "GameObject.h"
+#include "Clock.h"
 
 // DX12
 #include <DirectXMath.h>
@@ -29,6 +30,7 @@ int WINAPI WinMain(HINSTANCE hInstance,    //Main windows function
 
 	// Initialize game scene
 	GameScene game;
+	Clock time;	// time for frame
 
 	DX12Mesh * mesh = DX12Mesh::GeneratePrimitiveMesh(DX12Mesh::ePlane);
 	GameObject * gameObject = game.CreateGameObject();
@@ -36,16 +38,17 @@ int WINAPI WinMain(HINSTANCE hInstance,    //Main windows function
 
 	while (renderEngine.GetWindow().IsOpen())
 	{
+		float elapsedTime = time.Restart().ToSeconds();
 		// Update inputs and window position, and prepare command list to render
 		renderEngine.UpdateWindow();
 
 		// Update logic of the engine
+		game.UpdateScene(elapsedTime);
 
-		// Render
+		// prepare buffer and command list for rendering
 		renderEngine.PrepareForRender();
 
-		// Render stuff here
-		game.UpdateScene(0.f);
+		// render objects on the scene
 		game.RenderScene();
 
 		// Execute command list

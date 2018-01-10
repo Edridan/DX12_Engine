@@ -10,7 +10,6 @@ Transform::~Transform()
 
 XMMATRIX Transform::GetMatrix() const
 {
-
-
+	
 	return XMMATRIX();
 }

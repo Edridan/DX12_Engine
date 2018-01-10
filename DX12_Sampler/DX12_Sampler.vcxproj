@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Clock.cpp" />
     <ClCompile Include="DX12Camera.cpp" />
     <ClCompile Include="DX12Mesh.cpp" />
     <ClCompile Include="DX12ConstantBuffer.cpp" />
@@ -160,10 +161,12 @@
     <ClCompile Include="DX12Window.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Clock.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="DX12Camera.h" />
     <ClInclude Include="DX12Mesh.h" />
@@ -174,8 +177,10 @@
     <ClInclude Include="DX12Window.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
@@ -201,6 +206,14 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX12_Sampler.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="resources\obj\lowpolytree.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

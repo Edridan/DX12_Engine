@@ -34,6 +34,15 @@
     <Filter Include="Resource Files\Resources">
       <UniqueIdentifier>{f4ebb7aa-5008-4d7f-b491-e636c752ce80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Lib">
+      <UniqueIdentifier>{1ce74116-253d-47bf-a311-a98d6b481269}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lib\TinyObjLoader">
+      <UniqueIdentifier>{cd65e061-84f0-4d89-9691-72f24a804238}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Obj">
+      <UniqueIdentifier>{f6d7d661-ffbd-4cba-87ce-0e7c964f8932}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DX12Camera.cpp">
@@ -64,6 +73,12 @@
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="Transform.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
+      <Filter>Lib\TinyObjLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="Clock.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -104,6 +119,15 @@
     <ClInclude Include="resource.h">
       <Filter>Resource Files\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
+      <Filter>Lib\TinyObjLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Clock.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">
@@ -122,5 +146,10 @@
     <ResourceCompile Include="DX12_Sampler.rc">
       <Filter>Resource Files\Resources</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="resources\obj\lowpolytree.obj">
+      <Filter>Resource Files\Obj</Filter>
+    </Object>
   </ItemGroup>
 </Project>
