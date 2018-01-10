@@ -572,6 +572,13 @@ void DX12RenderEngine::PopUpError(const wchar_t * i_Message)
 	DEBUG_BREAK;
 }
 
+void DX12RenderEngine::PopUpWarning(const wchar_t * i_Message)
+{
+	MessageBox(NULL, i_Message,
+		L"Warning", MB_OK | MB_ICONWARNING);
+	DEBUG_BREAK;
+}
+
 int DX12RenderEngine::GetFrameIndex() const
 {
 	return m_FrameIndex;

@@ -19,7 +19,6 @@ GameObject::~GameObject()
 
 void GameObject::Update(float i_ElapsedTime)
 {
-
 }
 
 void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
