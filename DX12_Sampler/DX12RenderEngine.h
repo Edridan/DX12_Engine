@@ -72,6 +72,7 @@ public:
 	// Error management
 	void			PopUpError(const wchar_t * i_Message);
 	void			PopUpWarning(const wchar_t * i_Message);
+	void			PrintMessage(const char * i_Message);
 
 	// Engine
 	DX12Window &					GetWindow();

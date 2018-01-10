@@ -580,6 +580,11 @@ void DX12RenderEngine::PopUpWarning(const wchar_t * i_Message)
 	DEBUG_BREAK;
 }
 
+void DX12RenderEngine::PrintMessage(const char * i_Message)
+{
+	OutputDebugStringA(i_Message);
+}
+
 int DX12RenderEngine::GetFrameIndex() const
 {
 	return m_FrameIndex;

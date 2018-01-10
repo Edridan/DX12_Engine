@@ -30,7 +30,7 @@ public:
 	};
 	// Factory
 	static DX12Mesh *	GeneratePrimitiveMesh(EPrimitiveMesh i_Prim);
-	static DX12Mesh *	LoadMesh(const char * i_Filename);
+	static DX12Mesh *	LoadMesh(const char * i_Filename, const char * i_Folder = nullptr);
 
 	// Mesh
 	DX12Mesh(Vertex * i_Vertices, UINT i_VerticeCount);

@@ -1,8 +1,15 @@
 #include "DX12Mesh.h"
+#include "DX12RenderEngine.h"
 
 #include "d3dx12.h"
+#include "Clock.h"
 
-#include "DX12RenderEngine.h"
+#include <sstream>
+#include <algorithm>
+
+// mesh loader
+#include "lib/tinyobjloader/tiny_obj_loader.h"
+
 
 #define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
 
@@ -99,8 +106,46 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	return returnMesh;
 }
 
-DX12Mesh * DX12Mesh::LoadMesh(const char * i_Filename)
+DX12Mesh * DX12Mesh::LoadMesh(const char * i_Filename, const char * i_Folder)
 {
+	tinyobj::attrib_t					attrib;
+	std::vector<tinyobj::shape_t>		shapes;
+	std::vector<tinyobj::material_t>	material;
+
+	std::string error;
+	Clock timer;
+	timer.Restart();
+
+	// load the model
+	bool ret = tinyobj::LoadObj(&attrib, &shapes, &material, &error, i_Filename, i_Folder);
+	float loadTime = timer.GetElaspedTime().ToSeconds();
+
+#ifdef _DEBUG
+	// display debug message
+	std::replace(error.begin(), error.end(), '\n', ' ');
+	std::ostringstream stream;
+	stream << i_Filename << " : load time (" << loadTime << ")" << std::endl << error << std::endl;
+	std::string message(stream.str());
+	DX12RenderEngine::GetInstance().PrintMessage(message.c_str());
+#else
+	if (!ret)
+	{
+		// display error message
+		std::replace(error.begin(), error.end(), '\n', ' ');
+		DX12RenderEngine::GetInstance().PrintMessage(error.c_str());
+		return nullptr;
+	}
+#endif
+
+	// Create buffer
+	UINT64 verticeCount = (attrib.vertices.size() / 3);
+	UINT64 shapesCount = shapes.size();
+
+	// create padding array and put them into a buffer
+
+
+
+
 	return nullptr;
 }
 
