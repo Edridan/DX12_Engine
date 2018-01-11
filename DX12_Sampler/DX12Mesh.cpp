@@ -137,14 +137,6 @@ DX12Mesh * DX12Mesh::LoadMesh(const char * i_Filename, const char * i_Folder)
 	}
 #endif
 
-	// Create buffer
-	UINT64 verticeCount = (attrib.vertices.size() / 3);
-	UINT64 shapesCount = shapes.size();
-
-	// create padding array and put them into a buffer
-
-
-
 
 	return nullptr;
 }
