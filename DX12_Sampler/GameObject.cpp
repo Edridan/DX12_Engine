@@ -71,6 +71,8 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 
 void GameObject::SetMesh(DX12Mesh * i_Mesh, ID3D12PipelineState * i_PipelineState)
 {
+	if (i_Mesh == nullptr)	return;
+
 	// setup the root mesh into the game object
 	SetMeshBuffer(i_Mesh->GetRootMesh(), i_PipelineState);
 
