@@ -1,14 +1,9 @@
 #include "DX12Window.h"
 #include <DirectXMath.h>
+#include <windowsx.h>
 
 #include "d3dx12.h"
 #include "resource.h"
-
-
-struct Vertex {
-	DirectX::XMFLOAT3 pos;
-};
-
 
 DX12Window::DX12Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_t * i_WindowTitle, UINT i_Width, UINT i_Height, Icon i_Icon)
 	:m_hInstance(i_hInstance)
@@ -120,12 +115,20 @@ LRESULT CALLBACK DX12Window::WndProc(HWND hwnd,
 
 		PostQuitMessage(0);
 		return 0;
+	case WM_MOUSEMOVE:
+		window->RegisterMouseMove(IntVec2(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+		break;
 	}
 
 	return DefWindowProc(hwnd,
 		msg,
 		wParam,
 		lParam);
+}
+
+void DX12Window::RegisterMouseMove(const IntVec2 & i_Movement)
+{
+
 }
 
 void DX12Window::Update()
@@ -167,6 +170,11 @@ UINT DX12Window::GetHeight() const
 HWND DX12Window::GetHWnd() const
 {
 	return m_Hwnd;
+}
+
+IntVec2 DX12Window::GetMouseMove() const
+{
+	return IntVec2();
 }
 
 DX12Window::~DX12Window()

@@ -32,6 +32,15 @@ const DirectX::XMFLOAT3 Vec3Right	= { 1.f, 0.f, 0.f };
 const FLOAT Zero	= 0.f;
 const FLOAT One		= 1.f;
 
+// struct
+struct IntVec2
+{
+	int x, y;
+	IntVec2() :x(0), y(0) {};
+	IntVec2(int i_X, int i_Y) :x(i_X), y(i_Y) {};
+};
+
+
 // Helpers
 // return the size of an DXGI_FORMAT element
 UINT SizeOfFormatElement(DXGI_FORMAT i_Format);

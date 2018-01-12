@@ -49,31 +49,37 @@ void DX12Camera::Update(FLOAT i_ElapsedTime)
 		DX12Window & window = DX12RenderEngine::GetInstance().GetWindow();
 
 		// forward/backward
-		if		(GetAsyncKeyState('Z'))		velocity.x = speed;
-		else if (GetAsyncKeyState('S'))		velocity.x = -speed;
+		if		(GetAsyncKeyState('Z'))		velocity.z = speed;
+		else if (GetAsyncKeyState('S'))		velocity.z = -speed;
 		// right/left
-		if		(GetAsyncKeyState('D'))		velocity.y = speed;
-		else if (GetAsyncKeyState('Q'))		velocity.y = -speed;
+		if		(GetAsyncKeyState('D'))		velocity.x = speed;
+		else if (GetAsyncKeyState('Q'))		velocity.x = -speed;
 		// up/down
-		if		(GetAsyncKeyState('E'))		velocity.z = speed;
-		else if (GetAsyncKeyState('A'))		velocity.z = -speed;
+		if		(GetAsyncKeyState('E'))		velocity.y = speed;
+		else if (GetAsyncKeyState('A'))		velocity.y = -speed;
 
 		// create velocity
-		XMVECTOR cVelocity = XMLoadFloat3(&velocity) * cForward;
+		DirectX::XMVECTOR cVelocity = XMLoadFloat3(&velocity);
+		cVelocity = cForward * velocity.z;
+		cVelocity += cRight * velocity.x;
+		cVelocity += cUp * velocity.y;
+
+
 		cVelocity *= i_ElapsedTime;
 
 #ifdef _DEBUG
 		// debug values
-		XMFLOAT3 dVelocity;
+		DirectX::XMFLOAT3 dVelocity;
 		XMStoreFloat3(&dVelocity, cVelocity);
 #endif
 
 		// update positon of the camera
 		cPos += cVelocity;
+		cTarg += cVelocity;
 
 		// update vectors after transforms to be computed
 		XMStoreFloat4(&m_Position, cPos);
-
+		XMStoreFloat4(&m_Target, cTarg);
 	}
 
 	XMMATRIX tmpMat = XMMatrixLookAtLH(cPos, cTarg, cUp);
