@@ -160,7 +160,6 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 	}
 #endif
 
-
 	// load mesh information and create the stream
 	DX12Mesh * mesh = new DX12Mesh;
 
