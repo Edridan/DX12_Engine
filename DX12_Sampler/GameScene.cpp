@@ -14,6 +14,9 @@ GameScene::GameScene()
 	m_Camera.m_Position = XMFLOAT4(1.f, 0.f, -1.f, 0.f);
 	m_Camera.m_Target = XMFLOAT4(0.f, 0.f, 0.f, 0.f);
 	m_Camera.m_Up = XMFLOAT4(0.f, 1.f, 0.f, 0.f);
+
+	// debug mode activated
+	m_Camera.SetFreecamEnabled(true);
 }
 
 GameScene::~GameScene()
@@ -95,7 +98,7 @@ bool GameScene::DeleteGameObject(GameObject * i_GameObject, bool i_DeleteChild)
 void GameScene::UpdateScene(float i_ElapsedTime)
 {
 	// Update camera
-	m_Camera.Update();
+	m_Camera.Update(i_ElapsedTime);
 
 	auto itr = m_RootGameObjects.begin();
 

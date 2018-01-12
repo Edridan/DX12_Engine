@@ -24,6 +24,12 @@ public:
 		UINT		m_Height, m_Width;
 	};
 
+	// Mouse movement
+	struct MouseMove
+	{
+		int		m_X, m_Y;
+	};
+
 	// DX12Window
 	DX12Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName = L"Default", const wchar_t * i_WindowTitle = L"Default", UINT i_Width = 800, UINT i_Height = 600, Icon i_Icon = Icon(L"Default", 0, 0));
 	~DX12Window();

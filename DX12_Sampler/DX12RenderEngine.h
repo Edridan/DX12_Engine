@@ -120,7 +120,7 @@ private:
 	// Constant buffer
 	#define  CONSTANT_BUFFER_HEAP_SIZE			32
 	UINT						m_ConstantBufferHeapSize = CONSTANT_BUFFER_HEAP_SIZE;
-	ID3D12DescriptorHeap *		m_MainDescriptorHeap[FRAME_BUFFER_COUNT];
+	ID3D12DescriptorHeap *		m_MainDescriptorHeap[FRAME_BUFFER_COUNT];	// Warning : unused
 	ID3D12Resource *			m_ConstantBufferUploadHeap[FRAME_BUFFER_COUNT];	// memory where constant buffers for each frame will be placed
 	UINT8 *						m_ConstantBufferGPUAdress[FRAME_BUFFER_COUNT];	// pointer for each of the resource buffer constant heap
 	bool						m_ConstantBufferReservedAddress[CONSTANT_BUFFER_HEAP_SIZE];	// internal constant buffer management

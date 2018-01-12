@@ -731,6 +731,8 @@ DX12RenderEngine::~DX12RenderEngine()
 		SAFE_RELEASE(m_RenderTargets[i]);
 		SAFE_RELEASE(m_CommandAllocator[i]);
 		SAFE_RELEASE(m_Fences[i]);
+
+		SAFE_RELEASE(m_ConstantBufferUploadHeap[i]);
 	};
 
 	SAFE_RELEASE(m_DefaultRootSignature);

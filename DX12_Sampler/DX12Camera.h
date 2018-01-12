@@ -3,6 +3,7 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include <d3d12.h>
 
 using namespace DirectX;
 
@@ -13,11 +14,9 @@ public:
 	DX12Camera();
 	~DX12Camera();
 
-	// Camera management
-	void			Update();
-
 	// camera management
-	// these are XMFLOAT4 to render directly use the function or translate these vector to XMVECTOR in order to do math
+	void			Update(FLOAT i_ElapsedTime);
+
 	XMFLOAT4	m_Position;
 	XMFLOAT4	m_Target;
 	XMFLOAT4	m_Up;
@@ -25,10 +24,17 @@ public:
 	XMFLOAT4X4	GetViewMatrix() const;
 	XMFLOAT4X4	GetProjMatrix() const;
 
+	// freecam
+	void	SetFreecamEnabled(bool i_Enabled);
+	bool	FreecamIsEnabled() const;
+
 private:
 	// Matrix
 	XMFLOAT4X4	m_Projection;
 	XMFLOAT4X4	m_View;
 
-	
+	// freecam management
+	bool		m_Freecam;
+	FLOAT		m_Yaw, m_Pitch;
+	FLOAT		m_Sensivity;
 };

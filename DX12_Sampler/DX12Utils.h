@@ -23,6 +23,11 @@ typedef UINT64 ADDRESS_ID;
 
 const ADDRESS_ID UnavailableAdressId = ((ADDRESS_ID)-1);
 
+// math
+const DirectX::XMFLOAT3 Vec3Zero	= { 0.f, 0.f, 0.f };
+const DirectX::XMFLOAT3 Vec3One		= { 1.f, 1.f, 1.f };
+const DirectX::XMFLOAT3 Vec3Up		= { 0.f, 1.f, 0.f };
+const DirectX::XMFLOAT3 Vec3Right	= { 1.f, 0.f, 0.f };
 
 const FLOAT Zero	= 0.f;
 const FLOAT One		= 1.f;

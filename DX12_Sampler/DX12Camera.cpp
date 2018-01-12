@@ -6,6 +6,7 @@
 DX12Camera::DX12Camera(XMMATRIX i_Projection)
 	:m_Position(0.f, 0.f, 0.f, 0.f)
 	,m_Target(0.f, 0.f, 1.f, 0.f)
+	,m_Freecam(false)
 {
 	XMStoreFloat4x4(&m_Projection, i_Projection);
 }
@@ -13,6 +14,7 @@ DX12Camera::DX12Camera(XMMATRIX i_Projection)
 DX12Camera::DX12Camera()
 	:m_Position(0.f, 0.f, 0.f, 0.f)
 	,m_Target(0.f, 0.f, 1.f, 0.f)
+	,m_Freecam(false)
 {
 	// build projection matrix
 	DX12Window & wnd = DX12RenderEngine::GetInstance().GetWindow();
@@ -27,12 +29,52 @@ DX12Camera::~DX12Camera()
 {
 }
 
-void DX12Camera::Update()
+void DX12Camera::Update(FLOAT i_ElapsedTime)
 {
 	// build view matrix
 	XMVECTOR cPos = XMLoadFloat4(&m_Position);
 	XMVECTOR cTarg = XMLoadFloat4(&m_Target);
 	XMVECTOR cUp = XMLoadFloat4(&m_Up);
+
+	if (m_Freecam)
+	{
+		// manage free camera
+		DirectX::XMVECTOR cForward = cTarg - cPos;
+		DirectX::XMVECTOR cRight = DirectX::XMVector3Cross(cUp, cForward);
+		cRight = DirectX::XMVector3Normalize(cRight);
+		DirectX::XMFLOAT3 velocity = { 0.f, 0.f, 0.f };
+		const static FLOAT speed = 10.f;
+
+		// retreive the input concerning mouse
+		DX12Window & window = DX12RenderEngine::GetInstance().GetWindow();
+
+		// forward/backward
+		if		(GetAsyncKeyState('Z'))		velocity.x = speed;
+		else if (GetAsyncKeyState('S'))		velocity.x = -speed;
+		// right/left
+		if		(GetAsyncKeyState('D'))		velocity.y = speed;
+		else if (GetAsyncKeyState('Q'))		velocity.y = -speed;
+		// up/down
+		if		(GetAsyncKeyState('E'))		velocity.z = speed;
+		else if (GetAsyncKeyState('A'))		velocity.z = -speed;
+
+		// create velocity
+		XMVECTOR cVelocity = XMLoadFloat3(&velocity) * cForward;
+		cVelocity *= i_ElapsedTime;
+
+#ifdef _DEBUG
+		// debug values
+		XMFLOAT3 dVelocity;
+		XMStoreFloat3(&dVelocity, cVelocity);
+#endif
+
+		// update positon of the camera
+		cPos += cVelocity;
+
+		// update vectors after transforms to be computed
+		XMStoreFloat4(&m_Position, cPos);
+
+	}
 
 	XMMATRIX tmpMat = XMMatrixLookAtLH(cPos, cTarg, cUp);
 
@@ -47,4 +89,14 @@ XMFLOAT4X4 DX12Camera::GetViewMatrix() const
 XMFLOAT4X4 DX12Camera::GetProjMatrix() const
 {
 	return m_Projection;
+}
+
+void DX12Camera::SetFreecamEnabled(bool i_Enabled)
+{
+	m_Freecam = i_Enabled;
+}
+
+bool DX12Camera::FreecamIsEnabled() const
+{
+	return m_Freecam;
 }
