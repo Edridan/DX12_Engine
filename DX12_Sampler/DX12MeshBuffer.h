@@ -3,13 +3,14 @@
 #pragma once
 
 #include <d3d12.h>
+#include <string>
 
 class DX12MeshBuffer
 {
 public:
 	// contructor / destructor
-	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount);
-	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount);
+	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name = L"Unknown");
+	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name = L"Unknown");
 	~DX12MeshBuffer();
 
 	const D3D12_INPUT_LAYOUT_DESC & GetInputLayout() const;
@@ -33,6 +34,8 @@ private:
 	// Buffer view
 	D3D12_VERTEX_BUFFER_VIEW			m_VertexBufferView;
 	D3D12_INDEX_BUFFER_VIEW				m_IndexBufferView;
+	// Other
+	const std::wstring 					m_Name;
 
 	const bool		m_HaveIndex;
 	const UINT		m_Count;	// vertices/index count for drawing

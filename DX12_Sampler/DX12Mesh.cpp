@@ -7,32 +7,39 @@
 
 #include <sstream>
 #include <algorithm>
+#include <codecvt>
 
 // mesh loader
 #include "lib/tinyobjloader/tiny_obj_loader.h"
 
-// Input elements following the vertex struct (DX12Mesh.h)
-const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_DefaultInputElement[] =
+// default input element using the input color
+const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_DefaultInputColor[] =
 {
 	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, (sizeof(float) * 3), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 };
 
 // fill out the default input layout description structure
-D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_DefaultInputLayout =
+D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_DefaultInputColorLayout =
 {
-	s_DefaultInputElement,
-	sizeof(DX12Mesh::s_DefaultInputElement) / sizeof(D3D12_INPUT_ELEMENT_DESC)
+	s_DefaultInputColor,
+	sizeof(DX12Mesh::s_DefaultInputColor) / sizeof(D3D12_INPUT_ELEMENT_DESC)
 };
 
-/*
-struct Vertex
+// default input element using the input normal
+const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_DefaultInputNormal[] =
 {
-	// Vertice definition
-	DirectX::XMFLOAT3 m_Pos;	// float x, float y, float z
-	DirectX::XMFLOAT4 m_Color;	// float x, float y, float z, float a
+	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, (sizeof(float) * 3), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 };
-*/
+
+// fill out the default input layout description structure
+D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_DefaultInputNormalLayout =
+{
+	s_DefaultInputNormal,
+	sizeof(DX12Mesh::s_DefaultInputNormal) / sizeof(D3D12_INPUT_ELEMENT_DESC)
+};
+
 
 /*
  *	Mesh primitive buffers
@@ -103,15 +110,15 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	switch (i_Prim)
 	{
 	case ePlane:
-		returnMesh = new DX12Mesh(s_DefaultInputLayout, 
+		returnMesh = new DX12Mesh(s_DefaultInputColorLayout,
 			reinterpret_cast<BYTE*>(vPlane), 4u, iPlane, 6u);
 		break;
 	case eTriangle:
-		returnMesh = new DX12Mesh(s_DefaultInputLayout, 
+		returnMesh = new DX12Mesh(s_DefaultInputColorLayout,
 			reinterpret_cast<BYTE*>(vTriangle), 3u);
 		break;
 	case eCube:
-		returnMesh = new DX12Mesh(s_DefaultInputLayout, 
+		returnMesh = new DX12Mesh(s_DefaultInputColorLayout,
 			reinterpret_cast<BYTE*>(vCube), 24u, iCube, 36u);
 		break;
 	}
@@ -119,7 +126,7 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	return returnMesh;
 }
 
-DX12Mesh * DX12Mesh::LoadMesh(const char * i_Filename, const char * i_Folder)
+DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder)
 {
 	tinyobj::attrib_t					attrib;
 	std::vector<tinyobj::shape_t>		shapes;
@@ -130,16 +137,19 @@ DX12Mesh * DX12Mesh::LoadMesh(const char * i_Filename, const char * i_Folder)
 	timer.Restart();
 
 	// load the model
-	bool ret = tinyobj::LoadObj(&attrib, &shapes, &material, &error, i_Filename, i_Folder);
+	bool ret = tinyobj::LoadObj(&attrib, &shapes, &material, &error, i_Filename, i_MaterialFolder);
 	float loadTime = timer.GetElaspedTime().ToSeconds();
 
 #ifdef _DEBUG
 	// display debug message
 	std::replace(error.begin(), error.end(), '\n', ' ');
 	std::ostringstream stream;
-	stream << i_Filename << " : load time (" << loadTime << ")" << std::endl << error << std::endl;
+	stream << i_Filename << " : load time (" << loadTime << ")"
+		<< std::endl << (ret ? "[No Error]" : error) << std::endl;
+	
 	std::string message(stream.str());
 	DX12RenderEngine::GetInstance().PrintMessage(message.c_str());
+
 #else
 	if (!ret)
 	{
@@ -151,7 +161,57 @@ DX12Mesh * DX12Mesh::LoadMesh(const char * i_Filename, const char * i_Folder)
 #endif
 
 
-	return nullptr;
+	// load mesh information and create the stream
+	DX12Mesh * mesh = new DX12Mesh;
+
+	for (size_t sh = 0; sh < shapes.size(); ++sh)
+	{
+		// create buffer and initialize data
+		const static UINT stride	= 7;
+		tinyobj::shape_t * shape	= &shapes[sh];
+		const size_t verticeCount	= shape->mesh.indices.size();
+		FLOAT * const verticeBuffer = new FLOAT[verticeCount * stride];
+		FLOAT * bufferItr			= verticeBuffer;
+
+		for (size_t id = 0; id < shape->mesh.indices.size(); ++id)
+		{
+			tinyobj::index_t index = shape->mesh.indices[id];
+
+			// copy the position to the buffer
+			memcpy(bufferItr, & attrib.vertices[3 * index.vertex_index], 3 * sizeof(FLOAT));
+			bufferItr += 3;
+			// copy the normal (as color for now)
+			memcpy(bufferItr, & attrib.normals[3 * index.normal_index], 3 * sizeof(FLOAT));
+			bufferItr += 3;
+			// copy the last float (for color float4)
+			memcpy(bufferItr, & One, sizeof(FLOAT));
+			++bufferItr;
+		}
+
+		// Get the name of the shape
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> stringConverter;
+		std::wstring wname = stringConverter.from_bytes(shape->name);
+
+		// create mesh and initialize it
+		mesh->m_SubMeshBuffer.push_back(new DX12MeshBuffer(
+			s_DefaultInputColorLayout,
+			reinterpret_cast<BYTE*>(verticeBuffer),
+			(UINT)verticeCount,
+			wname.c_str()
+		));
+		
+		// cleanup the resources
+		delete[] verticeBuffer;
+	}
+
+	if (shapes.size() == 1)
+	{
+		// we put the only one submesh from the submeshes to the root mesh
+		mesh->m_RootMeshBuffer = mesh->m_SubMeshBuffer[0];
+		mesh->m_SubMeshBuffer.clear();
+	}
+
+	return mesh;
 }
 
 DX12Mesh::DX12Mesh()

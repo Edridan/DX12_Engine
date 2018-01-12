@@ -15,11 +15,11 @@
 #include "d3dx12.h"
 
 
-int WINAPI WinMain(HINSTANCE hInstance,    //Main windows function
+int WINAPI WinMain(
+	HINSTANCE hInstance,    //Main windows function
 	HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine,
 	int nShowCmd)
-
 {
 	// Initializing rendering, window
 	// Create the window and initialize dx12
@@ -32,14 +32,16 @@ int WINAPI WinMain(HINSTANCE hInstance,    //Main windows function
 	GameScene game;
 	Clock time;	// time for frame
 
-	DX12Mesh * cube = DX12Mesh::GeneratePrimitiveMesh(DX12Mesh::eCube);
-	//DX12Mesh * mesh = DX12Mesh::LoadMesh("resources/obj/lowpolytree.obj");
+	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/lowpolytree.obj", "resources/obj/");
+	DX12Mesh * cube = DX12Mesh::GeneratePrimitiveMesh(DX12Mesh::eTriangle);
+
+	renderEngine.Render();
 
 	GameObject * gameObject = game.CreateGameObject();
 	gameObject->SetMesh(cube, DX12RenderEngine::GetInstance().GetDefaultPipelineState());
 
-	/*gameObject = game.CreateGameObject();
-	gameObject->SetMesh(mesh, DX12RenderEngine::GetInstance().GetDefaultPipelineState());*/
+	gameObject = game.CreateGameObject();
+	gameObject->SetMesh(mesh, DX12RenderEngine::GetInstance().GetDefaultPipelineState());
 
 	while (renderEngine.GetWindow().IsOpen())
 	{
@@ -59,6 +61,9 @@ int WINAPI WinMain(HINSTANCE hInstance,    //Main windows function
 		// Execute command list
 		renderEngine.Render();
 	}
+
+	// cleanup resources
+	DX12RenderEngine::Delete();
 
 	return 0;
 }

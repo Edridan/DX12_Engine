@@ -24,6 +24,9 @@ typedef UINT64 ADDRESS_ID;
 const ADDRESS_ID UnavailableAdressId = ((ADDRESS_ID)-1);
 
 
+const FLOAT Zero	= 0.f;
+const FLOAT One		= 1.f;
+
 // Helpers
 // return the size of an DXGI_FORMAT element
 UINT SizeOfFormatElement(DXGI_FORMAT i_Format);

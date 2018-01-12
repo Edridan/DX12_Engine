@@ -137,6 +137,9 @@
     <ClInclude Include="DX12MeshBuffer.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="DX12Material.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">

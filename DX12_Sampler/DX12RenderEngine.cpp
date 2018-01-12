@@ -338,7 +338,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	// Create default pso
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC defaultPipelineDesc = {};
 
-	defaultPipelineDesc.InputLayout = DX12Mesh::s_DefaultInputLayout; // the structure describing our input layout
+	defaultPipelineDesc.InputLayout = DX12Mesh::s_DefaultInputColorLayout; // the structure describing our input layout
 	defaultPipelineDesc.pRootSignature = m_DefaultRootSignature; // the root signature that describes the input data this pso needs
 	defaultPipelineDesc.VS = m_DefaultVertexShader->GetByteCode(); // structure describing where to find the vertex shader bytecode and how large it is	(thx ZELDARCK)
 	defaultPipelineDesc.PS = m_DefaultPixelShader->GetByteCode(); // same as VS but for pixel shader
@@ -380,9 +380,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 HRESULT DX12RenderEngine::PrepareForRender()
 {
 	HRESULT hr;
-
-	// close the commandlist
-	//m_CommandList->Close();	// this may be already done
 
 	// We have to wait for the gpu to finish with the command allocator before we reset it
 	WaitForPreviousFrame();

@@ -9,11 +9,12 @@
 UINT DX12MeshBuffer::s_MeshInstanciated = 0;
 #endif
 
-DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount)
+DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name)
 	:m_Count(i_VerticesCount)
 	,m_IndexBuffer(nullptr)
 	,m_IndexBufferView()
 	,m_HaveIndex(false)
+	,m_Name(i_Name.c_str())
 {
 	// get size of the input layout
 	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
@@ -26,10 +27,10 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	const UINT vBufferSize = i_VerticesCount * stride;
 
 	// create vertex buffer
-	CreateBuffer(&m_VertexBuffer, vBufferSize, L"Vertex buffer");
+	CreateBuffer(&m_VertexBuffer, vBufferSize, i_Name.c_str());
 	UpdateData(commandList, m_VertexBuffer, vBufferSize, /*reinterpret_cast<BYTE*>*/(i_VerticesBuffer));
 
-	if (FAILED(commandList->Close()))
+	/*if (FAILED(commandList->Close()))
 	{
 		DX12RenderEngine::GetInstance().PopUpError(L"Error during Close the command list (Mesh Initialization)");
 	}
@@ -38,7 +39,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	if (FAILED(DX12RenderEngine::GetInstance().IncrementFence()))
-		DX12RenderEngine::GetInstance().PopUpError(L"Error during fence incrementation (Mesh Initialization)");
+		DX12RenderEngine::GetInstance().PopUpError(L"Error during fence incrementation (Mesh Initialization)");*/
 
 	// create a vertex buffer view for the triangle. We get the GPU memory address to the pointer using the GetGPUVirtualAddress() method
 	m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
@@ -46,9 +47,10 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	m_VertexBufferView.SizeInBytes = vBufferSize;
 }
 
-DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount)
+DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name)
 	:m_Count(i_IndexCount)
 	,m_HaveIndex(true)
+	,m_Name(i_Name.c_str())
 {
 	// get size of the input layout
 	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
@@ -64,13 +66,13 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	const UINT iBufferSize = sizeof(DWORD) * i_IndexCount;
 
 	// create vertex buffer
-	CreateBuffer(&m_VertexBuffer, vBufferSize, L"Vertex buffer");
+	CreateBuffer(&m_VertexBuffer, vBufferSize, i_Name.c_str());
 	UpdateData(commandList, m_VertexBuffer, vBufferSize, /*reinterpret_cast<BYTE*>*/(i_VerticesBuffer));
 
-	CreateBuffer(&m_IndexBuffer, iBufferSize, L"Index buffer");
+	CreateBuffer(&m_IndexBuffer, iBufferSize, i_Name.c_str());
 	UpdateData(commandList, m_IndexBuffer, iBufferSize, reinterpret_cast<BYTE*>(i_IndexBuffer));
 
-	if (FAILED(commandList->Close()))
+	/*if (FAILED(commandList->Close()))
 	{
 		DX12RenderEngine::GetInstance().PopUpError(L"Error during Close the command list (Mesh Initialization)");
 	}
@@ -80,7 +82,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 
 	if (FAILED(DX12RenderEngine::GetInstance().IncrementFence()))
-		DX12RenderEngine::GetInstance().PopUpError(L"Error during fence incrementation (Mesh Initialization)");
+		DX12RenderEngine::GetInstance().PopUpError(L"Error during fence incrementation (Mesh Initialization)");*/
 
 	// create a vertex buffer view for the triangle. We get the GPU memory address to the pointer using the GetGPUVirtualAddress() method
 	m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();

@@ -171,6 +171,7 @@
     <ClInclude Include="Clock.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="DX12Camera.h" />
+    <ClInclude Include="DX12Material.h" />
     <ClInclude Include="DX12Mesh.h" />
     <ClInclude Include="DX12ConstantBuffer.h" />
     <ClInclude Include="DX12MeshBuffer.h" />

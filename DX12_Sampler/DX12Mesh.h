@@ -28,7 +28,7 @@ public:
 
 	// Factory
 	static DX12Mesh *	GeneratePrimitiveMesh(EPrimitiveMesh i_Prim);
-	static DX12Mesh *	LoadMesh(const char * i_Filename, const char * i_Folder = nullptr);
+	static DX12Mesh *	LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder = nullptr);
 
 	// To do : impl textures and different PSO management
 	// element input defines the element desc in flags
@@ -59,8 +59,11 @@ public:
 	const D3D12_GRAPHICS_PIPELINE_STATE_DESC & GetPipelineStateDesc() const;
 
 	// Input layout defined for rendering meshes (Used by PSO)
-	static const D3D12_INPUT_ELEMENT_DESC	s_DefaultInputElement[];
-	static D3D12_INPUT_LAYOUT_DESC			s_DefaultInputLayout;
+	static const D3D12_INPUT_ELEMENT_DESC	s_DefaultInputColor[];
+	static D3D12_INPUT_LAYOUT_DESC			s_DefaultInputColorLayout;
+
+	static const D3D12_INPUT_ELEMENT_DESC	s_DefaultInputNormal[];
+	static D3D12_INPUT_LAYOUT_DESC			s_DefaultInputNormalLayout;
 
 private:
 	// private constructor created by LoadMesh static function
