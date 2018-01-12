@@ -2,7 +2,9 @@
 
 #pragma once
 
+#include "d3dx12.h"
 #include <DirectXMath.h>
+#include <Windows.h>
 
 // release and delete macros
 #define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
@@ -20,3 +22,8 @@
 typedef UINT64 ADDRESS_ID;
 
 const ADDRESS_ID UnavailableAdressId = ((ADDRESS_ID)-1);
+
+
+// Helpers
+// return the size of an DXGI_FORMAT element
+UINT SizeOfFormatElement(DXGI_FORMAT i_Format);

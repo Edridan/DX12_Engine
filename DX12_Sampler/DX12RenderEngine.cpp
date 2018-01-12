@@ -381,6 +381,9 @@ HRESULT DX12RenderEngine::PrepareForRender()
 {
 	HRESULT hr;
 
+	// close the commandlist
+	//m_CommandList->Close();	// this may be already done
+
 	// We have to wait for the gpu to finish with the command allocator before we reset it
 	WaitForPreviousFrame();
 

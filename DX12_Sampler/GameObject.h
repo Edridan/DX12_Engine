@@ -4,22 +4,30 @@
 
 #include <vector>
 
-#include "DX12Mesh.h"
 #include "DX12ConstantBuffer.h"
 
+// class predef
+// engine
 class GameScene;
+
+// dx12
+class DX12Mesh;
+class DX12MeshBuffer;
+
 
 class GameObject
 {
 public:
 	// game object management
-	void		SetMesh(DX12Mesh * i_Mesh, ID3D12PipelineState * i_RenderState);
+	void		SetMesh(DX12Mesh * i_Mesh, ID3D12PipelineState * i_RenderState);	// this function can create children
+	void		SetMeshBuffer(const DX12MeshBuffer * i_MeshBuffer, ID3D12PipelineState * i_RenderState);
 
 	// information
 	bool	IsRoot() const;
 	bool	IsEmpty() const;
 	bool	HaveChild() const;
 	bool	NeedRendering() const;
+	bool	CanBeRendered() const;
 
 	// parenting
 	void	SetParent(GameObject * i_Parent);
@@ -42,9 +50,8 @@ private:
 	virtual void	Update(float i_ElapsedTime);
 	void			Render(ID3D12GraphicsCommandList* i_CommandList);
 
-	// game object attributes
-	// rendering pipeline stuff
-	DX12Mesh *				m_Mesh;
+	// rendering pipeline
+	const DX12MeshBuffer *	m_Mesh;
 	ID3D12PipelineState *	m_PipelineState;
 	ADDRESS_ID				m_ConstBuffer;
 

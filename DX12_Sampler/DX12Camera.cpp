@@ -17,7 +17,7 @@ DX12Camera::DX12Camera()
 	// build projection matrix
 	DX12Window & wnd = DX12RenderEngine::GetInstance().GetWindow();
 
-	const float windowRatio = wnd.GetWidth() / wnd.GetHeight();
+	const float windowRatio = (float)(wnd.GetWidth() / wnd.GetHeight());
 	XMMATRIX tmpProj = XMMatrixPerspectiveFovLH(90.f, windowRatio, 0.05f, 1000.f);
 
 	XMStoreFloat4x4(&m_Projection, tmpProj);

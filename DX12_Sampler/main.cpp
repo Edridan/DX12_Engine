@@ -33,13 +33,13 @@ int WINAPI WinMain(HINSTANCE hInstance,    //Main windows function
 	Clock time;	// time for frame
 
 	DX12Mesh * cube = DX12Mesh::GeneratePrimitiveMesh(DX12Mesh::eCube);
-	DX12Mesh * mesh = DX12Mesh::LoadMesh("resources/obj/lowpolytree.obj");
+	//DX12Mesh * mesh = DX12Mesh::LoadMesh("resources/obj/lowpolytree.obj");
 
 	GameObject * gameObject = game.CreateGameObject();
 	gameObject->SetMesh(cube, DX12RenderEngine::GetInstance().GetDefaultPipelineState());
 
-	gameObject = game.CreateGameObject();
-	gameObject->SetMesh(mesh, DX12RenderEngine::GetInstance().GetDefaultPipelineState());
+	/*gameObject = game.CreateGameObject();
+	gameObject->SetMesh(mesh, DX12RenderEngine::GetInstance().GetDefaultPipelineState());*/
 
 	while (renderEngine.GetWindow().IsOpen())
 	{

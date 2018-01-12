@@ -2,6 +2,10 @@
 
 #include "GameScene.h"
 
+// DX12
+#include "DX12Mesh.h"
+#include "DX12MeshBuffer.h"
+
 // initialize game object
 GameObject::GameObject(GameScene * const i_Scene)
 	:m_Mesh(nullptr)
@@ -23,7 +27,7 @@ void GameObject::Update(float i_ElapsedTime)
 
 void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 {
-	if (NeedRendering())
+	if (CanBeRendered())
 	{
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
@@ -37,13 +41,26 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 
 		// update data into the const buffer
 		XMStoreFloat4x4(&constantBuffer.m_Transform, mvpMatrix);
-
 		DX12RenderEngine::GetInstance().UpdateConstantBuffer(m_ConstBuffer, constantBuffer);
 
-		// draw
-		m_Mesh->Draw(i_CommandList, m_PipelineState, render.GetConstantBufferUploadVirtualAddress(m_ConstBuffer));
+		// render mesh
+		// add pso and root signature to the commandlist
+		i_CommandList->SetGraphicsRootSignature(render.GetRootSignature());
+		
+		// push const buffer
+		if (m_ConstBuffer != UnavailableAdressId)
+		{
+			i_CommandList->SetGraphicsRootConstantBufferView(0, render.GetConstantBufferUploadVirtualAddress(m_ConstBuffer));
+		}
+
+		// Setup the pipeline state
+		i_CommandList->SetPipelineState(m_PipelineState);
+
+		// push the mesh on the commandlist
+		m_Mesh->PushOnCommandList(i_CommandList);
 	}
 
+	// render childs gameobjects
 	auto itr = m_Child.begin();
 	while (itr != m_Child.end())
 	{
@@ -54,12 +71,26 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 
 void GameObject::SetMesh(DX12Mesh * i_Mesh, ID3D12PipelineState * i_PipelineState)
 {
-	m_Mesh = i_Mesh;
-	m_PipelineState = i_PipelineState;
+	// setup the root mesh into the game object
+	SetMeshBuffer(i_Mesh->GetRootMesh(), i_PipelineState);
 
-	if (i_Mesh && (m_ConstBuffer == UnavailableAdressId))
+	/*for (UINT32 subMesh = 0; i_Mesh->SubMeshesCount(); ++subMesh)
+	{
+		GameObject * subGameObject = m_Scene->CreateGameObject(this);
+	}*/
+	//if (i_Mesh->)
+}
+
+void GameObject::SetMeshBuffer(const DX12MeshBuffer * i_MeshBuffer, ID3D12PipelineState * i_RenderState)
+{
+	// setup mesh 
+	m_Mesh = i_MeshBuffer;
+	m_PipelineState = i_RenderState;
+
+	if (m_Mesh && (m_ConstBuffer == UnavailableAdressId))
 	{
 		// map gpu const buffer address if necessary
+		// this allow the game object to put data into the const buffer
 		m_ConstBuffer = DX12RenderEngine::GetInstance().ReserveConstantBufferVirtualAddress();
 	}
 }
@@ -82,6 +113,11 @@ bool GameObject::HaveChild() const
 bool GameObject::NeedRendering() const
 {
 	return (m_Mesh != nullptr);
+}
+
+bool GameObject::CanBeRendered() const
+{
+	return ((m_Mesh != NULL) && (m_PipelineState != NULL));
 }
 
 void GameObject::SetParent(GameObject * i_Parent)

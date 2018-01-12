@@ -5,16 +5,13 @@
 #include <D3Dcompiler.h>
 #include <DirectXMath.h>
 
+#include <vector>
+
 #include "DX12Shader.h"
 #include "DX12ConstantBuffer.h"
 
-// Struct
-struct Vertex
-{
-	// Vertice definition
-	DirectX::XMFLOAT3 m_Pos;	// float x, float y, float z
-	DirectX::XMFLOAT4 m_Color;	// float x, float y, float z, float a
-};
+// class predef
+class DX12MeshBuffer;
 
 class DX12Mesh
 {
@@ -28,18 +25,34 @@ public:
 		ePlane,
 		eCube,
 	};
+
 	// Factory
 	static DX12Mesh *	GeneratePrimitiveMesh(EPrimitiveMesh i_Prim);
 	static DX12Mesh *	LoadMesh(const char * i_Filename, const char * i_Folder = nullptr);
 
-	// Mesh
-	DX12Mesh(Vertex * i_Vertices, UINT i_VerticeCount);
-	DX12Mesh(Vertex * i_Vertices, UINT i_VerticeCount, DWORD * i_Indices, UINT i_IndiceCount);
+	// To do : impl textures and different PSO management
+	// element input defines the element desc in flags
+	enum EElementInput
+	{
+		eNone			= 0,
+		eHaveNormal		= 1 << 0,
+		eHaveTexcoord	= 1 << 1,
+		eHaveColor		= 1 << 2,
+	};
+
+	// one shape mesh generation
+	DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount);
+	DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount);
 	~DX12Mesh();
 
-	// Management
-	void		Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineState*  i_Pso);
-	void		Draw(ID3D12GraphicsCommandList* i_CommandList, ID3D12PipelineState*  i_Pso, D3D12_GPU_VIRTUAL_ADDRESS i_ConstantBufferAddress);
+	// submeshes
+	bool	HaveSubMeshes() const;
+	UINT	SubMeshesCount() const;
+
+	const DX12MeshBuffer *					GetRootMesh() const;
+	const std::vector<DX12MeshBuffer*>	&	GetSubMeshes() const;
+
+	UINT64		GetElementFlags() const;
 
 	// Get/Set
 	const D3D12_INPUT_LAYOUT_DESC & GetInputLayoutDesc() const;
@@ -50,21 +63,14 @@ public:
 	static D3D12_INPUT_LAYOUT_DESC			s_DefaultInputLayout;
 
 private:
-	// Mesh data
-	UINT		m_VerticesCount;
-	UINT		m_IndexCount;
-	const bool	m_HaveIndex;
+	// private constructor created by LoadMesh static function
+	DX12Mesh();
 
-	// DX12
-	ID3D12Resource*						m_VertexBuffer;
-	ID3D12Resource*						m_IndexBuffer;
+	// mesh buffer (GPU)
+	DX12MeshBuffer	*				m_RootMeshBuffer;
+	std::vector<DX12MeshBuffer*>	m_SubMeshBuffer;	// if there is multiple shapes per mesh, there are here (sometime there is only submeshes so the root mesh is null)
 
-	// Helpers
-	HRESULT		PushDX12ResourceBuffer(ID3D12Resource ** i_Buffer, UINT i_BufferSize, DWORD * i_BufferPtr, ID3D12GraphicsCommandList* i_CommandList, ID3D12Device * i_Device);
-
-	// Buffer view
-	D3D12_VERTEX_BUFFER_VIEW			m_VertexBufferView;
-	D3D12_INDEX_BUFFER_VIEW				m_IndexBufferView;
+	UINT64							m_ElementFlags;
 
 	// To do : implement pso management for mesh rendering
 	D3D12_INPUT_LAYOUT_DESC						m_InputLayoutDesc;

@@ -156,8 +156,10 @@
     <ClCompile Include="DX12Camera.cpp" />
     <ClCompile Include="DX12Mesh.cpp" />
     <ClCompile Include="DX12ConstantBuffer.cpp" />
+    <ClCompile Include="DX12MeshBuffer.cpp" />
     <ClCompile Include="DX12RenderEngine.cpp" />
     <ClCompile Include="DX12Shader.cpp" />
+    <ClCompile Include="DX12Utils.cpp" />
     <ClCompile Include="DX12Window.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
@@ -171,6 +173,7 @@
     <ClInclude Include="DX12Camera.h" />
     <ClInclude Include="DX12Mesh.h" />
     <ClInclude Include="DX12ConstantBuffer.h" />
+    <ClInclude Include="DX12MeshBuffer.h" />
     <ClInclude Include="DX12RenderEngine.h" />
     <ClInclude Include="DX12Shader.h" />
     <ClInclude Include="DX12Utils.h" />
