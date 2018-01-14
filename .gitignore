@@ -12,6 +12,7 @@
 *.opendb
 *.TMP
 *.suo
+*.ipch
 
 
 # Compilation files
