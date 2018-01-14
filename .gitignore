@@ -11,7 +11,7 @@
 *.db
 *.opendb
 *.TMP
-.vs/DX12_Sampler/v14/.suo
+*.suo
 
 
 # Compilation files
