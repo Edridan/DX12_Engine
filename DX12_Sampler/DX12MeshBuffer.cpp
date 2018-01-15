@@ -9,12 +9,13 @@
 UINT DX12MeshBuffer::s_MeshInstanciated = 0;
 #endif
 
-DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name)
+DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, UINT64 i_ElementFlags, BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name)
 	:m_Count(i_VerticesCount)
 	,m_IndexBuffer(nullptr)
 	,m_IndexBufferView()
 	,m_HaveIndex(false)
 	,m_Name(i_Name.c_str())
+	,m_ElementFlags(i_ElementFlags)
 {
 	// get size of the input layout
 	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
@@ -47,10 +48,11 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	m_VertexBufferView.SizeInBytes = vBufferSize;
 }
 
-DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name)
+DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, UINT64 i_ElementFlags, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name)
 	:m_Count(i_IndexCount)
 	,m_HaveIndex(true)
 	,m_Name(i_Name.c_str())
+	,m_ElementFlags(i_ElementFlags)
 {
 	// get size of the input layout
 	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;

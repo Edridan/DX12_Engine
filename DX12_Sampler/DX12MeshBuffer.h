@@ -19,8 +19,8 @@ public:
 	};
 
 	// contructor / destructor
-	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name = L"Unknown");
-	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name = L"Unknown");
+	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, UINT64 i_ElementFlags, BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name = L"Unknown");
+	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, UINT64 i_ElementFlags, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name = L"Unknown");
 	~DX12MeshBuffer();
 
 	const D3D12_INPUT_LAYOUT_DESC & GetInputLayout() const;

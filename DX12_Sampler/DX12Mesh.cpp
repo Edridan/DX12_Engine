@@ -106,6 +106,10 @@ DWORD iCube[] = {
 DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 {
 	DX12Mesh * returnMesh = nullptr;
+	// default primitive mesh flags
+	static const UINT64 flags = 
+		DX12MeshBuffer::EElementFlags::eHaveNormal |
+		DX12MeshBuffer::EElementFlags::eHaveTexcoord;
 
 	switch (i_Prim)
 	{
@@ -229,6 +233,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		// create mesh and initialize it
 		mesh->m_SubMeshBuffer.push_back(new DX12MeshBuffer(
 			s_DefaultInputColorLayout,
+			flags,
 			reinterpret_cast<BYTE*>(verticeBuffer),
 			(UINT)verticeCount,
 			wname.c_str()
