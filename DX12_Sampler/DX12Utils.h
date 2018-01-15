@@ -4,7 +4,6 @@
 
 #include "d3dx12.h"
 #include <DirectXMath.h>
-#include <Windows.h>
 
 // release and delete macros
 #define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
@@ -38,9 +37,34 @@ struct IntVec2
 	int x, y;
 	IntVec2() :x(0), y(0) {};
 	IntVec2(int i_X, int i_Y) :x(i_X), y(i_Y) {};
+
+	// operators
+	IntVec2 operator+(const IntVec2 & i_Other)
+	{
+		return IntVec2(x + i_Other.x, y + i_Other.y);
+	}
+
+	IntVec2 operator-(const IntVec2 & i_Other)
+	{
+		return IntVec2(x - i_Other.x, y - i_Other.y);
+	}
+
 };
 
 
 // Helpers
 // return the size of an DXGI_FORMAT element
 UINT SizeOfFormatElement(DXGI_FORMAT i_Format);
+
+
+// Debug
+#ifdef _DEBUG
+void OutputDebug(const char * i_Text, ...);
+
+
+#define PRINT_DEBUG(i_Text, ...)	OutputDebug(i_Text, ...)
+#else
+
+#define  PRINT_DEBUG(i_Text, ...)	
+
+#endif

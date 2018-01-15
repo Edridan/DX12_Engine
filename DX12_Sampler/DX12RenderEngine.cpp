@@ -50,11 +50,12 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		DX12RenderEngine::GetInstance().PopUpError(L"Error D3D12GetDebugInterface");
 		return E_FAIL;
 	}
+
+	m_DebugController->EnableDebugLayer();
 #else
 	m_DebugController = nullptr;
 #endif
 
-	m_DebugController->EnableDebugLayer();
 
 	// -- Create the Device -- //
 
@@ -349,7 +350,9 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	defaultPipelineDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // a default rasterizer state.
 	defaultPipelineDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
 	defaultPipelineDesc.NumRenderTargets = 1; // we are only binding one render target
+	defaultPipelineDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	defaultPipelineDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
+
 
 	// Create the default pipeline state object
 	hr = m_Device->CreateGraphicsPipelineState(&defaultPipelineDesc, IID_PPV_ARGS(&m_DefaultPipelineState));
@@ -360,7 +363,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		return false;
 	}
 
-
 	// -- Create depth/stencil buffer -- //
 
 	// create a depth stencil descriptor heap so we can get a pointer to the depth stencil buffer
@@ -369,17 +371,17 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	hr = m_Device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DepthStencilDescriptorHeap));
-	
+
 	if (FAILED(hr))
 	{
 		DX12RenderEngine::GetInstance().PopUpError(L"Error during CreateDescriptorHeap Depth/Stencil creation");
 		return hr;
 	}
 
-	D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilDesc = {};
-	depthStencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	depthStencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	depthStencilDesc.Flags = D3D12_DSV_FLAG_NONE;
+	D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
+	depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthStencilViewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	depthStencilViewDesc.Flags = D3D12_DSV_FLAG_NONE;
 
 	D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
 	depthOptimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
@@ -394,12 +396,13 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		&depthOptimizedClearValue,
 		IID_PPV_ARGS(&m_DepthStencilBuffer)
 	);
-	
-	m_DepthStencilDescriptorHeap->SetName(L"Depth/Stencil Resource Heap");
-	
-	// create view
-	m_Device->CreateDepthStencilView(m_DepthStencilBuffer, &depthStencilDesc, m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
+	m_DepthStencilDescriptorHeap->SetName(L"Depth/Stencil Resource Heap");
+
+	// create view
+	m_Device->CreateDepthStencilView(m_DepthStencilBuffer, &depthStencilViewDesc, m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	m_DepthStencilBuffer->SetName(L"Depth Stencil buffer");
 
 	// -- Setup viewport and scissor -- //
 

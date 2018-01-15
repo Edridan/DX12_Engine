@@ -49,7 +49,7 @@ private:
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	// internal management
-	void		RegisterMouseMove(const IntVec2 & i_Movement);
+	void		RegisterMouseMove(const IntVec2 & i_NewPosition);
 
 	// Window
 	HICON		m_Icon;

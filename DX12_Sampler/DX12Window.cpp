@@ -82,6 +82,14 @@ DX12Window::DX12Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, cons
 	ShowWindow(m_Hwnd, SW_SHOW);
 	UpdateWindow(m_Hwnd);
 
+	// Update mouse position
+	POINT cursorPos;
+	GetCursorPos(&cursorPos);
+
+	// Retreive the current position of the mouse
+	m_MousePosition.x = cursorPos.x;
+	m_MousePosition.y = cursorPos.y;
+
 	// Setup callback management
 	SetWindowLongPtrW(m_Hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
@@ -126,9 +134,12 @@ LRESULT CALLBACK DX12Window::WndProc(HWND hwnd,
 		lParam);
 }
 
-void DX12Window::RegisterMouseMove(const IntVec2 & i_Movement)
+void DX12Window::RegisterMouseMove(const IntVec2 & i_NewPosition)
 {
+	m_MouseMove = m_MousePosition - i_NewPosition;
+	m_MousePosition = i_NewPosition;
 
+	OutputDebug("Mouse move (%i,%i) [Pos = (%i,%i)]", m_MouseMove.x, m_MouseMove.y, m_MousePosition.x, m_MousePosition.y);
 }
 
 void DX12Window::Update()
@@ -174,7 +185,7 @@ HWND DX12Window::GetHWnd() const
 
 IntVec2 DX12Window::GetMouseMove() const
 {
-	return IntVec2();
+	return m_MouseMove;
 }
 
 DX12Window::~DX12Window()

@@ -1,5 +1,8 @@
 #include "DX12Utils.h"
 
+#include <cstdarg>
+#include <stdio.h>
+
 UINT SizeOfFormatElement(DXGI_FORMAT i_Format)
 {
 	switch (i_Format)
@@ -121,3 +124,25 @@ UINT SizeOfFormatElement(DXGI_FORMAT i_Format)
 		return 0;
 	}
 }
+
+
+// debug functions
+#ifdef _DEBUG
+
+void OutputDebug(const char * i_Text, ...)
+{
+	static char buffer[2048];
+	const char * p = buffer;
+
+	va_list args;
+	va_start(args, i_Text);
+
+	sprintf_s(buffer, i_Text, args);
+
+	va_end(args);
+
+	OutputDebugStringA(buffer);
+}
+
+
+#endif
