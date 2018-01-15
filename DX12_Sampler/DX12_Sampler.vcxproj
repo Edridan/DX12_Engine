@@ -185,7 +185,6 @@
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PixelShader.hlsl">

@@ -142,6 +142,9 @@ void DX12Window::RegisterMouseMove(const IntVec2 & i_NewPosition)
 
 void DX12Window::Update()
 {
+	// reset state
+	m_MouseMove = IntVec2(0, 0);
+
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
 

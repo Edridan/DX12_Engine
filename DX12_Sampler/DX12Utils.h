@@ -31,6 +31,10 @@ const DirectX::XMFLOAT3 Vec3Right	= { 1.f, 0.f, 0.f };
 const FLOAT Zero	= 0.f;
 const FLOAT One		= 1.f;
 
+
+const float DegToRad = 0.01745329238f; // retreived from google
+const float RadToDeg = 57.29578f;
+
 // struct
 struct IntVec2
 {

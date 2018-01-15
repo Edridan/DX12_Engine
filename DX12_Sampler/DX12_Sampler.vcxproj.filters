@@ -91,7 +91,7 @@
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="DX12Material.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\DX12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -133,9 +133,6 @@
     </ClInclude>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
       <Filter>Lib\TinyObjLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
-      <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Clock.h">
       <Filter>Header Files\Game</Filter>
