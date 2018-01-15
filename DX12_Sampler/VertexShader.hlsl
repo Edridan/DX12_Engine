@@ -13,7 +13,9 @@ struct VS_OUTPUT
 // b0 buffer
 cbuffer ConstantBuffer : register(b0)
 {
-	float4x4 transform;
+	matrix model;
+	matrix view;
+	matrix projection;
 };
 
 VS_OUTPUT main(VS_INPUT input)
@@ -22,7 +24,14 @@ VS_OUTPUT main(VS_INPUT input)
 	float4 pos = input.pos;
 
 	// Transform the vertex position into projected space.
-	output.pos = mul(input.pos, transform);
+	pos = mul(pos, model);
+	pos = mul(pos, view);
+	pos = mul(pos, projection);
+
+	// Old
+	//output.pos = mul(input.pos, transform);
+
+	output.pos = pos;
 	output.color = input.color;
 	
 	return output;

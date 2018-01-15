@@ -28,7 +28,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 
 	// create vertex buffer
 	CreateBuffer(&m_VertexBuffer, vBufferSize, i_Name.c_str());
-	UpdateData(commandList, m_VertexBuffer, vBufferSize, /*reinterpret_cast<BYTE*>*/(i_VerticesBuffer));
+	UpdateData(commandList, m_VertexBuffer, vBufferSize, (i_VerticesBuffer));
 
 	/*if (FAILED(commandList->Close()))
 	{
@@ -67,7 +67,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 
 	// create vertex buffer
 	CreateBuffer(&m_VertexBuffer, vBufferSize, i_Name.c_str());
-	UpdateData(commandList, m_VertexBuffer, vBufferSize, /*reinterpret_cast<BYTE*>*/(i_VerticesBuffer));
+	UpdateData(commandList, m_VertexBuffer, vBufferSize, (i_VerticesBuffer));
 
 	CreateBuffer(&m_IndexBuffer, iBufferSize, i_Name.c_str());
 	UpdateData(commandList, m_IndexBuffer, iBufferSize, reinterpret_cast<BYTE*>(i_IndexBuffer));

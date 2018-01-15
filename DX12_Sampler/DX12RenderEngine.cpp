@@ -110,7 +110,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	// Create the m_Device
 	hr = D3D12CreateDevice(
 		adapter,
-		D3D_FEATURE_LEVEL_12_0,
+		D3D_FEATURE_LEVEL_11_0,
 		IID_PPV_ARGS(&m_Device)
 	);
 	if (FAILED(hr))
@@ -359,7 +359,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	defaultPipelineDesc.NumRenderTargets = 1; // we are only binding one render target
 	defaultPipelineDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 	defaultPipelineDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
-
 
 	// Create the default pipeline state object
 	hr = m_Device->CreateGraphicsPipelineState(&defaultPipelineDesc, IID_PPV_ARGS(&m_DefaultPipelineState));

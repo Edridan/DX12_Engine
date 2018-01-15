@@ -48,7 +48,26 @@ struct IntVec2
 	{
 		return IntVec2(x - i_Other.x, y - i_Other.y);
 	}
+};
 
+struct Color
+{
+	float r, g, b;
+	Color() {};
+	Color(const Color & i_Other)
+		:r(i_Other.r)
+		,g(i_Other.g)
+		,b(i_Other.b)
+	{}
+	
+	// operators
+	Color & operator=(const Color & i_Other)
+	{
+		r = i_Other.r;
+		g = i_Other.g;
+		b = i_Other.b;
+		return *this;
+	}
 };
 
 

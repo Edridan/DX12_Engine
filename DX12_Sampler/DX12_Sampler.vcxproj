@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="DX12Camera.cpp" />
+    <ClCompile Include="DX12Material.cpp" />
     <ClCompile Include="DX12Mesh.cpp" />
     <ClCompile Include="DX12ConstantBuffer.cpp" />
     <ClCompile Include="DX12MeshBuffer.cpp" />
