@@ -138,8 +138,6 @@ void DX12Window::RegisterMouseMove(const IntVec2 & i_NewPosition)
 {
 	m_MouseMove = m_MousePosition - i_NewPosition;
 	m_MousePosition = i_NewPosition;
-
-	OutputDebug("Mouse move (%i,%i) [Pos = (%i,%i)]", m_MouseMove.x, m_MouseMove.y, m_MousePosition.x, m_MousePosition.y);
 }
 
 void DX12Window::Update()

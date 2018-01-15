@@ -136,7 +136,7 @@ void OutputDebug(const char * i_Text, ...)
 
 	va_list args;
 	va_start(args, i_Text);
-	sprintf_s(buffer, i_Text, args);
+	vsnprintf(buffer, 2048, i_Text, args);
 	va_end(args);
 
 	OutputDebugStringA(buffer);
