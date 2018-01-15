@@ -12,6 +12,7 @@
 
 // class predef
 class DX12MeshBuffer;
+class DX12Material;
 
 class DX12Mesh
 {
@@ -30,16 +31,6 @@ public:
 	static DX12Mesh *	GeneratePrimitiveMesh(EPrimitiveMesh i_Prim);
 	static DX12Mesh *	LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder = nullptr);
 
-	// To do : impl textures and different PSO management
-	// element input defines the element desc in flags
-	enum EElementInput
-	{
-		eNone			= 0,
-		eHaveNormal		= 1 << 0,
-		eHaveTexcoord	= 1 << 1,
-		eHaveColor		= 1 << 2,
-	};
-
 	// one shape mesh generation
 	DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount);
 	DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount);
@@ -51,8 +42,6 @@ public:
 
 	const DX12MeshBuffer *					GetRootMesh() const;
 	const std::vector<DX12MeshBuffer*>	&	GetSubMeshes() const;
-
-	UINT64		GetElementFlags() const;
 
 	// Get/Set
 	const D3D12_INPUT_LAYOUT_DESC & GetInputLayoutDesc() const;
@@ -73,7 +62,9 @@ private:
 	DX12MeshBuffer	*				m_RootMeshBuffer;
 	std::vector<DX12MeshBuffer*>	m_SubMeshBuffer;	// if there is multiple shapes per mesh, there are here (sometime there is only submeshes so the root mesh is null)
 
-	UINT64							m_ElementFlags;
+	// material
+	DX12Material *					m_RootMeshMaterial;
+	std::vector<DX12Material*>		m_SubMeshMaterial;
 
 	// To do : implement pso management for mesh rendering
 	D3D12_INPUT_LAYOUT_DESC						m_InputLayoutDesc;

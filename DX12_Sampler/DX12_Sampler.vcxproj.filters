@@ -93,6 +93,9 @@
     <ClCompile Include="DX12Material.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
+    <ClCompile Include="DX12Texture.cpp">
+      <Filter>Source Files\DX12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dx12.h">
@@ -141,6 +144,9 @@
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="DX12Material.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12Texture.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
   </ItemGroup>

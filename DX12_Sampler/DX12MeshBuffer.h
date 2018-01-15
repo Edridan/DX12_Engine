@@ -8,6 +8,16 @@
 class DX12MeshBuffer
 {
 public:
+	// To do : impl textures and different PSO management
+	// element input defines the element desc in flags
+	enum EElementFlags
+	{
+		eNone = 0,
+		eHaveNormal = 1 << 0,
+		eHaveTexcoord = 1 << 1,
+		eHaveColor = 1 << 2,
+	};
+
 	// contructor / destructor
 	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name = L"Unknown");
 	DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name = L"Unknown");
@@ -17,6 +27,7 @@ public:
 
 	// push vertices buffer on commandlist
 	HRESULT PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
+	UINT64	GetElementFlags() const;	// retreive flags to render the mesh buffer
 
 	// friend class
 	friend class DX12Mesh;
@@ -36,6 +47,8 @@ private:
 	D3D12_INDEX_BUFFER_VIEW				m_IndexBufferView;
 	// Other
 	const std::wstring 					m_Name;
+
+	UINT64								m_ElementFlags;
 
 	const bool		m_HaveIndex;
 	const UINT		m_Count;	// vertices/index count for drawing

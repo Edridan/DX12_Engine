@@ -4,6 +4,7 @@
 
 #include "d3dx12.h"
 #include <DirectXMath.h>
+#include <wincodec.h>
 
 // release and delete macros
 #define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
@@ -57,7 +58,12 @@ struct IntVec2
 struct Color
 {
 	float r, g, b;
-	Color() {};
+	Color() :Color(0.f, 0.f, 0.f) {};
+	Color(float i_R, float i_G, float i_B)
+		:r(i_R)
+		,g(i_G)
+		,b(i_B)
+	{}
 	Color(const Color & i_Other)
 		:r(i_Other.r)
 		,g(i_Other.g)
@@ -72,12 +78,34 @@ struct Color
 		b = i_Other.b;
 		return *this;
 	}
+
+	// vector conversion
+	DirectX::XMFLOAT3 ToVec3() const
+	{
+		return DirectX::XMFLOAT3(r, g, b);
+	}
+
+	DirectX::XMFLOAT4 ToVec4() const
+	{
+		return DirectX::XMFLOAT4(r, g, b, 1.f);
+	}
 };
+
+const Color Black(0.f, 0.f, 0.f);
+const Color Red(0.f, 0.f, 0.f);
+const Color Blue(0.f, 0.f, 0.f);
+const Color Green(0.f, 0.f, 0.f);
 
 
 // Helpers
 // return the size of an DXGI_FORMAT element
 UINT SizeOfFormatElement(DXGI_FORMAT i_Format);
+// get the dxgi format equivalent of a wic format
+DXGI_FORMAT GetDXGIFormatFromWICFormat(WICPixelFormatGUID & i_WicFormat);
+// get a dxgi compatible wic format from another wic format
+WICPixelFormatGUID GetConvertToWICFormat(WICPixelFormatGUID & i_WicFormat);
+// get the number of bits per pixel for a dxgi format
+int GetDXGIFormatBitsPerPixel(DXGI_FORMAT & i_DxGIFormat);
 
 enum PopUpIcon
 {

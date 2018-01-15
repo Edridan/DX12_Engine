@@ -47,17 +47,17 @@ D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_DefaultInputNormalLayout =
 
  // Triangle data
 FLOAT vTriangle[] = {
-	 0.0f, 0.5f, 0.0f,		1.0f, 0.0f, 0.0f, 1.f,
-	 0.5f, -0.5f, 0.0f,		0.0f, 1.0f, 0.0f, 1.f,
-	 -0.5f, -0.5f, 0.0f,	0.0f, 0.0f, 1.0f, 1.f,
+	 0.0f, 0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	0.5f, 0.0f,
+	 0.5f, -0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	0.0f, 1.0f,
+	 -0.5f, -0.5f, 0.0f,	0.0f, 0.0f, -1.0f,	0.0f, 0.0f,
 };
 
 // Plane data
 FLOAT vPlane[] = {
-	-0.5f,  0.5f, 0.0f ,	1.0f, 0.0f, 0.0f, 1.f,
-	0.5f, -0.5f, 0.0f ,		0.0f, 1.0f, 0.0f, 1.f,
-	-0.5f, -0.5f, 0.0f ,	0.0f, 0.0f, 1.0f, 1.f,
-	 0.5f,  0.5f, 0.0f ,	0.0f, 0.0f, 0.0f, 1.f
+	-0.5f,  0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	0.0f, 1.0f,
+	0.5f, -0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	1.0f, 1.0f,
+	-0.5f, -0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	0.0f, 0.0f,
+	 0.5f,  0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	1.0f, 1.0f
 };
 
 DWORD iPlane[] = {
@@ -67,30 +67,30 @@ DWORD iPlane[] = {
 
 // Cube mesh
 FLOAT vCube[] = {
-	-0.5f,  0.5f, -0.5f,	1.0f, 0.0f, 0.0f, 1.0f ,
-	0.5f, -0.5f, -0.5f,		1.0f, 0.0f, 1.0f, 1.0f ,
-	-0.5f, -0.5f, -0.5f,	0.0f, 0.0f, 1.0f, 1.0f ,
-	0.5f,  0.5f, -0.5f,		0.0f, 1.0f, 0.0f, 1.0f ,
-	0.5f, -0.5f, -0.5f,		1.0f, 0.0f, 0.0f, 1.0f ,
-	0.5f,  0.5f,  0.5f,		1.0f, 0.0f, 1.0f, 1.0f ,
-	0.5f, -0.5f,  0.5f,		0.0f, 0.0f, 1.0f, 1.0f ,
-	0.5f,  0.5f, -0.5f,		0.0f, 1.0f, 0.0f, 1.0f ,
-	-0.5f,  0.5f,  0.5f,	1.0f, 0.0f, 0.0f, 1.0f ,
-	-0.5f, -0.5f, -0.5f,	1.0f, 0.0f, 1.0f, 1.0f ,
-	-0.5f, -0.5f,  0.5f,	0.0f, 0.0f, 1.0f, 1.0f ,
-	-0.5f,  0.5f, -0.5f,	0.0f, 1.0f, 0.0f, 1.0f ,
-	0.5f,  0.5f,  0.5f,		1.0f, 0.0f, 0.0f, 1.0f ,
-	-0.5f, -0.5f,  0.5f,	1.0f, 0.0f, 1.0f, 1.0f ,
-	0.5f, -0.5f,  0.5f,		0.0f, 0.0f, 1.0f, 1.0f ,
-	-0.5f,  0.5f,  0.5f,	0.0f, 1.0f, 0.0f, 1.0f ,
-	-0.5f,  0.5f, -0.5f,	1.0f, 0.0f, 0.0f, 1.0f ,
-	0.5f,  0.5f,  0.5f,		1.0f, 0.0f, 1.0f, 1.0f ,
-	0.5f,  0.5f, -0.5f,		0.0f, 0.0f, 1.0f, 1.0f ,
-	-0.5f,  0.5f,  0.5f,	0.0f, 1.0f, 0.0f, 1.0f ,
-	0.5f, -0.5f,  0.5f,		1.0f, 0.0f, 0.0f, 1.0f ,
-	-0.5f, -0.5f, -0.5f,	1.0f, 0.0f, 1.0f, 1.0f ,
-	0.5f, -0.5f, -0.5f,		0.0f, 0.0f, 1.0f, 1.0f ,
-	-0.5f, -0.5f,  0.5f,	0.0f, 1.0f, 0.0f, 1.0f ,
+	-0.5f,  0.5f, -0.5f,	1.0f, 0.0f, 0.0f,	1.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,		1.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,	0.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	0.5f,  0.5f, -0.5f,		0.0f, 1.0f, 0.0f,	1.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,		1.0f, 0.0f, 0.0f,	1.0f, 1.0f,
+	0.5f,  0.5f,  0.5f,		1.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	0.5f, -0.5f,  0.5f,		0.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	0.5f,  0.5f, -0.5f,		0.0f, 1.0f, 0.0f,	1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,	1.0f, 0.0f, 0.0f,	1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,	1.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,	0.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,	0.0f, 1.0f, 0.0f,	1.0f, 1.0f,
+	0.5f,  0.5f,  0.5f,		1.0f, 0.0f, 0.0f,	1.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,	1.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	0.5f, -0.5f,  0.5f,		0.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,	0.0f, 1.0f, 0.0f,	1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,	1.0f, 0.0f, 0.0f,	1.0f, 1.0f,
+	0.5f,  0.5f,  0.5f,		1.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	0.5f,  0.5f, -0.5f,		0.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,	0.0f, 1.0f, 0.0f,	1.0f, 1.0f,
+	0.5f, -0.5f,  0.5f,		1.0f, 0.0f, 0.0f,	1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,	1.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,		0.0f, 0.0f, 1.0f,	1.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,	0.0f, 1.0f, 0.0f,	1.0f, 1.0f,
 };
 
 DWORD iCube[] = {
@@ -166,25 +166,60 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 	for (size_t sh = 0; sh < shapes.size(); ++sh)
 	{
 		// create buffer and initialize data
-		const static UINT stride	= 7;
+		UINT stride					= 3;	// default stride in float (3 float for positions)
 		tinyobj::shape_t * shape	= &shapes[sh];
 		const size_t verticeCount	= shape->mesh.indices.size();
 		FLOAT * const verticeBuffer = new FLOAT[verticeCount * stride];
 		FLOAT * bufferItr			= verticeBuffer;
 
+		// compute the flag :
+		// by default the mesh always have normals
+		const tinyobj::index_t origin = shape->mesh.indices[0];
+		UINT64 flags = DX12MeshBuffer::EElementFlags::eNone;
+
+		// compute stride and flags for the mesh
+		if (origin.normal_index != -1)
+		{
+			flags |= DX12MeshBuffer::EElementFlags::eHaveNormal;
+			stride += 3;
+		}
+		if (origin.texcoord_index != -1)
+		{
+			flags |= DX12MeshBuffer::EElementFlags::eHaveTexcoord;
+			stride += 2;
+		}
+		if (attrib.colors.size() != 0)
+		{
+			flags |= DX12MeshBuffer::EElementFlags::eHaveColor;
+			stride += 3;
+		}
+		// To do : implement multi material rendering
+
 		for (size_t id = 0; id < shape->mesh.indices.size(); ++id)
 		{
-			tinyobj::index_t index = shape->mesh.indices[id];
+			const tinyobj::index_t index = shape->mesh.indices[id];
 
 			// copy the position to the buffer
 			memcpy(bufferItr, & attrib.vertices[3 * index.vertex_index], 3 * sizeof(FLOAT));
 			bufferItr += 3;
-			// copy the normal (as color for now)
-			memcpy(bufferItr, & attrib.normals[3 * index.normal_index], 3 * sizeof(FLOAT));
-			bufferItr += 3;
-			// copy the last float (for color float4)
-			memcpy(bufferItr, & One, sizeof(FLOAT));
-			++bufferItr;
+			if (flags & DX12MeshBuffer::EElementFlags::eHaveNormal)
+			{
+				// copy the normal
+				memcpy(bufferItr, &attrib.normals[3 * index.normal_index], 3 * sizeof(FLOAT));
+				bufferItr += 3;
+			}
+			if (flags & DX12MeshBuffer::EElementFlags::eHaveTexcoord)
+			{
+				// copy the uv
+				memcpy(bufferItr, &attrib.texcoords[2 * index.texcoord_index], 2 * sizeof(FLOAT));
+				bufferItr += 2;
+			}
+			if (flags & DX12MeshBuffer::EElementFlags::eHaveColor)
+			{
+				// copy the color
+				memcpy(bufferItr, &attrib.colors[3 * index.vertex_index], 3 * sizeof(FLOAT));
+				bufferItr += 3;
+			}
 		}
 
 		// Get the name of the shape
@@ -255,11 +290,6 @@ const DX12MeshBuffer * DX12Mesh::GetRootMesh() const
 const std::vector<DX12MeshBuffer*>& DX12Mesh::GetSubMeshes() const
 {
 	return m_SubMeshBuffer;
-}
-
-UINT64 DX12Mesh::GetElementFlags() const
-{
-	return m_ElementFlags;
 }
 
 const D3D12_INPUT_LAYOUT_DESC & DX12Mesh::GetInputLayoutDesc() const

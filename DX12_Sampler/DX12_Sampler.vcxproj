@@ -160,6 +160,7 @@
     <ClCompile Include="DX12MeshBuffer.cpp" />
     <ClCompile Include="DX12RenderEngine.cpp" />
     <ClCompile Include="DX12Shader.cpp" />
+    <ClCompile Include="DX12Texture.cpp" />
     <ClCompile Include="DX12Utils.cpp" />
     <ClCompile Include="DX12Window.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="DX12MeshBuffer.h" />
     <ClInclude Include="DX12RenderEngine.h" />
     <ClInclude Include="DX12Shader.h" />
+    <ClInclude Include="DX12Texture.h" />
     <ClInclude Include="DX12Utils.h" />
     <ClInclude Include="DX12Window.h" />
     <ClInclude Include="GameObject.h" />

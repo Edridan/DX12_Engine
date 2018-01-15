@@ -69,7 +69,7 @@ void DX12Camera::Update(FLOAT i_ElapsedTime)
 		if (GetAsyncKeyState(VK_RBUTTON))
 		{
 			// To do : optimize this part of code, need good math here
-
+			// need to fix strange deformation of the screen's edges
 			static const float Sensivity = 0.1f;
 			// Retreive the current pitch and yaw of the camera
 			IntVec2 mouseMovement = window.GetMouseMove();
@@ -117,7 +117,6 @@ void DX12Camera::Update(FLOAT i_ElapsedTime)
 	}
 
 	XMMATRIX tmpMat = XMMatrixLookAtLH(cPos, cTarg, cUp);
-
 	XMStoreFloat4x4(&m_View, tmpMat);
 }
 
