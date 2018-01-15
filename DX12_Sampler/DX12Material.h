@@ -6,7 +6,8 @@
 class DX12Material
 {
 public:
-
+	DX12Material();
+	~DX12Material();
 
 private:
 };
