@@ -79,7 +79,7 @@ D3D12_GPU_VIRTUAL_ADDRESS DX12ConstantBuffer::GetUploadVirtualAddress(ADDRESS_ID
 
 	if (m_ConstantBufferReservedAddress[i_Address] == false)
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error using a non reserved address for constant buffer");
+		POPUP_ERROR("Error using a non reserved address for constant buffer");
 	}
 
 	return m_ConstantBufferUploadHeap[frameIndex]->GetGPUVirtualAddress() + (i_Address * m_ElementSize);

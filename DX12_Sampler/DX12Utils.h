@@ -56,15 +56,39 @@ struct IntVec2
 // return the size of an DXGI_FORMAT element
 UINT SizeOfFormatElement(DXGI_FORMAT i_Format);
 
+enum PopUpIcon
+{
+	eError		= MB_ICONERROR,
+	eWarning	= MB_ICONWARNING,
+};
 
 // Debug
 #ifdef _DEBUG
 void OutputDebug(const char * i_Text, ...);
+void PopUpWindow(PopUpIcon i_Icon, const char * i_Notif, const char * i_Text, ...);
 
+#define PRINT_DEBUG(i_Text, ...)	OutputDebug(i_Text, __VA_ARGS__)
+#define POPUP_WARNING(i_Text, ...)	PopUpWindow(eWarning, "Warning", i_Text, __VA_ARGS__)
+#define POPUP_ERROR(i_Text, ...)	PopUpWindow(eError, "Error", i_Text, __VA_ARGS__)
 
-#define PRINT_DEBUG(i_Text, ...)	OutputDebug(i_Text, ...)
+// Assert e
+#define ASSERT(i_Condition)												\
+do																		\
+{																		\
+	if (!i_Condition)													\
+	{																	\
+		PopUpWindow(eError, "Assert", "Assert error file : %s [%i]",	\
+				__FILE__, __LINE__);									\
+		Assert(i_Text, ...);											\
+	}																	\
+} while (false)
+
 #else
 
 #define  PRINT_DEBUG(i_Text, ...)	
+#define PRINT_DEBUG(i_Text, ...)	OutputDebug(i_Text, ...)
+#define POPUP_WARNING(i_Text, ...)	PopUpWindow(eWarning, "Warning", i_Text, ...)
+
+#define ASSERT(i_Condition)
 
 #endif

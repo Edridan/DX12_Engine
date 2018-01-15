@@ -18,6 +18,12 @@ const int DX12RenderEngine::ConstantBufferPerObjectAlignedSize = (sizeof(Default
 // Destructor
 #define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
 
+
+#define ASSERT_ERROR(i_Text,...)		\
+	POPUP_ERROR(i_Text, __VA_ARGS__);	\
+	DEBUG_BREAK;						\
+	m_Window.Close()
+
 DX12RenderEngine & DX12RenderEngine::GetInstance()
 {
 	assert(s_Instance != nullptr);
@@ -47,7 +53,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error D3D12GetDebugInterface");
+		ASSERT_ERROR("Error D3D12GetDebugInterface");
 		return E_FAIL;
 	}
 
@@ -63,7 +69,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	hr = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error when creating the DXGIFactory1");
+		ASSERT_ERROR("Error when creating the DXGIFactory1");
 		return E_FAIL;
 	}
 
@@ -96,7 +102,8 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	if (!adapterFound)
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error : Device compatible with DX12 not found");
+		ASSERT_ERROR("Error : Device compatible with DX12 not found");
+		DEBUG_BREAK;
 		return E_FAIL;
 	}
 
@@ -108,7 +115,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	);
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error : D3D12CreateDevice");
+		ASSERT_ERROR("Error : D3D12CreateDevice");
 		return E_FAIL;
 	}
 
@@ -121,7 +128,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	hr = m_Device->CreateCommandQueue(&cqDesc, IID_PPV_ARGS(&m_CommandQueue)); // create the command queue
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateCommandQueue");
+		ASSERT_ERROR("Error : CreateCommandQueue");
 		return E_FAIL;
 	}
 
@@ -156,7 +163,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateSwapChain");
+		ASSERT_ERROR("Error : CreateSwapChain");
 		return E_FAIL;
 	}
 
@@ -177,7 +184,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	hr = m_Device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_RtvDescriptorHeap));
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateDescriptorHeap");
+		ASSERT_ERROR("Error : CreateDescriptorHeap");
 		return E_FAIL;
 	}
 
@@ -198,7 +205,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		hr = m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_RenderTargets[i]));
 		if (FAILED(hr))
 		{
-			DX12RenderEngine::GetInstance().PopUpError(L"Error : m_SwapChain->GetBuffer");
+			ASSERT_ERROR("Error : m_SwapChain->GetBuffer");
 			return E_FAIL;
 		}
 
@@ -216,7 +223,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		hr = m_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocator[i]));
 		if (FAILED(hr))
 		{
-			DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateCommandAllocator");
+			ASSERT_ERROR("Error : CreateCommandAllocator");
 			return E_FAIL;
 		}
 	}
@@ -227,7 +234,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	hr = m_Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocator[m_FrameIndex], NULL, IID_PPV_ARGS(&m_CommandList));
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateCommandList");
+		ASSERT_ERROR("Error : CreateCommandList");
 		return E_FAIL;
 	}
 
@@ -238,7 +245,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		hr = m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fences[i]));
 		if (FAILED(hr))
 		{
-			DX12RenderEngine::GetInstance().PopUpError(L"Error : Fences -> CreateFence");
+			ASSERT_ERROR("Error : Fences -> CreateFence");
 			return E_FAIL;
 		}
 		m_FenceValue[i] = 0; // set the initial m_Fences value to 0
@@ -248,7 +255,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_FenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	if (m_FenceEvent == nullptr)
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error : Fences -> CreateEvent");
+		ASSERT_ERROR("Error : Fences -> CreateEvent");
 		return E_FAIL;
 	}
 
@@ -266,7 +273,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 		if (FAILED(hr))
 		{
-			DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateCommittedResource");
+			ASSERT_ERROR("Error : CreateCommittedResource");
 			return E_FAIL;
 		}
 
@@ -277,7 +284,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 		if (FAILED(hr))
 		{
-			DX12RenderEngine::GetInstance().PopUpError(L"Error : Error during Map");
+			ASSERT_ERROR("Error : Error during Map");
 			return E_FAIL;
 		}
 	}
@@ -317,14 +324,14 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, nullptr);
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error : D3D12SerializeRootSignature");
+		ASSERT_ERROR("Error : D3D12SerializeRootSignature");
 		return E_FAIL;
 	}
 
 	hr = m_Device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_DefaultRootSignature));
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error : CreateRootSignature");
+		ASSERT_ERROR("Error : CreateRootSignature");
 		return E_FAIL;
 	}
 
@@ -359,7 +366,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error during default graphics pipeline state creation");
+		ASSERT_ERROR("Error during default graphics pipeline state creation");
 		return false;
 	}
 
@@ -374,7 +381,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	if (FAILED(hr))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error during CreateDescriptorHeap Depth/Stencil creation");
+		ASSERT_ERROR("Error during CreateDescriptorHeap Depth/Stencil creation");
 		return hr;
 	}
 
@@ -433,7 +440,7 @@ HRESULT DX12RenderEngine::PrepareForRender()
 	hr = m_CommandAllocator[m_FrameIndex]->Reset();
 	if (FAILED(hr))
 	{
-		PopUpError(L"Error : Failed to reset command allocator");
+		POPUP_ERROR("Error : Failed to reset command allocator");
 		return hr;
 	}
 
@@ -450,7 +457,7 @@ HRESULT DX12RenderEngine::PrepareForRender()
 	hr = m_CommandList->Reset(m_CommandAllocator[m_FrameIndex], nullptr);
 	if (FAILED(hr))
 	{
-		PopUpError(L"Error in prepare for render");
+		POPUP_ERROR("Error in prepare for render");
 		return hr;
 	}
 
@@ -485,7 +492,7 @@ HRESULT DX12RenderEngine::Render()
 {
 	if (FAILED(UpdatePipeline()))
 	{
-		PopUpError( L"Error during update pipeline");
+		ASSERT_ERROR("Error during update pipeline");
 		return E_FAIL;
 	}
 	else
@@ -575,7 +582,7 @@ void DX12RenderEngine::UpdateConstantBuffer(ADDRESS_ID i_Address, DefaultConstan
 	}
 	else
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error trying to update non reserved address");
+		ASSERT_ERROR("Error trying to update non reserved address");
 	}
 }
 
@@ -588,7 +595,8 @@ D3D12_GPU_VIRTUAL_ADDRESS DX12RenderEngine::GetConstantBufferUploadVirtualAddres
 {
 	if (m_ConstantBufferReservedAddress[i_Address] == false || (i_Address == UnavailableAdressId))
 	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error using a non reserved address for constant buffer");
+		POPUP_ERROR("Error using a non reserved address for constant buffer");
+		DEBUG_BREAK;
 	}
 
 	return m_ConstantBufferUploadHeap[m_FrameIndex]->GetGPUVirtualAddress() + (i_Address * ConstantBufferPerObjectAlignedSize);
@@ -612,26 +620,6 @@ HRESULT DX12RenderEngine::LoadShader(const wchar_t i_Filename)
 {
 	// To do : impl
 	return E_NOTIMPL;
-}
-
-void DX12RenderEngine::PopUpError(const wchar_t * i_Message)
-{
-	MessageBox(NULL, i_Message,
-		L"Error", MB_OK | MB_ICONERROR);
-	m_Window.Close();
-	DEBUG_BREAK;
-}
-
-void DX12RenderEngine::PopUpWarning(const wchar_t * i_Message)
-{
-	MessageBox(NULL, i_Message,
-		L"Warning", MB_OK | MB_ICONWARNING);
-	DEBUG_BREAK;
-}
-
-void DX12RenderEngine::PrintMessage(const char * i_Message)
-{
-	OutputDebugStringA(i_Message);
 }
 
 int DX12RenderEngine::GetFrameIndex() const

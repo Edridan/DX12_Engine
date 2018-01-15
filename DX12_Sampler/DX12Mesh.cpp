@@ -148,7 +148,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		<< std::endl << (ret ? "[No Error]" : error) << std::endl;
 	
 	std::string message(stream.str());
-	DX12RenderEngine::GetInstance().PrintMessage(message.c_str());
+	PRINT_DEBUG(message.c_str());
 
 #else
 	if (!ret)

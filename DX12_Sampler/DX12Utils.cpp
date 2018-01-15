@@ -136,12 +136,24 @@ void OutputDebug(const char * i_Text, ...)
 
 	va_list args;
 	va_start(args, i_Text);
-
 	sprintf_s(buffer, i_Text, args);
-
 	va_end(args);
 
 	OutputDebugStringA(buffer);
+}
+
+void PopUpWindow(PopUpIcon i_Icon, const char * i_Notif, const char * i_Text, ...)
+{
+	static char buffer[2048];
+	const char * p = buffer;
+
+	va_list args;
+	va_start(args, i_Text);
+	sprintf_s(buffer, i_Text, args);
+	va_end(args);
+
+	MessageBoxA(NULL, buffer,
+		i_Notif, MB_OK | MB_ICONERROR);
 }
 
 
