@@ -13,32 +13,32 @@
 #include "lib/tinyobjloader/tiny_obj_loader.h"
 
 // default input element using the input color
-const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_DefaultInputColor[] =
+const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_PrimitiveElementDesc[] =
 {
 	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, (sizeof(float) * 3), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 };
 
 // fill out the default input layout description structure
-D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_DefaultInputColorLayout =
+D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_PrimitiveLayoutDesc =
 {
-	s_DefaultInputColor,
-	sizeof(DX12Mesh::s_DefaultInputColor) / sizeof(D3D12_INPUT_ELEMENT_DESC)
+	s_PrimitiveElementDesc,
+	sizeof(DX12Mesh::s_PrimitiveElementDesc) / sizeof(D3D12_INPUT_ELEMENT_DESC)
 };
-
-// default input element using the input normal
-const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_DefaultInputNormal[] =
-{
-	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, (sizeof(float) * 3), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-};
-
-// fill out the default input layout description structure
-D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_DefaultInputNormalLayout =
-{
-	s_DefaultInputNormal,
-	sizeof(DX12Mesh::s_DefaultInputNormal) / sizeof(D3D12_INPUT_ELEMENT_DESC)
-};
+//
+//// default input element using the input normal
+//const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_DefaultInputNormal[] =
+//{
+//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+//	{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, (sizeof(float) * 3), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+//};
+//
+//// fill out the default input layout description structure
+//D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_DefaultInputNormalLayout =
+//{
+//	s_DefaultInputNormal,
+//	sizeof(DX12Mesh::s_DefaultInputNormal) / sizeof(D3D12_INPUT_ELEMENT_DESC)
+//};
 
 
 /*
@@ -114,15 +114,15 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	switch (i_Prim)
 	{
 	case ePlane:
-		returnMesh = new DX12Mesh(s_DefaultInputColorLayout,
+		returnMesh = new DX12Mesh(s_PrimitiveLayoutDesc,
 			reinterpret_cast<BYTE*>(vPlane), 4u, iPlane, 6u);
 		break;
 	case eTriangle:
-		returnMesh = new DX12Mesh(s_DefaultInputColorLayout,
+		returnMesh = new DX12Mesh(s_PrimitiveLayoutDesc,
 			reinterpret_cast<BYTE*>(vTriangle), 3u);
 		break;
 	case eCube:
-		returnMesh = new DX12Mesh(s_DefaultInputColorLayout,
+		returnMesh = new DX12Mesh(s_PrimitiveLayoutDesc,
 			reinterpret_cast<BYTE*>(vCube), 24u, iCube, 36u);
 		break;
 	}
@@ -173,8 +173,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		UINT stride					= 3;	// default stride in float (3 float for positions)
 		tinyobj::shape_t * shape	= &shapes[sh];
 		const size_t verticeCount	= shape->mesh.indices.size();
-		FLOAT * const verticeBuffer = new FLOAT[verticeCount * stride];
-		FLOAT * bufferItr			= verticeBuffer;
+
 
 		// compute the flag :
 		// by default the mesh always have normals
@@ -197,11 +196,19 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 			flags |= DX12Mesh::EElementFlags::eHaveColor;
 			stride += 3;
 		}
-		// To do : implement multi material rendering
+
+		FLOAT * const verticeBuffer = new FLOAT[verticeCount * stride];
+		FLOAT * bufferItr = verticeBuffer;
 
 		for (size_t id = 0; id < shape->mesh.indices.size(); ++id)
 		{
 			const tinyobj::index_t index = shape->mesh.indices[id];
+
+			// layout order definition depending flags : 
+			// 1 - Position
+			// 2 - Normal
+			// 3 - Texcoord
+			// 4 - Color
 
 			// copy the position to the buffer
 			memcpy(bufferItr, & attrib.vertices[3 * index.vertex_index], 3 * sizeof(FLOAT));
@@ -230,9 +237,12 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> stringConverter;
 		std::wstring wname = stringConverter.from_bytes(shape->name);
 
+		D3D12_INPUT_LAYOUT_DESC layout;
+		CreateInputLayoutFromFlags(layout, flags);
+
 		// create mesh and initialize it
 		mesh->m_SubMeshBuffer.push_back(new DX12MeshBuffer(
-			s_DefaultInputColorLayout,
+			layout,	// the generated layout depending on the flags
 			reinterpret_cast<BYTE*>(verticeBuffer),
 			(UINT)verticeCount,
 			wname.c_str()
@@ -254,7 +264,6 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 
 DX12Mesh::DX12Mesh()
 	:m_RootMeshBuffer(nullptr)
-
 {
 }
 
@@ -294,16 +303,6 @@ const DX12MeshBuffer * DX12Mesh::GetRootMesh() const
 const std::vector<DX12MeshBuffer*>& DX12Mesh::GetSubMeshes() const
 {
 	return m_SubMeshBuffer;
-}
-
-const D3D12_INPUT_LAYOUT_DESC & DX12Mesh::GetInputLayoutDesc() const
-{
-	return m_InputLayoutDesc;
-}
-
-const D3D12_GRAPHICS_PIPELINE_STATE_DESC & DX12Mesh::GetPipelineStateDesc() const
-{
-	return *m_PipelineStateDesc;
 }
 
 UINT DX12Mesh::GetElementSize(D3D12_INPUT_LAYOUT_DESC i_InputLayout)
@@ -360,23 +359,29 @@ void DX12Mesh::CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_InputLayou
 	o_InputLayout.NumElements = size;
 	o_InputLayout.pInputElementDescs = elements;
 
+	// layout order definition depending flags : 
+	// 1 - Position
+	// 2 - Normal
+	// 3 - Texcoord
+	// 4 - Color
+
 	// default position
-	elements[index++] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	elements[index++] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	offset += 3 * sizeof(float);
 
-	if (i_Flags & EElementFlags::eHaveTexcoord)
-	{
-		elements[index++] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-		offset += 2 * sizeof(float);
-	}
 	if (i_Flags & EElementFlags::eHaveNormal)
 	{
-		elements[index++] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+		elements[index++] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 		offset += 3 * sizeof(float);
+	}
+	if (i_Flags & EElementFlags::eHaveTexcoord)
+	{
+		elements[index++] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+		offset += 2 * sizeof(float);
 	}
 	if (i_Flags & EElementFlags::eHaveColor)
 	{
-		elements[index++] = { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+		elements[index++] = { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 		offset += 3 * sizeof(float);
 	}
 }

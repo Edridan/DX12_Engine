@@ -1,13 +1,14 @@
 struct VS_INPUT
 {
-	float4 pos : POSITION;
-	float4 color: COLOR;
+	float3 pos		: POSITION;
+	float3 normal	: NORMAL;
+	float3 color	: COLOR;
 };
 
 struct VS_OUTPUT
 {
-	float4 pos: SV_POSITION;
-	float4 color: COLOR;
+	float4 pos		: SV_POSITION;
+	float4 color	: COLOR;
 };
 
 // b0 buffer
@@ -21,18 +22,16 @@ cbuffer ConstantBuffer : register(b0)
 VS_OUTPUT main(VS_INPUT input)
 {
 	VS_OUTPUT output;
-	float4 pos = input.pos;
+	float4 pos = float4(input.pos, 1.f);
 
 	// Transform the vertex position into projected space.
 	pos = mul(pos, model);
 	pos = mul(pos, view);
 	pos = mul(pos, projection);
 
-	// Old
-	//output.pos = mul(input.pos, transform);
-
+	// Return 
 	output.pos = pos;
-	output.color = input.color;
-	
+	output.color = float4(input.color, 1.f);
+
 	return output;
 }

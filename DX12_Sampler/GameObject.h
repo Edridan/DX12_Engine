@@ -19,8 +19,8 @@ class GameObject
 {
 public:
 	// game object management
-	void		SetMesh(DX12Mesh * i_Mesh, ID3D12PipelineState * i_RenderState);	// this function can create children
-	void		SetMeshBuffer(const DX12MeshBuffer * i_MeshBuffer, ID3D12PipelineState * i_RenderState);
+	void		SetMesh(DX12Mesh * i_Mesh);	// this function can create children
+	void		SetMeshBuffer(const DX12MeshBuffer * i_MeshBuffer);
 
 	// information
 	bool	IsRoot() const;
@@ -53,6 +53,7 @@ private:
 	// rendering pipeline
 	const DX12MeshBuffer *	m_Mesh;
 	ID3D12PipelineState *	m_PipelineState;
+	ID3D12RootSignature *	m_RootSignature;
 	ADDRESS_ID				m_ConstBuffer;
 
 	GameScene * const	m_Scene;

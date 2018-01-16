@@ -35,13 +35,14 @@ int WINAPI WinMain(
 	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/lowpolytree.obj", "resources/obj/");
 	DX12Mesh * cube = DX12Mesh::GeneratePrimitiveMesh(DX12Mesh::eTriangle);
 
+	// push data to the GPU
 	renderEngine.Render();
 
 	GameObject * gameObject = game.CreateGameObject();
-	gameObject->SetMesh(cube, DX12RenderEngine::GetInstance().GetDefaultPipelineState());
+	/*gameObject->SetMesh(cube);
 
-	gameObject = game.CreateGameObject();
-	gameObject->SetMesh(mesh, DX12RenderEngine::GetInstance().GetDefaultPipelineState());
+	gameObject = game.CreateGameObject();*/
+	gameObject->SetMesh(mesh);
 
 	while (renderEngine.GetWindow().IsOpen())
 	{

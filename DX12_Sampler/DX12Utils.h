@@ -122,6 +122,18 @@ void PopUpWindow(PopUpIcon i_Icon, const char * i_Notif, const char * i_Text, ..
 #define POPUP_WARNING(i_Text, ...)	PopUpWindow(eWarning, "Warning", i_Text, __VA_ARGS__)
 #define POPUP_ERROR(i_Text, ...)	PopUpWindow(eError, "Error", i_Text, __VA_ARGS__)
 
+// assert on DX12 error
+#define DX12_ASSERT(i_Hres)				\
+do {									\
+	if (FAILED(i_Hres))					\
+	{									\
+		PRINT_DEBUG("", #i_Hres);		\
+		POPUP_ERROR("", #i_Hres);		\
+		DEBUG_BREAK;					\
+	}									\
+while(false)
+
+
 // Assert e
 #define ASSERT(i_Condition)												\
 do																		\
@@ -136,10 +148,11 @@ do																		\
 
 #else
 
-#define  PRINT_DEBUG(i_Text, ...)	
+#define PRINT_DEBUG(i_Text, ...)	
 #define PRINT_DEBUG(i_Text, ...)	OutputDebug(i_Text, ...)
 #define POPUP_WARNING(i_Text, ...)	PopUpWindow(eWarning, "Warning", i_Text, ...)
 
-#define ASSERT(i_Condition)
+#define DX12_ASSERT(i_Hres)		i_Hres
+#define ASSERT(i_Condition)		i_Condition
 
 #endif

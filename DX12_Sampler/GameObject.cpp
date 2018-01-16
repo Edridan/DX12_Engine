@@ -14,6 +14,8 @@ GameObject::GameObject(GameScene * const i_Scene)
 	,m_Transform(DirectX::XMMatrixIdentity())
 	,m_Scene(i_Scene)
 	,m_ConstBuffer((ADDRESS_ID)-1)
+	,m_PipelineState(nullptr)
+	,m_RootSignature(nullptr)
 {
 }
 
@@ -48,7 +50,7 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 
 		// render mesh
 		// add pso and root signature to the commandlist
-		i_CommandList->SetGraphicsRootSignature(render.GetRootSignature());
+		i_CommandList->SetGraphicsRootSignature(m_RootSignature);
 		
 		// push const buffer
 		if (m_ConstBuffer != UnavailableAdressId)
@@ -72,30 +74,54 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 	}
 }
 
-void GameObject::SetMesh(DX12Mesh * i_Mesh, ID3D12PipelineState * i_PipelineState)
+void GameObject::SetMesh(DX12Mesh * i_Mesh)
 {
 	if (i_Mesh == nullptr)	return;
 
 	// setup the root mesh into the game object
-	SetMeshBuffer(i_Mesh->GetRootMesh(), i_PipelineState);
+	SetMeshBuffer(i_Mesh->GetRootMesh());
 
-	/*for (UINT32 subMesh = 0; i_Mesh->SubMeshesCount(); ++subMesh)
+	// push submesh in different game objects
+	for (UINT32 subMesh = 0; i_Mesh->SubMeshesCount(); ++subMesh)
 	{
 		GameObject * subGameObject = m_Scene->CreateGameObject(this);
-	}*/
+		subGameObject->SetMeshBuffer(i_Mesh->GetSubMeshes()[subMesh]);
+	}
 }
 
-void GameObject::SetMeshBuffer(const DX12MeshBuffer * i_MeshBuffer, ID3D12PipelineState * i_RenderState)
+void GameObject::SetMeshBuffer(const DX12MeshBuffer * i_MeshBuffer)
 {
-	// setup mesh 
+	// setup mesh
 	m_Mesh = i_MeshBuffer;
-	m_PipelineState = i_RenderState;
 
-	if (m_Mesh && (m_ConstBuffer == UnavailableAdressId))
+	if (m_Mesh)
+	{
+		UINT64 flags = m_Mesh->GetElementFlags();
+		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
+		DX12RenderEngine::PipelineStateObject * pipelineStateObject = render.GetPipelineStateObject(flags);
+
+		if (pipelineStateObject != nullptr)
+		{
+			m_PipelineState = pipelineStateObject->m_PipelineState;
+			m_RootSignature = pipelineStateObject->m_DefaultRootSignature;
+		}
+		else
+		{
+			POPUP_ERROR("Unable to find the root or pipeline state in the engine");
+		}
+	}
+
+	if (m_Mesh && m_PipelineState && m_RootSignature && (m_ConstBuffer == UnavailableAdressId))
 	{
 		// map gpu const buffer address if necessary
 		// this allow the game object to put data into the const buffer
 		m_ConstBuffer = DX12RenderEngine::GetInstance().ReserveConstantBufferVirtualAddress();
+	}
+	// release the address if we don't need it anymore
+	else if (m_Mesh == nullptr && (m_ConstBuffer != UnavailableAdressId))
+	{
+		DX12RenderEngine::GetInstance().ReleaseConstantBufferVirtualAddress(m_ConstBuffer);
 	}
 }
 
@@ -121,7 +147,7 @@ bool GameObject::NeedRendering() const
 
 bool GameObject::CanBeRendered() const
 {
-	return ((m_Mesh != NULL) && (m_PipelineState != NULL));
+	return (m_Mesh != NULL);
 }
 
 void GameObject::SetParent(GameObject * i_Parent)

@@ -17,11 +17,13 @@ public:
 	~DX12Shader();
 
 	// Get/Set
-	const D3D12_SHADER_BYTECODE & GetByteCode() const;
+	const D3D12_SHADER_BYTECODE &	GetByteCode() const;
+	bool							IsLoaded() const;
 
 private:
 	// Information
 	const EShaderType	m_ShaderType;
+	bool				m_IsLoaded;	// if true : is loaded and compiled = no error
 	
 	// DX12
 	D3D12_SHADER_BYTECODE		m_ShaderByteCode;

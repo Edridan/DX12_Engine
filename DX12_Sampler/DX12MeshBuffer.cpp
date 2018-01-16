@@ -138,6 +138,11 @@ UINT64 DX12MeshBuffer::GetElementFlags() const
 	return m_ElementFlags;
 }
 
+const std::wstring & DX12MeshBuffer::GetName() const
+{
+	return m_Name;
+}
+
 inline HRESULT DX12MeshBuffer::CreateBuffer(ID3D12Resource ** i_Buffer, UINT i_BufferSize, const wchar_t * i_Name)
 {
 	HRESULT hr;

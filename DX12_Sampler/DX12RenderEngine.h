@@ -6,6 +6,7 @@
 #include <d3d12.h>
 #include <Windows.h>
 #include <DirectXMath.h>
+#include <unordered_map>
 
 #include "DX12Utils.h"
 #include "DX12Window.h"
@@ -32,6 +33,18 @@ public:
 		DirectX::XMFLOAT4X4		m_Projection;
 	};
 
+	struct PipelineStateObject
+	{
+		ID3D12PipelineState *	m_PipelineState;
+		ID3D12RootSignature *	m_DefaultRootSignature;
+	};
+
+	struct ShaderPipeline
+	{
+		DX12Shader *		m_Pixel;
+		DX12Shader *		m_Vertex;
+	};
+
 	// Singleton
 	static DX12RenderEngine &	GetInstance();
 	static void					Create(HINSTANCE & i_HInstance);
@@ -52,10 +65,11 @@ public:
 	UINT8 *						GetConstantBufferGPUAddress(ADDRESS_ID i_Address) const;
 	D3D12_GPU_VIRTUAL_ADDRESS	GetConstantBufferUploadVirtualAddress(ADDRESS_ID i_Address) const;
 	// pipeline state management
-	ID3D12PipelineState *		GetPipelineState(UINT64 i_Flag);
-	ID3D12PipelineState *		GetDefaultPipelineState() const;
-	// shader management
-	HRESULT						LoadShader(const wchar_t i_Filename);
+	// this is used for default basic rendering
+	// if you need other pipeline states (skinned objects for example) create a pipeline state objects on your side
+	PipelineStateObject *		GetPipelineStateObject(UINT64 i_Flag);
+	// get the shaders for default pipeline state objects
+	DX12Shader *				GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type);
 
 	// Get/Set
 	int								GetFrameIndex() const;
@@ -85,6 +99,10 @@ private:
 	// DX12 Internal management
 	HRESULT				UpdatePipeline();
 	HRESULT				WaitForPreviousFrame();
+	// Engine initialization
+	void				GenerateDefaultPipelineState();	// load shaders, root and pipeline state for rendering objects
+	void				CreatePipelineState(UINT64 i_Flags);
+	HRESULT				LoadShader(const wchar_t * i_Filename, DX12Shader::EShaderType i_ShaderType, UINT64 i_Flags);
 
 	// Desc
 #define FRAME_BUFFER_COUNT		3
@@ -125,9 +143,13 @@ private:
 	DX12Shader *				m_DefaultPixelShader;
 	DX12Shader *				m_DefaultVertexShader;
 
-	// Pipeline state
+	// Default Pipeline state
 	ID3D12PipelineState *		m_DefaultPipelineState;	// pipeline state that define all rendering process
 	ID3D12RootSignature*		m_DefaultRootSignature; // root signature defines data shaders will access
+
+	// all default pipeline state objects for rendering are stored in this map (this is used only for basic rendering, if it need alpha, rigging and skinning create your own Pipeline State)
+	std::unordered_map<UINT64, PipelineStateObject*>	m_PipelineStateObjects;	// this containing pipeline states and root
+	std::unordered_map<UINT64, DX12Shader*>				m_PixelShaders, m_VertexShaders;	// this containing pixel and vertices shaders depending the flags
 
 	// Render
 	D3D12_VIEWPORT				m_Viewport; // area that output from rasterizer will be stretched to.

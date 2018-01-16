@@ -16,8 +16,9 @@ public:
 	const D3D12_INPUT_LAYOUT_DESC & GetInputLayout() const;
 
 	// push vertices buffer on commandlist
-	HRESULT PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
-	UINT64	GetElementFlags() const;	// retreive flags to render the mesh buffer
+	HRESULT					PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
+	UINT64					GetElementFlags() const;	// retreive flags to render the mesh buffer
+	const std::wstring &	GetName() const;
 
 	// friend class
 	friend class DX12Mesh;
@@ -25,7 +26,6 @@ private:
 	// dx12 helpers
 	static HRESULT	CreateBuffer(ID3D12Resource ** i_Buffer, UINT i_BufferSize, const wchar_t * i_Name = L"Default Buffer");
 	static HRESULT	UpdateData(ID3D12GraphicsCommandList* i_CommandList, ID3D12Resource * i_Buffer, UINT i_BufferSize, BYTE * i_Data);
-
 
 	// DX12
 	D3D12_INPUT_LAYOUT_DESC				m_InputLayoutDesc;
@@ -37,7 +37,7 @@ private:
 	D3D12_INDEX_BUFFER_VIEW				m_IndexBufferView;
 	// Other
 	const std::wstring 					m_Name;
-
+	// element flags
 	UINT64								m_ElementFlags;
 
 	const bool		m_HaveIndex;

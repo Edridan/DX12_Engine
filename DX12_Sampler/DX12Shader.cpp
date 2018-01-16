@@ -4,6 +4,7 @@
 
 DX12Shader::DX12Shader(EShaderType i_Type, const wchar_t * i_Filename)
 	:m_ShaderType(i_Type)
+	,m_IsLoaded(false)
 {
 	// Load and generate the shader
 	ID3DBlob* shader; // d3d blob for holding vertex shader bytecode
@@ -49,6 +50,7 @@ DX12Shader::DX12Shader(EShaderType i_Type, const wchar_t * i_Filename)
 	m_ShaderByteCode.BytecodeLength = shader->GetBufferSize();
 	m_ShaderByteCode.pShaderBytecode = shader->GetBufferPointer();
 
+	m_IsLoaded = true;
 }
 
 DX12Shader::~DX12Shader()
@@ -58,4 +60,9 @@ DX12Shader::~DX12Shader()
 const D3D12_SHADER_BYTECODE & DX12Shader::GetByteCode() const
 {
 	return m_ShaderByteCode;
+}
+
+bool DX12Shader::IsLoaded() const
+{
+	return m_IsLoaded;
 }

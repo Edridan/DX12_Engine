@@ -53,16 +53,9 @@ public:
 	const DX12MeshBuffer *					GetRootMesh() const;
 	const std::vector<DX12MeshBuffer*>	&	GetSubMeshes() const;
 
-	// Get/Set
-	const D3D12_INPUT_LAYOUT_DESC & GetInputLayoutDesc() const;
-	const D3D12_GRAPHICS_PIPELINE_STATE_DESC & GetPipelineStateDesc() const;
-
-	// Input layout defined for rendering meshes (Used by PSO)
-	static const D3D12_INPUT_ELEMENT_DESC	s_DefaultInputColor[];
-	static D3D12_INPUT_LAYOUT_DESC			s_DefaultInputColorLayout;
-
-	static const D3D12_INPUT_ELEMENT_DESC	s_DefaultInputNormal[];
-	static D3D12_INPUT_LAYOUT_DESC			s_DefaultInputNormalLayout;
+	// these statics are for the primitive meshes
+	static const D3D12_INPUT_ELEMENT_DESC	s_PrimitiveElementDesc[];
+	static D3D12_INPUT_LAYOUT_DESC			s_PrimitiveLayoutDesc;
 
 	// static helpers
 	static UINT		GetElementSize(D3D12_INPUT_LAYOUT_DESC i_InputLayout);
@@ -80,8 +73,4 @@ private:
 	// material
 	DX12Material *					m_RootMeshMaterial;
 	std::vector<DX12Material*>		m_SubMeshMaterial;
-
-	// To do : implement pso management for mesh rendering
-	D3D12_INPUT_LAYOUT_DESC						m_InputLayoutDesc;
-	const D3D12_GRAPHICS_PIPELINE_STATE_DESC *	m_PipelineStateDesc;	// External
 };
