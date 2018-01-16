@@ -3,6 +3,7 @@
 #include "d3dx12.h"
 #include "DX12RenderEngine.h"
 #include "DX12Utils.h"
+#include "DX12Mesh.h"
 
 
 #ifdef _DEBUG
@@ -15,7 +16,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	,m_IndexBufferView()
 	,m_HaveIndex(false)
 	,m_Name(i_Name.c_str())
-	,m_ElementFlags(GetElementFlags(i_InputLayout))
+	,m_ElementFlags(DX12Mesh::CreateFlagsFromInputLayout(i_InputLayout))
 {
 	// get size of the input layout
 	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
@@ -24,7 +25,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	// retreive informations
 	ID3D12GraphicsCommandList * commandList = DX12RenderEngine::GetInstance().GetCommandList();
 	ID3D12CommandQueue * commandQueue = DX12RenderEngine::GetInstance().GetCommandQueue();
-	const UINT stride = GetElementSize(i_InputLayout);
+	const UINT stride = DX12Mesh::GetElementSize(i_InputLayout);
 	const UINT vBufferSize = i_VerticesCount * stride;
 
 	// create vertex buffer
@@ -52,7 +53,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	:m_Count(i_IndexCount)
 	,m_HaveIndex(true)
 	,m_Name(i_Name.c_str())
-	,m_ElementFlags(GetElementFlags(i_InputLayout))
+	,m_ElementFlags(DX12Mesh::CreateFlagsFromInputLayout(i_InputLayout))
 {
 	// get size of the input layout
 	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
@@ -62,7 +63,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	ID3D12GraphicsCommandList * commandList = DX12RenderEngine::GetInstance().GetCommandList();
 	ID3D12CommandQueue * commandQueue = DX12RenderEngine::GetInstance().GetCommandQueue();
 	// vertices count
-	const UINT stride = GetElementSize(i_InputLayout);
+	const UINT stride = DX12Mesh::GetElementSize(i_InputLayout);
 	const UINT vBufferSize = i_VerticesCount * stride;
 	// index count
 	const UINT iBufferSize = sizeof(DWORD) * i_IndexCount;
@@ -194,42 +195,4 @@ inline HRESULT DX12MeshBuffer::UpdateData(ID3D12GraphicsCommandList* i_CommandLi
 	i_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(i_Buffer, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
 
 	return hr;
-}
-
-UINT DX12MeshBuffer::GetElementSize(D3D12_INPUT_LAYOUT_DESC i_InputLayout)
-{
-	// size of one element
-	UINT elementSize = 0;
-	
-	// go into the structure and get the size of the buffer
-	for (UINT i = 0; i < i_InputLayout.NumElements; ++i)
-	{
-		D3D12_INPUT_ELEMENT_DESC element = i_InputLayout.pInputElementDescs[i];
-
-		if ((element.AlignedByteOffset != D3D12_APPEND_ALIGNED_ELEMENT) && (element.AlignedByteOffset != elementSize))
-		{
-			elementSize = element.AlignedByteOffset;
-		}
-
-		// update the size of the current buffer
-		elementSize += SizeOfFormatElement(element.Format);
-	}
-
-	return elementSize;
-}
-
-UINT64 DX12MeshBuffer::GetElementFlags(D3D12_INPUT_LAYOUT_DESC i_InputLayout)
-{
-	UINT64 flags = EElementFlags::eNone;
-	// go into the structure and get the size of the buffer
-	for (UINT i = 0; i < i_InputLayout.NumElements; ++i)
-	{
-		D3D12_INPUT_ELEMENT_DESC element = i_InputLayout.pInputElementDescs[i];
-		
-		if		(strcmp(element.SemanticName, "TEXCOORD") == 0)	flags |= EElementFlags::eHaveTexcoord;
-		else if (strcmp(element.SemanticName, "COLOR") == 0)	flags |= EElementFlags::eHaveColor;
-		else if (strcmp(element.SemanticName, "NORMAL") == 0)	flags |= EElementFlags::eHaveNormal;
-	}
-
-	return flags;
 }

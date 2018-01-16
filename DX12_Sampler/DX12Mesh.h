@@ -27,6 +27,16 @@ public:
 		eCube,
 	};
 
+	// To do : impl textures and different PSO management
+	// element input defines the element desc in flags
+	enum EElementFlags
+	{
+		eNone = 0,
+		eHaveNormal = 1 << 0,
+		eHaveTexcoord = 1 << 1,
+		eHaveColor = 1 << 2,
+	};
+
 	// Factory
 	static DX12Mesh *	GeneratePrimitiveMesh(EPrimitiveMesh i_Prim);
 	static DX12Mesh *	LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder = nullptr);
@@ -53,6 +63,11 @@ public:
 
 	static const D3D12_INPUT_ELEMENT_DESC	s_DefaultInputNormal[];
 	static D3D12_INPUT_LAYOUT_DESC			s_DefaultInputNormalLayout;
+
+	// static helpers
+	static UINT		GetElementSize(D3D12_INPUT_LAYOUT_DESC i_InputLayout);
+	static UINT64	CreateFlagsFromInputLayout(D3D12_INPUT_LAYOUT_DESC i_InputLayout);
+	static void		CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_InputLayout, UINT64 i_Flags);
 
 private:
 	// private constructor created by LoadMesh static function

@@ -108,8 +108,8 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	DX12Mesh * returnMesh = nullptr;
 	// default primitive mesh flags
 	static const UINT64 flags = 
-		DX12MeshBuffer::EElementFlags::eHaveNormal |
-		DX12MeshBuffer::EElementFlags::eHaveTexcoord;
+		DX12Mesh::EElementFlags::eHaveNormal |
+		DX12Mesh::EElementFlags::eHaveTexcoord;
 
 	switch (i_Prim)
 	{
@@ -179,22 +179,22 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		// compute the flag :
 		// by default the mesh always have normals
 		const tinyobj::index_t origin = shape->mesh.indices[0];
-		UINT64 flags = DX12MeshBuffer::EElementFlags::eNone;
+		UINT64 flags = DX12Mesh::EElementFlags::eNone;
 
 		// compute stride and flags for the mesh
 		if (origin.normal_index != -1)
 		{
-			flags |= DX12MeshBuffer::EElementFlags::eHaveNormal;
+			flags |= DX12Mesh::EElementFlags::eHaveNormal;
 			stride += 3;
 		}
 		if (origin.texcoord_index != -1)
 		{
-			flags |= DX12MeshBuffer::EElementFlags::eHaveTexcoord;
+			flags |= DX12Mesh::EElementFlags::eHaveTexcoord;
 			stride += 2;
 		}
 		if (attrib.colors.size() != 0)
 		{
-			flags |= DX12MeshBuffer::EElementFlags::eHaveColor;
+			flags |= DX12Mesh::EElementFlags::eHaveColor;
 			stride += 3;
 		}
 		// To do : implement multi material rendering
@@ -206,19 +206,19 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 			// copy the position to the buffer
 			memcpy(bufferItr, & attrib.vertices[3 * index.vertex_index], 3 * sizeof(FLOAT));
 			bufferItr += 3;
-			if (flags & DX12MeshBuffer::EElementFlags::eHaveNormal)
+			if (flags & DX12Mesh::EElementFlags::eHaveNormal)
 			{
 				// copy the normal
 				memcpy(bufferItr, &attrib.normals[3 * index.normal_index], 3 * sizeof(FLOAT));
 				bufferItr += 3;
 			}
-			if (flags & DX12MeshBuffer::EElementFlags::eHaveTexcoord)
+			if (flags & DX12Mesh::EElementFlags::eHaveTexcoord)
 			{
 				// copy the uv
 				memcpy(bufferItr, &attrib.texcoords[2 * index.texcoord_index], 2 * sizeof(FLOAT));
 				bufferItr += 2;
 			}
-			if (flags & DX12MeshBuffer::EElementFlags::eHaveColor)
+			if (flags & DX12Mesh::EElementFlags::eHaveColor)
 			{
 				// copy the color
 				memcpy(bufferItr, &attrib.colors[3 * index.vertex_index], 3 * sizeof(FLOAT));
@@ -233,7 +233,6 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		// create mesh and initialize it
 		mesh->m_SubMeshBuffer.push_back(new DX12MeshBuffer(
 			s_DefaultInputColorLayout,
-			flags,
 			reinterpret_cast<BYTE*>(verticeBuffer),
 			(UINT)verticeCount,
 			wname.c_str()
@@ -305,4 +304,79 @@ const D3D12_INPUT_LAYOUT_DESC & DX12Mesh::GetInputLayoutDesc() const
 const D3D12_GRAPHICS_PIPELINE_STATE_DESC & DX12Mesh::GetPipelineStateDesc() const
 {
 	return *m_PipelineStateDesc;
+}
+
+UINT DX12Mesh::GetElementSize(D3D12_INPUT_LAYOUT_DESC i_InputLayout)
+{
+	// size of one element
+	UINT elementSize = 0;
+
+	// go into the structure and get the size of the buffer
+	for (UINT i = 0; i < i_InputLayout.NumElements; ++i)
+	{
+		D3D12_INPUT_ELEMENT_DESC element = i_InputLayout.pInputElementDescs[i];
+
+		if ((element.AlignedByteOffset != D3D12_APPEND_ALIGNED_ELEMENT) && (element.AlignedByteOffset != elementSize))
+		{
+			elementSize = element.AlignedByteOffset;
+		}
+
+		// update the size of the current buffer
+		elementSize += SizeOfFormatElement(element.Format);
+	}
+
+	return elementSize;
+}
+
+UINT64 DX12Mesh::CreateFlagsFromInputLayout(D3D12_INPUT_LAYOUT_DESC i_InputLayout)
+{
+	UINT64 flags = EElementFlags::eNone;
+	// go into the structure and get the size of the buffer
+	for (UINT i = 0; i < i_InputLayout.NumElements; ++i)
+	{
+		D3D12_INPUT_ELEMENT_DESC element = i_InputLayout.pInputElementDescs[i];
+
+		if (strcmp(element.SemanticName, "TEXCOORD") == 0)	flags |= EElementFlags::eHaveTexcoord;
+		else if (strcmp(element.SemanticName, "COLOR") == 0)	flags |= EElementFlags::eHaveColor;
+		else if (strcmp(element.SemanticName, "NORMAL") == 0)	flags |= EElementFlags::eHaveNormal;
+	}
+
+	return flags;
+}
+
+void DX12Mesh::CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_InputLayout, UINT64 i_Flags)
+{
+	// compute size of elements
+	D3D12_INPUT_ELEMENT_DESC * elements;
+	UINT size = 1;
+	UINT index = 0;
+	UINT offset = 0;
+
+	if (i_Flags & EElementFlags::eHaveColor)			++size;
+	if (i_Flags & EElementFlags::eHaveTexcoord)			++size;
+	if (i_Flags & EElementFlags::eHaveNormal)			++size;
+
+	elements = new D3D12_INPUT_ELEMENT_DESC[size];
+	o_InputLayout.NumElements = size;
+	o_InputLayout.pInputElementDescs = elements;
+
+	// default position
+	elements[index++] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	offset += 3 * sizeof(float);
+
+	if (i_Flags & EElementFlags::eHaveTexcoord)
+	{
+		elements[index++] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+		offset += 2 * sizeof(float);
+	}
+	if (i_Flags & EElementFlags::eHaveNormal)
+	{
+		elements[index++] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+		offset += 3 * sizeof(float);
+	}
+	if (i_Flags & EElementFlags::eHaveColor)
+	{
+		elements[index++] = { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+		offset += 3 * sizeof(float);
+	}
 }
