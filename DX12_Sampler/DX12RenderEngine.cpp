@@ -782,42 +782,33 @@ inline void DX12RenderEngine::GenerateDefaultPipelineState()
 {
 	// preload shaders
 	LoadShader(L"DefaultPixel.hlsl", DX12Shader::ePixel, 
-		DX12Mesh::EElementFlags::eNone 
-		| DX12Mesh::EElementFlags::eHaveNormal);
+		DX12Mesh::EElementFlags::eHaveNormal);
 	LoadShader(L"NormalVertex.hlsl", DX12Shader::eVertex, 
-		DX12Mesh::EElementFlags::eNone 
-		| DX12Mesh::EElementFlags::eHaveNormal);
+		DX12Mesh::EElementFlags::eHaveNormal);
 
 	LoadShader(L"NormalTexPixel.hlsl", DX12Shader::ePixel, 
-		DX12Mesh::EElementFlags::eNone 
-		| DX12Mesh::EElementFlags::eHaveNormal 
+		DX12Mesh::EElementFlags::eHaveNormal 
 		| DX12Mesh::EElementFlags::eHaveTexcoord);
 	LoadShader(L"NormalTexVertex.hlsl", DX12Shader::eVertex, 
-		DX12Mesh::EElementFlags::eNone 
-		| DX12Mesh::EElementFlags::eHaveNormal 
+		DX12Mesh::EElementFlags::eHaveNormal 
 		| DX12Mesh::EElementFlags::eHaveTexcoord);
 
 	LoadShader(L"DefaultPixel.hlsl", DX12Shader::ePixel, 
-		DX12Mesh::EElementFlags::eNone 
-		| DX12Mesh::EElementFlags::eHaveNormal 
+		DX12Mesh::EElementFlags::eHaveNormal 
 		| DX12Mesh::EElementFlags::eHaveColor);
 	LoadShader(L"NormalColorVertex.hlsl", DX12Shader::eVertex,
-		DX12Mesh::EElementFlags::eNone 
-		| DX12Mesh::EElementFlags::eHaveNormal 
+		DX12Mesh::EElementFlags::eHaveNormal 
 		| DX12Mesh::EElementFlags::eHaveColor);
 
 	// here we are going to build each pipeline state for rendering
 	// this is a default rendering pipeline and root signatures
 	// if a mesh need other pipeline state object to be rendered don't use them
-	CreatePipelineState(DX12Mesh::EElementFlags::eNone
-		| DX12Mesh::EElementFlags::eHaveNormal);
+	CreatePipelineState(DX12Mesh::EElementFlags::eHaveNormal);
 
-	CreatePipelineState(DX12Mesh::EElementFlags::eNone
-		| DX12Mesh::EElementFlags::eHaveNormal
+	CreatePipelineState(DX12Mesh::EElementFlags::eHaveNormal
 		| DX12Mesh::EElementFlags::eHaveTexcoord);
 
-	CreatePipelineState(DX12Mesh::EElementFlags::eNone 
-		| DX12Mesh::EElementFlags::eHaveNormal 
+	CreatePipelineState(DX12Mesh::EElementFlags::eHaveNormal 
 		| DX12Mesh::EElementFlags::eHaveColor);
 }
 
