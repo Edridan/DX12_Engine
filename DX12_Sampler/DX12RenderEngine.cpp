@@ -788,14 +788,14 @@ inline void DX12RenderEngine::GenerateDefaultPipelineState()
 		DX12Mesh::EElementFlags::eNone 
 		| DX12Mesh::EElementFlags::eHaveNormal);
 
-	/*LoadShader(L"NormalTexPixel.hlsl", DX12Shader::ePixel, 
+	LoadShader(L"NormalTexPixel.hlsl", DX12Shader::ePixel, 
 		DX12Mesh::EElementFlags::eNone 
 		| DX12Mesh::EElementFlags::eHaveNormal 
 		| DX12Mesh::EElementFlags::eHaveTexcoord);
 	LoadShader(L"NormalTexVertex.hlsl", DX12Shader::eVertex, 
 		DX12Mesh::EElementFlags::eNone 
 		| DX12Mesh::EElementFlags::eHaveNormal 
-		| DX12Mesh::EElementFlags::eHaveTexcoord);*/
+		| DX12Mesh::EElementFlags::eHaveTexcoord);
 
 	LoadShader(L"DefaultPixel.hlsl", DX12Shader::ePixel, 
 		DX12Mesh::EElementFlags::eNone 
@@ -812,9 +812,9 @@ inline void DX12RenderEngine::GenerateDefaultPipelineState()
 	CreatePipelineState(DX12Mesh::EElementFlags::eNone
 		| DX12Mesh::EElementFlags::eHaveNormal);
 
-	/*CreatePipelineState(DX12Mesh::EElementFlags::eNone
+	CreatePipelineState(DX12Mesh::EElementFlags::eNone
 		| DX12Mesh::EElementFlags::eHaveNormal
-		| DX12Mesh::EElementFlags::eHaveTexcoord);*/
+		| DX12Mesh::EElementFlags::eHaveTexcoord);
 
 	CreatePipelineState(DX12Mesh::EElementFlags::eNone 
 		| DX12Mesh::EElementFlags::eHaveNormal 
@@ -833,14 +833,9 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	DX12Shader * pixelShader = nullptr, *vertexShader = nullptr;
 	UINT textureCount = 0;
 
-	// this should have one texture minimum
-	if (i_Flags & DX12Mesh::EElementFlags::eHaveTexcoord)
-	{
-		textureCount = 1;
-	}
-
 	// sampler for textures
-	D3D12_STATIC_SAMPLER_DESC* sampler = nullptr;
+	D3D12_STATIC_SAMPLER_DESC	* sampler			= nullptr;
+	D3D12_ROOT_DESCRIPTOR_TABLE * descriptorTable	= nullptr;
 
 	// create input layout
 	DX12Mesh::CreateInputLayoutFromFlags(desc, i_Flags);
@@ -857,6 +852,49 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	{
 		PopUpWindow(PopUpIcon::eWarning, "Warning", "Trying to create a pipeline state but pixel or vertex shaders are not loaded");
 		DEBUG_BREAK;
+		return;
+	}
+
+	// create sampler for mesh buffer with tex coord
+	// we are going to use static samplers that are samplers that we can't change when they are set to the pipeline state
+	// this mean we have to save samplers in files and read them when loading the mesh
+	// To do : multiple textures count
+	if (i_Flags & DX12Mesh::EElementFlags::eHaveTexcoord)
+	{
+		// at least one texture
+		textureCount = 1;
+
+		// create descriptor table ranges
+		D3D12_DESCRIPTOR_RANGE*  descriptorTableRanges = new D3D12_DESCRIPTOR_RANGE[textureCount];
+		descriptorTableRanges[0].RangeType			= D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // this is a range of shader resource views (descriptors)
+		descriptorTableRanges[0].NumDescriptors		= 1; // we only have one texture right now, so the range is only 1
+		descriptorTableRanges[0].BaseShaderRegister = 0; // start index of the shader registers in the range
+		descriptorTableRanges[0].RegisterSpace		= 0; // space 0. can usually be zero
+
+		descriptorTableRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
+
+		descriptorTable = new D3D12_ROOT_DESCRIPTOR_TABLE[1];	// create a descriptor table
+		descriptorTable[0].NumDescriptorRanges	= textureCount;	// one range per texture
+		descriptorTable[0].pDescriptorRanges	= descriptorTableRanges; // the pointer to the beginning of our ranges array
+
+		sampler = new D3D12_STATIC_SAMPLER_DESC[textureCount]; // create a descriptor table
+
+		for (UINT i = 0; i < textureCount; ++i)
+		{
+			sampler[0].Filter			= D3D12_FILTER_MIN_MAG_MIP_POINT;
+			sampler[0].AddressU			= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+			sampler[0].AddressV			= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+			sampler[0].AddressW			= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+			sampler[0].MipLODBias		= 0;
+			sampler[0].MaxAnisotropy	= 0;
+			sampler[0].ComparisonFunc	= D3D12_COMPARISON_FUNC_NEVER;
+			sampler[0].BorderColor		= D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+			sampler[0].MinLOD			= 0.0f;
+			sampler[0].MaxLOD			= D3D12_FLOAT32_MAX;
+			sampler[0].ShaderRegister	= 0;
+			sampler[0].RegisterSpace	= 0;
+			sampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+		}
 	}
 
 	// -- Create root signature -- //
@@ -875,6 +913,14 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	rootParameters[0].Descriptor = rootCBVDescriptor; // this is the root descriptor for this root parameter
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
 
+	// setup the root parameters for textures
+	for (UINT i = 0; i < textureCount; ++i) 
+	{
+		rootParameters[1 + i].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[1 + i].DescriptorTable	= descriptorTable[i];
+		rootParameters[1 + i].ShaderVisibility	= D3D12_SHADER_VISIBILITY_PIXEL;	// for now only the pixel shader will going to use the textures
+	}
+
 	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
@@ -888,8 +934,8 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
 	rootSignatureDesc.Init(1 + textureCount, // we have 1 root parameter
 		rootParameters,			// a pointer to the beginning of our root parameters array
-		0,						// static samplers count
-		nullptr,				// static samplers pointer
+		textureCount,			// static samplers count
+		sampler,				// static samplers pointer
 		rootSignatureFlags);	// flags
 
 	ID3DBlob* signature;
