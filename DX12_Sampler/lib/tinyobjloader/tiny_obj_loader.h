@@ -670,9 +670,10 @@ static inline bool parseVertexWithColor(real_t *x, real_t *y, real_t *z, real_t 
   (*y) = parseReal(token, default_y);
   (*z) = parseReal(token, default_z);
 
-  (*r) = parseReal(token, 1.0);
-  (*g) = parseReal(token, 1.0);
-  (*b) = parseReal(token, 1.0);
+  // custom code
+  (*r) = parseReal(token, -1.0);
+  (*g) = parseReal(token, -1.0);
+  (*b) = parseReal(token, -1.0);
 
   return true;
 }

@@ -174,7 +174,6 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		tinyobj::shape_t * shape	= &shapes[sh];
 		const size_t verticeCount	= shape->mesh.indices.size();
 
-
 		// compute the flag :
 		// by default the mesh always have normals
 		const tinyobj::index_t origin = shape->mesh.indices[0];
@@ -191,7 +190,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 			flags |= DX12Mesh::EElementFlags::eHaveTexcoord;
 			stride += 2;
 		}
-		if (attrib.colors.size() != 0)
+		if (attrib.colors.size() != 0 && (attrib.colors[0] != -1.0f) /* verify that color is really present in the model */)
 		{
 			flags |= DX12Mesh::EElementFlags::eHaveColor;
 			stride += 3;
