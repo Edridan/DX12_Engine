@@ -1,4 +1,5 @@
 #include "DX12Mesh.h"
+#include "DX12Texture.h"
 #include "DX12RenderEngine.h"
 #include "DX12MeshBuffer.h"
 
@@ -25,21 +26,6 @@ D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_PrimitiveLayoutDesc =
 	s_PrimitiveElementDesc,
 	sizeof(DX12Mesh::s_PrimitiveElementDesc) / sizeof(D3D12_INPUT_ELEMENT_DESC)
 };
-//
-//// default input element using the input normal
-//const D3D12_INPUT_ELEMENT_DESC DX12Mesh::s_DefaultInputNormal[] =
-//{
-//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-//	{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, (sizeof(float) * 3), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-//};
-//
-//// fill out the default input layout description structure
-//D3D12_INPUT_LAYOUT_DESC DX12Mesh::s_DefaultInputNormalLayout =
-//{
-//	s_DefaultInputNormal,
-//	sizeof(DX12Mesh::s_DefaultInputNormal) / sizeof(D3D12_INPUT_ELEMENT_DESC)
-//};
-
 
 /*
  *	Mesh primitive buffers
@@ -130,7 +116,7 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	return returnMesh;
 }
 
-DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder)
+DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder, const char * i_TextureFolder)
 {
 	tinyobj::attrib_t					attrib;
 	std::vector<tinyobj::shape_t>		shapes;
@@ -166,6 +152,47 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 
 	// load mesh information and create the stream
 	DX12Mesh * mesh = new DX12Mesh;
+
+	// load textures
+	// create load directory
+	std::string textureFolder;
+
+	if (i_TextureFolder == nullptr)
+	{
+		if (i_MaterialFolder == nullptr)
+		{
+			textureFolder.append(i_MaterialFolder);
+		}
+		else
+		{
+			// default texture folder
+			textureFolder.append("resources/tex/");
+		}
+	}
+
+	for (size_t i = 0; i < material.size(); ++i)
+	{
+		//std::string texFilename = 
+		const char * texName = material[i].ambient_texname.c_str();
+
+		if (std::strcmp(texName, "") != 0 && mesh->m_Textures[texName] == nullptr)
+		{
+			std::string texFilepath(textureFolder);
+			texFilepath.append(texName);
+
+			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> stringConverter;
+			std::wstring wTexName = stringConverter.from_bytes(texFilepath.c_str());
+
+			DX12Texture * tex = new DX12Texture(wTexName.c_str());
+
+			// add to textures loaded
+			if (tex->IsLoaded())
+			{
+				mesh->m_Textures[texName] = tex;
+			}
+		}
+	}
+
 
 	for (size_t sh = 0; sh < shapes.size(); ++sh)
 	{
@@ -292,6 +319,28 @@ bool DX12Mesh::HaveSubMeshes() const
 UINT DX12Mesh::SubMeshesCount() const
 {
 	return (UINT)(m_SubMeshBuffer.size());
+}
+
+int DX12Mesh::GetTextures(std::vector<DX12Texture*> o_Textures, size_t i_SubMeshId)
+{
+
+
+	return 0;
+}
+
+int DX12Mesh::GetTextures(std::vector<DX12Texture*> o_Textures)
+{
+	return 0;
+}
+
+int DX12Mesh::GetMaterial(std::vector<DX12Material*> o_Mat, size_t i_SubMeshId)
+{
+	return 0;
+}
+
+int DX12Mesh::GetMaterial(std::vector<DX12Material*> o_Mat)
+{
+	return 0;
 }
 
 const DX12MeshBuffer * DX12Mesh::GetRootMesh() const

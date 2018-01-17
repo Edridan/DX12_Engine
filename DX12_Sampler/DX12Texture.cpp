@@ -1,26 +1,97 @@
 #include "DX12Texture.h"
 
 #include "DX12Utils.h"
+#include "DX12RenderEngine.h"
 
 DX12Texture::DX12Texture(const wchar_t * i_Filename)
 	:m_Name(i_Filename)
 	,m_IsLoaded(false)
+	,m_DescriptorHeap(nullptr)
+	,m_TextureBuffer(nullptr)
+	,m_TextureBufferUploadHeap(nullptr)
+	,m_Desc()
 {
 	BYTE * data = nullptr;
+	ImageDataDesc imageDesc;
 	int bytesPerRow = 0;
 
+	int imageSize = LoadImageDataFromFile(&data, m_Desc, imageDesc, m_Name.c_str());
+
 	// load image from file
-	if (FAILED(LoadImageDataFromFile(&data, m_Desc, bytesPerRow, m_Name.c_str())))
+	if (imageSize <= 0)
 	{
 		POPUP_ERROR("Unable to load %S\n", m_Name.c_str());
 		DEBUG_BREAK;
 		return;
 	}
 
+	// copy the data to the texture resource
+	ID3D12Device * device = DX12RenderEngine::GetInstance().GetDevice();
+	ID3D12GraphicsCommandList * commandList = DX12RenderEngine::GetInstance().GetCommandList();
 
-	// push data on gpu
+	// create the descriptor heap that will store our srv
+	D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+	heapDesc.NumDescriptors = 1;
+	heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	DX12_ASSERT(device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_DescriptorHeap)));
 
+	DX12_ASSERT(device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), // a default heap
+		D3D12_HEAP_FLAG_NONE, // no flags
+		&m_Desc, // the description of our texture
+		D3D12_RESOURCE_STATE_COPY_DEST, // We will copy the texture from the upload heap to here, so we start it out in a copy dest state
+		nullptr, // used for render targets and depth/stencil buffers
+		IID_PPV_ARGS(&m_TextureBuffer)));
 
+	// name the heap buffer
+	std::wstring heapName(i_Filename);
+	heapName.append(L" Buffer Resource Heap");
+	m_TextureBuffer->SetName(heapName.c_str());
+
+	UINT64 textureUploadBufferSize;
+	// this function gets the size an upload buffer needs to be to upload a texture to the gpu.
+	// each row must be 256 byte aligned except for the last row, which can just be the size in bytes of the row
+	// eg. textureUploadBufferSize = ((((width * numBytesPerPixel) + 255) & ~255) * (height - 1)) + (width * numBytesPerPixel);
+	//textureUploadBufferSize = (((imageBytesPerRow + 255) & ~255) * (textureDesc.Height - 1)) + imageBytesPerRow;
+	device->GetCopyableFootprints(&m_Desc, 0, 1, 0, nullptr, nullptr, nullptr, &textureUploadBufferSize);
+
+	DX12_ASSERT(device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // upload heap
+		D3D12_HEAP_FLAG_NONE, // no flags
+		&CD3DX12_RESOURCE_DESC::Buffer(textureUploadBufferSize), // resource description for a buffer (storing the image data in this heap just to copy to the default heap)
+		D3D12_RESOURCE_STATE_GENERIC_READ, // We will copy the contents from this heap to the default heap above
+		nullptr,
+		IID_PPV_ARGS(&m_TextureBufferUploadHeap)));
+
+	// name the heap buffer
+	std::wstring uploadBufferName(i_Filename);
+	uploadBufferName.append(L" Texture Buffer Upload Resource Heap");
+	m_TextureBufferUploadHeap->SetName(uploadBufferName.c_str());
+
+	// store vertex buffer in upload heap
+	D3D12_SUBRESOURCE_DATA textureData = {};
+	textureData.pData = &data[0]; // pointer to our image data
+	textureData.RowPitch = imageDesc.BytesPerRow; // size of all our triangle vertex data
+	textureData.SlicePitch = imageDesc.BytesPerRow * m_Desc.Height; // also the size of our triangle vertex data
+
+	// Now we copy the upload buffer contents to the default heap
+	UpdateSubresources(commandList, m_TextureBuffer, m_TextureBufferUploadHeap, 0, 0, 1, &textureData);
+
+	// transition the texture default heap to a pixel shader resource (we will be sampling from this heap in the pixel shader to get the color of pixels)
+	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_TextureBuffer, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+
+	// now we create a shader resource view (descriptor that points to the texture and describes it)
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = m_Desc.Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = 1;
+
+	device->CreateShaderResourceView(m_TextureBuffer, &srvDesc, m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	// delete unused data
+	delete data;
 
 	m_IsLoaded = true;
 }
@@ -32,8 +103,8 @@ DX12Texture::~DX12Texture()
 IntVec2 DX12Texture::GetSize() const
 {
 	return IntVec2(
-		m_Desc.Width,
-		m_Desc.Height
+		(int)m_Desc.Width,
+		(int)m_Desc.Height
 	);
 }
 
@@ -42,9 +113,38 @@ const std::wstring & DX12Texture::GetName() const
 	return m_Name;
 }
 
-int DX12Texture::LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, int & o_BytesPerRow, LPCWSTR i_Filename)
+bool DX12Texture::IsLoaded() const
+{
+	return m_IsLoaded;
+}
+
+const ID3D12DescriptorHeap * DX12Texture::GetDescriptorHeap() const
+{
+	return m_DescriptorHeap;
+}
+
+HRESULT DX12Texture::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
+{
+	// set the descriptor heap
+	ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap };
+	i_CommandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+	i_CommandList->SetGraphicsRootDescriptorTable(1, m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+
+	return S_OK;
+}
+
+// retreived from : https://www.braynzarsoft.net/viewtutorial/q16390-directx-12-textures-from-file
+int DX12Texture::LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, ImageDataDesc & o_Desc, LPCWSTR i_Filename)
 {
 	HRESULT hr;
+
+	// initialize the return data
+	o_Desc.BitsPerPixel = -1;
+	o_Desc.BytesPerRow = -1;
+	o_Desc.ImageSize = -1;
+	o_Desc.Height = -1;
+	o_Desc.Width = -1;
 
 	// we only need one instance of the imaging factory to create decoders and frames
 	static IWICImagingFactory *wicFactory;
@@ -129,27 +229,34 @@ int DX12Texture::LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC &
 		// this is so we know to get the image data from the wicConverter (otherwise we will get from wicFrame)
 		imageConverted = true;
 	}
-
+	
 	int bitsPerPixel = GetDXGIFormatBitsPerPixel(dxgiFormat); // number of bits per pixel
-	o_BytesPerRow = (textureWidth * bitsPerPixel) / 8; // number of bytes in each row of the image data
-	int imageSize = o_BytesPerRow * textureHeight; // total image size in bytes
+	int bytesPerRow = (textureWidth * bitsPerPixel) / 8; // number of bytes in each row of the image data
+	int imageSize = bytesPerRow * textureHeight; // total image size in bytes
 
-												 // allocate enough memory for the raw image data, and set o_ImageData to point to that memory
+	// allocate enough memory for the raw image data, and set o_ImageData to point to that memory
 	*o_ImageData = (BYTE*)malloc(imageSize);
 
 	// copy (decoded) raw image data into the newly allocated memory (o_ImageData)
 	if (imageConverted)
 	{
 		// if image format needed to be converted, the wic converter will contain the converted image
-		hr = wicConverter->CopyPixels(0, o_BytesPerRow, imageSize, *o_ImageData);
+		hr = wicConverter->CopyPixels(0, bytesPerRow, imageSize, *o_ImageData);
 		if (FAILED(hr)) return 0;
 	}
 	else
 	{
 		// no need to convert, just copy data from the wic frame
-		hr = wicFrame->CopyPixels(0, o_BytesPerRow, imageSize, *o_ImageData);
+		hr = wicFrame->CopyPixels(0, bytesPerRow, imageSize, *o_ImageData);
 		if (FAILED(hr)) return 0;
 	}
+
+	// fill up the desc
+	o_Desc.BitsPerPixel = bitsPerPixel;
+	o_Desc.BytesPerRow = bytesPerRow;
+	o_Desc.ImageSize = imageSize;
+	o_Desc.Height = textureHeight;
+	o_Desc.Width = textureWidth;
 
 	// now describe the texture with the information we have obtained from the image
 	o_ResourceDescription = {};

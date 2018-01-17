@@ -123,15 +123,15 @@ void PopUpWindow(PopUpIcon i_Icon, const char * i_Notif, const char * i_Text, ..
 #define POPUP_ERROR(i_Text, ...)	PopUpWindow(eError, "Error", i_Text, __VA_ARGS__)
 
 // assert on DX12 error
-#define DX12_ASSERT(i_Hres)				\
-do {									\
-	if (FAILED(i_Hres))					\
-	{									\
-		PRINT_DEBUG("", #i_Hres);		\
-		POPUP_ERROR("", #i_Hres);		\
-		DEBUG_BREAK;					\
-	}									\
-while(false)
+#define DX12_ASSERT(i_Hres)											\
+do {																\
+	if (FAILED(i_Hres))												\
+	{																\
+		PRINT_DEBUG("%s : %s %i", #i_Hres, __FILE__, __LINE__);		\
+		POPUP_ERROR("%s : %s %i", #i_Hres, __FILE__, __LINE__);		\
+		DEBUG_BREAK;												\
+	}																\
+} while(false)
 
 
 // Assert e

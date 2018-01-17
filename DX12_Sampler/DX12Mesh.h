@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 
 #include <vector>
+#include <map>
 
 #include "DX12Shader.h"
 #include "DX12ConstantBuffer.h"
@@ -13,6 +14,7 @@
 // class predef
 class DX12MeshBuffer;
 class DX12Material;
+class DX12Texture;
 
 class DX12Mesh
 {
@@ -39,7 +41,7 @@ public:
 
 	// Factory
 	static DX12Mesh *	GeneratePrimitiveMesh(EPrimitiveMesh i_Prim);
-	static DX12Mesh *	LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder = nullptr);
+	static DX12Mesh *	LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder = nullptr, const char * i_TextureFolder = nullptr);
 
 	// one shape mesh generation
 	DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount);
@@ -49,6 +51,14 @@ public:
 	// submeshes
 	bool	HaveSubMeshes() const;
 	UINT	SubMeshesCount() const;
+
+	// get the textures for the meshes (future : will be stocked directly into the materials)
+	int		GetTextures(std::vector<DX12Texture*> o_Textures, size_t i_SubMeshId);	// specific for the submeshes
+	int		GetTextures(std::vector<DX12Texture*> o_Textures);	// root mesh
+	// get material for the meshes
+	// to do : implement
+	int		GetMaterial(std::vector<DX12Material*> o_Mat, size_t i_SubMeshId);	// specific for the submeshes
+	int		GetMaterial(std::vector<DX12Material*> o_Mat);	// root mesh
 
 	const DX12MeshBuffer *					GetRootMesh() const;
 	const std::vector<DX12MeshBuffer*>	&	GetSubMeshes() const;
@@ -63,6 +73,13 @@ public:
 	static void		CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_InputLayout, UINT64 i_Flags);
 
 private:
+	struct MeshBuffer
+	{
+		std::vector<DX12Texture*>	Textures;
+		std::vector<DX12Material*>	Materials;
+		DX12MeshBuffer *			MeshBuffer;
+	};
+
 	// private constructor created by LoadMesh static function
 	DX12Mesh();
 
@@ -73,4 +90,7 @@ private:
 	// material
 	DX12Material *					m_RootMeshMaterial;
 	std::vector<DX12Material*>		m_SubMeshMaterial;
+
+	// textures
+	std::map<std::string, DX12Texture *>	m_Textures;
 };
