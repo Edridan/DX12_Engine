@@ -295,79 +295,12 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		m_ConstantBufferReservedAddress[i] = false;
 	}
 
-	// -- Create default root signature -- //
+	// -- Create multiple default Pipeline State and Root Signature for predifined -- //
 
-	// create the root descriptor : where to find the data for this root parameter
-	D3D12_ROOT_DESCRIPTOR rootDescriptor;
-	rootDescriptor.RegisterSpace = 0;
-	rootDescriptor.ShaderRegister = 0;
-
-	// create the default root parameter and fill it out
-	// this paramater is the model view projection matrix
-	D3D12_ROOT_PARAMETER  rootParameters[1]; // only one parameter right now
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
-	rootParameters[0].Descriptor = rootDescriptor; // this is the root descriptor for this root parameter
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
-
-	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Init(_countof(rootParameters), // we have 1 root parameter
-		rootParameters, // a pointer to the beginning of our root parameters array
-		0,
-		nullptr,
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // we can deny shader stages here for better performance
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS);
-	
-	ID3DBlob* signature;
-	hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, nullptr);
-	if (FAILED(hr))
-	{
-		ASSERT_ERROR("Error : D3D12SerializeRootSignature");
-		return E_FAIL;
-	}
-
-	hr = m_Device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_DefaultRootSignature));
-	if (FAILED(hr))
-	{
-		ASSERT_ERROR("Error : CreateRootSignature");
-		return E_FAIL;
-	}
-
-	// -- Create default PSO -- //
-
-	// load default shader
-
-	// Load default pso and shader
-	//m_DefaultPixelShader = new DX12Shader(DX12Shader::ePixel, L"PixelShader.hlsl");
-	//m_DefaultVertexShader = new DX12Shader(DX12Shader::eVertex, L"VertexShader.hlsl");
-
-	//// Create default pso
-	//D3D12_GRAPHICS_PIPELINE_STATE_DESC defaultPipelineDesc = {};
-
-	//defaultPipelineDesc.InputLayout = DX12Mesh::s_DefaultInputColorLayout; // the structure describing our input layout
-	//defaultPipelineDesc.pRootSignature = m_DefaultRootSignature; // the root signature that describes the input data this pso needs
-	//defaultPipelineDesc.VS = m_DefaultVertexShader->GetByteCode(); // structure describing where to find the vertex shader bytecode and how large it is	(thx ZELDARCK)
-	//defaultPipelineDesc.PS = m_DefaultPixelShader->GetByteCode(); // same as VS but for pixel shader
-	//defaultPipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // type of topology we are drawing
-	//defaultPipelineDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // format of the render target
-	//defaultPipelineDesc.SampleDesc = sampleDesc; // must be the same sample description as the swapchain and depth/stencil buffer
-	//defaultPipelineDesc.SampleMask = 0xffffffff; // sample mask has to do with multi-sampling. 0xffffffff means point sampling is done
-	//defaultPipelineDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // a default rasterizer state.
-	//defaultPipelineDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
-	//defaultPipelineDesc.NumRenderTargets = 1; // we are only binding one render target
-	//defaultPipelineDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-	//defaultPipelineDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
-
-	//// Create the default pipeline state object
-	//hr = m_Device->CreateGraphicsPipelineState(&defaultPipelineDesc, IID_PPV_ARGS(&m_DefaultPipelineState));
-
-	//if (FAILED(hr))
-	//{
-	//	ASSERT_ERROR("Error during default graphics pipeline state creation");
-	//	return false;
-	//}
+	// generate default pipeline states objects
+	// this is going to create default pipeline state for drawing default objects
+	// this features : vertex coloring, one texture handling
+	GenerateDefaultPipelineState();
 
 	// -- Create depth/stencil buffer -- //
 
@@ -410,8 +343,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	m_DepthStencilBuffer->SetName(L"Depth Stencil buffer");
 
-	// generate default pipeline states objects
-	GenerateDefaultPipelineState();
 
 	// -- Setup viewport and scissor -- //
 
@@ -478,7 +409,8 @@ HRESULT DX12RenderEngine::PrepareForRender()
 	m_CommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
 	// Clear the render target by using the ClearRenderTargetView command
-	const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	//const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	const float clearColor[] = { 0.4f, 0.4f, 0.4f, 1.0f };
 	m_CommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
 	// Setting up the command list
@@ -486,6 +418,13 @@ HRESULT DX12RenderEngine::PrepareForRender()
 	m_CommandList->RSSetScissorRects(1, &DX12RenderEngine::GetInstance().GetScissor());
 
 	m_CommandList->ClearDepthStencilView(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+
+
+
+	// setup primitive topology
+	m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
+
 
 	return S_OK;
 }
@@ -652,11 +591,6 @@ ID3D12Device * DX12RenderEngine::GetDevice() const
 	return m_Device;
 }
 
-ID3D12RootSignature * DX12RenderEngine::GetRootSignature() const
-{
-	return m_DefaultRootSignature;
-}
-
 ID3D12CommandQueue * DX12RenderEngine::GetCommandQueue() const
 {
 	return m_CommandQueue;
@@ -723,9 +657,6 @@ DX12RenderEngine::~DX12RenderEngine()
 
 		SAFE_RELEASE(m_ConstantBufferUploadHeap[i]);
 	};
-
-	SAFE_RELEASE(m_DefaultRootSignature);
-	//SAFE_RELEASE(m_DefaultPipelineState);
 
 	SAFE_RELEASE(m_DepthStencilBuffer);
 	SAFE_RELEASE(m_DepthStencilDescriptorHeap);

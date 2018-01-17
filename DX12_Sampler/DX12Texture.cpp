@@ -3,14 +3,46 @@
 #include "DX12Utils.h"
 
 DX12Texture::DX12Texture(const wchar_t * i_Filename)
+	:m_Name(i_Filename)
+	,m_IsLoaded(false)
 {
+	BYTE * data = nullptr;
+	int bytesPerRow = 0;
+
+	// load image from file
+	if (FAILED(LoadImageDataFromFile(&data, m_Desc, bytesPerRow, m_Name.c_str())))
+	{
+		POPUP_ERROR("Unable to load %S\n", m_Name.c_str());
+		DEBUG_BREAK;
+		return;
+	}
+
+
+	// push data on gpu
+
+
+
+	m_IsLoaded = true;
 }
 
 DX12Texture::~DX12Texture()
 {
 }
 
-int DX12Texture::LoadImageDataFromFile(BYTE ** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, LPCWSTR i_Filename, int & i_BytesPerRow)
+IntVec2 DX12Texture::GetSize() const
+{
+	return IntVec2(
+		m_Desc.Width,
+		m_Desc.Height
+	);
+}
+
+const std::wstring & DX12Texture::GetName() const
+{
+	return m_Name;
+}
+
+int DX12Texture::LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, int & o_BytesPerRow, LPCWSTR i_Filename)
 {
 	HRESULT hr;
 
@@ -99,8 +131,8 @@ int DX12Texture::LoadImageDataFromFile(BYTE ** o_ImageData, D3D12_RESOURCE_DESC 
 	}
 
 	int bitsPerPixel = GetDXGIFormatBitsPerPixel(dxgiFormat); // number of bits per pixel
-	i_BytesPerRow = (textureWidth * bitsPerPixel) / 8; // number of bytes in each row of the image data
-	int imageSize = i_BytesPerRow * textureHeight; // total image size in bytes
+	o_BytesPerRow = (textureWidth * bitsPerPixel) / 8; // number of bytes in each row of the image data
+	int imageSize = o_BytesPerRow * textureHeight; // total image size in bytes
 
 												 // allocate enough memory for the raw image data, and set o_ImageData to point to that memory
 	*o_ImageData = (BYTE*)malloc(imageSize);
@@ -109,13 +141,13 @@ int DX12Texture::LoadImageDataFromFile(BYTE ** o_ImageData, D3D12_RESOURCE_DESC 
 	if (imageConverted)
 	{
 		// if image format needed to be converted, the wic converter will contain the converted image
-		hr = wicConverter->CopyPixels(0, i_BytesPerRow, imageSize, *o_ImageData);
+		hr = wicConverter->CopyPixels(0, o_BytesPerRow, imageSize, *o_ImageData);
 		if (FAILED(hr)) return 0;
 	}
 	else
 	{
 		// no need to convert, just copy data from the wic frame
-		hr = wicFrame->CopyPixels(0, i_BytesPerRow, imageSize, *o_ImageData);
+		hr = wicFrame->CopyPixels(0, o_BytesPerRow, imageSize, *o_ImageData);
 		if (FAILED(hr)) return 0;
 	}
 

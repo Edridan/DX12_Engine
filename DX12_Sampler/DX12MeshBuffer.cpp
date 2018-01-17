@@ -117,7 +117,6 @@ const D3D12_INPUT_LAYOUT_DESC & DX12MeshBuffer::GetInputLayout() const
 
 HRESULT DX12MeshBuffer::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
 {
-	i_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
 	i_CommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView); // set the vertex buffer (using the vertex buffer view)
 
 	if (m_HaveIndex)

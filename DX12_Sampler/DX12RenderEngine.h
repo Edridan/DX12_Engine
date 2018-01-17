@@ -78,8 +78,7 @@ public:
 	D3D12_VIEWPORT &				GetViewport();
 	IDXGISwapChain3 *				SwapChain() const;
 	ID3D12Device*					GetDevice() const;
-	ID3D12GraphicsCommandList *		GetCommandList() const;
-	ID3D12RootSignature*			GetRootSignature() const;
+	ID3D12GraphicsCommandList *		GetCommandList() const;;
 	ID3D12CommandQueue*				GetCommandQueue() const;
 	const DXGI_SWAP_CHAIN_DESC &	GetSwapChainDesc() const;
 	bool							IsDX12DebugEnabled() const;
@@ -142,10 +141,6 @@ private:
 	// Shader
 	DX12Shader *				m_DefaultPixelShader;
 	DX12Shader *				m_DefaultVertexShader;
-
-	// Default Pipeline state
-	ID3D12PipelineState *		m_DefaultPipelineState;	// pipeline state that define all rendering process
-	ID3D12RootSignature*		m_DefaultRootSignature; // root signature defines data shaders will access
 
 	// all default pipeline state objects for rendering are stored in this map (this is used only for basic rendering, if it need alpha, rigging and skinning create your own Pipeline State)
 	std::unordered_map<UINT64, PipelineStateObject*>	m_PipelineStateObjects;	// this containing pipeline states and root
