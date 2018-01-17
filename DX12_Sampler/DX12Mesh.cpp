@@ -193,7 +193,6 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		}
 	}
 
-
 	for (size_t sh = 0; sh < shapes.size(); ++sh)
 	{
 		// create buffer and initialize data
@@ -289,7 +288,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 }
 
 DX12Mesh::DX12Mesh()
-	:m_RootMeshBuffer(nullptr)
+	:m_RootMeshBuffer(new MeshBuffer)
 {
 }
 
@@ -298,13 +297,20 @@ DX12Mesh::DX12Mesh()
 DX12Mesh::DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount)
 	:m_RootMeshBuffer(nullptr)
 {
-	m_RootMeshBuffer = new DX12MeshBuffer(i_InputLayout, i_VerticesBuffer, i_VerticesCount);
+	// create default material
+	MeshBuffer * meshBuffer = new MeshBuffer;
+	meshBuffer->Mesh = new DX12MeshBuffer(i_InputLayout, i_VerticesBuffer, i_VerticesCount);
+
+	m_RootMeshBuffer = meshBuffer;
 }
 
 DX12Mesh::DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount)
 	:m_RootMeshBuffer(nullptr)
 {
-	m_RootMeshBuffer = new DX12MeshBuffer(i_InputLayout, i_VerticesBuffer, i_VerticesCount, i_IndexBuffer, i_IndexCount);
+	MeshBuffer * meshBuffer = new MeshBuffer;
+	meshBuffer->Mesh = new DX12MeshBuffer(i_InputLayout, i_VerticesBuffer, i_VerticesCount, i_IndexBuffer, i_IndexCount);
+
+	m_RootMeshBuffer = meshBuffer;
 }
 
 DX12Mesh::~DX12Mesh()
@@ -345,12 +351,17 @@ int DX12Mesh::GetMaterial(std::vector<DX12Material*> o_Mat)
 
 const DX12MeshBuffer * DX12Mesh::GetRootMesh() const
 {
-	return m_RootMeshBuffer;
+	return m_RootMeshBuffer->Mesh;
 }
 
-const std::vector<DX12MeshBuffer*>& DX12Mesh::GetSubMeshes() const
+const DX12MeshBuffer* DX12Mesh::GetSubMeshes(size_t i_Index) const
 {
-	return m_SubMeshBuffer;
+	if (i_Index < m_SubMeshBuffer.size())
+	{
+		return m_SubMeshBuffer[i_Index]->Mesh;
+	}
+	
+	return nullptr;
 }
 
 UINT DX12Mesh::GetElementSize(D3D12_INPUT_LAYOUT_DESC i_InputLayout)

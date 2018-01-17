@@ -60,8 +60,8 @@ public:
 	int		GetMaterial(std::vector<DX12Material*> o_Mat, size_t i_SubMeshId);	// specific for the submeshes
 	int		GetMaterial(std::vector<DX12Material*> o_Mat);	// root mesh
 
-	const DX12MeshBuffer *					GetRootMesh() const;
-	const std::vector<DX12MeshBuffer*>	&	GetSubMeshes() const;
+	const DX12MeshBuffer *		GetRootMesh() const;
+	const DX12MeshBuffer*		GetSubMeshes(size_t i_Index) const;
 
 	// these statics are for the primitive meshes
 	static const D3D12_INPUT_ELEMENT_DESC	s_PrimitiveElementDesc[];
@@ -77,15 +77,15 @@ private:
 	{
 		std::vector<DX12Texture*>	Textures;
 		std::vector<DX12Material*>	Materials;
-		DX12MeshBuffer *			MeshBuffer;
+		DX12MeshBuffer *			Mesh;
 	};
 
 	// private constructor created by LoadMesh static function
 	DX12Mesh();
 
 	// mesh buffer (GPU)
-	DX12MeshBuffer	*				m_RootMeshBuffer;
-	std::vector<DX12MeshBuffer*>	m_SubMeshBuffer;	// if there is multiple shapes per mesh, there are here (sometime there is only submeshes so the root mesh is null)
+	MeshBuffer	*					m_RootMeshBuffer;
+	std::vector<MeshBuffer*>		m_SubMeshBuffer;	// if there is multiple shapes per mesh, there are here (sometime there is only submeshes so the root mesh is null)
 
 	// material
 	DX12Material *					m_RootMeshMaterial;
