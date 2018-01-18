@@ -156,6 +156,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		}
 		else
 		{
+			// default material folder
 			materialFolder.append("resources/mat/");
 		}
 	}
