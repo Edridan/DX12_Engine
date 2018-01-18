@@ -34,6 +34,7 @@ public:
 		DirectX::XMFLOAT4X4		m_Projection;
 		// other
 		FLOAT					m_Time;
+		DirectX::XMFLOAT3		m_CameraForward;
 	};
 
 	struct PipelineStateObject

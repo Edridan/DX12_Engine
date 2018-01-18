@@ -3,7 +3,7 @@
 
 // basic light calculation
 // assuming that there is a directionnal light in the sky
-static const float3 LightDir = float3(-1.f, -1.f, -1.f);	// directionnal light vector
+static const float3 LightDir = float3(1.f, 1.f, -1.f);	// directionnal light vector
 
 // return the color of the ambient depending the light dir and the normal surface
 float4 ComputeDirectionalLight(float3 lightDir, float3 i_color, float3 i_normal /* need the transformed normal */, float i_ambient = 0.2f)

@@ -50,6 +50,7 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 		XMStoreFloat4x4(&constantBuffer.m_Projection, XMMatrixTranspose(projMat));
 		// update time
 		constantBuffer.m_Time = m_Scene->GetLiveTime();
+		constantBuffer.m_CameraForward = XMFLOAT3((const float*)&cam.GetFoward());
 
 		DX12RenderEngine::GetInstance().UpdateConstantBuffer(m_ConstBuffer, constantBuffer);
 

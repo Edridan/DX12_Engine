@@ -23,6 +23,8 @@ public:
 
 	void		SetProjectionMatrix(const XMMATRIX & i_Projection);
 
+	XMFLOAT4	GetFoward() const;
+
 	XMFLOAT4X4	GetViewMatrix() const;
 	XMFLOAT4X4	GetProjMatrix() const;
 

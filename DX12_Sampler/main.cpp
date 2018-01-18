@@ -30,7 +30,7 @@ int WINAPI WinMain(
 
 	// Initialize game scene
 	GameScene::GameSceneDesc gameSceneDesc;
-	gameSceneDesc.CameraPosition	= XMFLOAT4(0.0, 0.f, -5.f, 0.f);
+	gameSceneDesc.CameraPosition	= XMFLOAT4(0.0, 0.f, 5.f, 0.f);
 	gameSceneDesc.CameraTarget		= XMFLOAT4(0.f, 0.f, 0.f, 0.f);
 
 	GameScene game(gameSceneDesc);

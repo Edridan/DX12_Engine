@@ -125,6 +125,18 @@ void DX12Camera::SetProjectionMatrix(const XMMATRIX & i_Projection)
 	XMStoreFloat4x4(&m_Projection, i_Projection);
 }
 
+XMFLOAT4 DX12Camera::GetFoward() const
+{
+	const XMVECTOR cPos = XMLoadFloat4(&m_Position);
+	const XMVECTOR cTarg = XMLoadFloat4(&m_Target);
+	const XMVECTOR cForward = (cTarg - cPos);
+
+	XMFLOAT4 forward;
+	XMStoreFloat4(&forward, cForward);
+
+	return forward;
+}
+
 XMFLOAT4X4 DX12Camera::GetViewMatrix() const
 {
 	return m_View;
