@@ -36,7 +36,7 @@ int WINAPI WinMain(
 	GameScene game(gameSceneDesc);
 
 	// load data here
-	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/cube.obj", "resources/obj/");
+	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/cube.obj");
 
 	// To do : create a commandlist specific for update resources on GPU and update when needed
 	// push data to the GPU

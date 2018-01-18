@@ -127,8 +127,41 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 	Clock timer;
 	timer.Restart();
 
+	// create load directory
+	std::string textureFolder;
+	std::string materialFolder;
+	std::string objFilepath(i_Filename);
+
+	if (i_TextureFolder == nullptr)
+	{
+		if (i_MaterialFolder != nullptr)
+		{
+			textureFolder.append(i_MaterialFolder);
+		}
+		else
+		{
+			// default texture folder
+			textureFolder.append("resources/tex/");
+		}
+	}
+
+	if (i_MaterialFolder == nullptr)
+	{
+		// retreive the same folder as the obj
+		size_t i = objFilepath.find_last_of("/");
+
+		if (i != std::string::npos)
+		{
+			materialFolder.append(objFilepath, 0, (i + 1));
+		}
+		else
+		{
+			materialFolder.append("resources/mat/");
+		}
+	}
+
 	// load the model
-	bool ret = tinyobj::LoadObj(&attrib, &shapes, &material, &error, i_Filename, i_MaterialFolder);
+	bool ret = tinyobj::LoadObj(&attrib, &shapes, &material, &error, objFilepath.c_str(), materialFolder.c_str());
 	float loadTime = timer.GetElaspedTime().ToSeconds();
 
 #ifdef _DEBUG
@@ -155,22 +188,6 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 	DX12Mesh * mesh = new DX12Mesh;
 
 	// load textures
-	// create load directory
-	std::string textureFolder;
-
-	if (i_TextureFolder == nullptr)
-	{
-		if (i_MaterialFolder == nullptr)
-		{
-			textureFolder.append(i_MaterialFolder);
-		}
-		else
-		{
-			// default texture folder
-			textureFolder.append("resources/tex/");
-		}
-	}
-
 	for (size_t i = 0; i < material.size(); ++i)
 	{
 		//std::string texFilename = 
