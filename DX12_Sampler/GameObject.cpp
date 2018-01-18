@@ -34,6 +34,7 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 	if (CanBeRendered())
 	{
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+		
 
 		// update the model view transform matrix
 		DX12RenderEngine::DefaultConstantBuffer constantBuffer;
@@ -47,6 +48,8 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 		XMStoreFloat4x4(&constantBuffer.m_Model, XMMatrixTranspose(modelMat));
 		XMStoreFloat4x4(&constantBuffer.m_View, XMMatrixTranspose(viewMat));
 		XMStoreFloat4x4(&constantBuffer.m_Projection, XMMatrixTranspose(projMat));
+		// update time
+		constantBuffer.m_Time = m_Scene->GetLiveTime();
 
 		DX12RenderEngine::GetInstance().UpdateConstantBuffer(m_ConstBuffer, constantBuffer);
 

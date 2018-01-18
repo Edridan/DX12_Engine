@@ -24,13 +24,15 @@ struct Time
 class Clock
 {
 public:
-	// Constructors
 	Clock();
 	~Clock();
 
 	// Informations related to the clock
 	Time	GetElaspedTime() const;
 	Time	Restart();
+	void	Reset();
+
+	Time	GetElapsedFromStart() const;
 
 	// Informations from the system
 	static Time	GetSystemTime();
@@ -38,4 +40,5 @@ public:
 private:
 	// Time management
 	Time	m_StartTime;
+	Time	m_DefaultTime;	// time at the beginning
 };

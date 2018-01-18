@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "DX12Camera.h"
+#include "Clock.h"
 
 
 class GameObject;
@@ -26,8 +27,12 @@ public:
 	GameObject *		CreateGameObject(GameObject * i_Parent = nullptr);
 	bool				DeleteGameObject(GameObject * i_GameObject, bool i_DeleteChild = true);
 
+	// game scene information
+	float				TickFrame();
+	float				GetLiveTime() const;
+
 	// Render scene
-	void				UpdateScene(float i_ElapsedTime);
+	void				UpdateScene();
 	void				RenderScene() const;
 	DX12Camera &		GetMainCamera();
 
@@ -37,7 +42,10 @@ private:
 	// game object internal management
 	void				UpdateGameObjectParenting(GameObject * i_GameObject);
 
-	DX12Camera			m_Camera;	// camera used for rendering
+	DX12Camera			m_Camera;		// camera used for rendering
+	Clock				m_GameClock;	// game clock
+	float				m_ElapsedTime;
+
 
 	// Containers
 	std::vector<GameObject *>		m_RootGameObjects;

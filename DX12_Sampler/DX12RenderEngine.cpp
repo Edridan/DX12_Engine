@@ -784,7 +784,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	if (i_Flags & DX12Mesh::EElementFlags::eHaveTexcoord)
 	{
 		// at least one texture
-		textureCount = 1;
+		textureCount = 1;	// for now only ambient texture is managed
 
 		// create descriptor table ranges
 		D3D12_DESCRIPTOR_RANGE*  descriptorTableRanges = new D3D12_DESCRIPTOR_RANGE[textureCount];

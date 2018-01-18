@@ -10,6 +10,7 @@
 GameScene::GameScene(const GameSceneDesc & i_GameSceneDesc)
 	:m_AllGameObjects()
 	,m_RootGameObjects()
+	,m_ElapsedTime(0.f)
 {
 	// setup default
 	m_Camera.m_Position = i_GameSceneDesc.CameraPosition;
@@ -24,6 +25,9 @@ GameScene::GameScene(const GameSceneDesc & i_GameSceneDesc)
 
 	// debug mode activated
 	m_Camera.SetFreecamEnabled(true);
+
+	// Start the time clock
+	m_GameClock.Reset();
 }
 
 GameScene::~GameScene()
@@ -102,17 +106,28 @@ bool GameScene::DeleteGameObject(GameObject * i_GameObject, bool i_DeleteChild)
 	return false;
 }
 
-void GameScene::UpdateScene(float i_ElapsedTime)
+float GameScene::TickFrame()
+{
+	m_ElapsedTime = m_GameClock.Restart().ToSeconds();
+	return m_ElapsedTime;
+}
+
+float GameScene::GetLiveTime() const
+{
+	return m_GameClock.GetElapsedFromStart().ToSeconds();
+}
+
+void GameScene::UpdateScene()
 {
 	// Update camera
-	m_Camera.Update(i_ElapsedTime);
+	m_Camera.Update(m_ElapsedTime);
 
 	auto itr = m_RootGameObjects.begin();
 
 	while (itr != m_RootGameObjects.end())
 	{
 		GameObject * gameObject = (*itr);
-		gameObject->Update(i_ElapsedTime);
+		gameObject->Update(m_ElapsedTime);
 
 		++itr;
 	}

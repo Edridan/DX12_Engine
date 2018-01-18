@@ -192,5 +192,8 @@
     <None Include="EffectLib.hlsli">
       <Filter>Resource Files\Shaders</Filter>
     </None>
+    <None Include="Buffer.hlsli">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

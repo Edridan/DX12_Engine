@@ -28,7 +28,7 @@ DX12Shader::DX12Shader(EShaderType i_Type, const wchar_t * i_Filename)
 	// Compile shader from file
 	hr = D3DCompileFromFile(i_Filename,
 		nullptr,
-		nullptr,
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main",
 		shaderTarget,
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,

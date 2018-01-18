@@ -28,9 +28,12 @@ public:
 	// Constant buffer definition
 	struct DefaultConstantBuffer
 	{
+		// 3D space computing
 		DirectX::XMFLOAT4X4		m_Model;
 		DirectX::XMFLOAT4X4		m_View;
 		DirectX::XMFLOAT4X4		m_Projection;
+		// other
+		FLOAT					m_Time;
 	};
 
 	struct PipelineStateObject

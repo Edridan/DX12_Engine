@@ -5,6 +5,7 @@
 Clock::Clock()
 {
 	m_StartTime = Clock::GetSystemTime();
+	m_DefaultTime = m_StartTime;
 }
 
 Clock::~Clock()
@@ -27,6 +28,18 @@ Time Clock::Restart()
 	m_StartTime = current;
 
 	return Time(elapsed);
+}
+
+void Clock::Reset()
+{
+	m_StartTime = Clock::GetSystemTime();
+	m_DefaultTime = m_StartTime;
+}
+
+Time Clock::GetElapsedFromStart() const
+{
+	// Get elapsed time from the last start
+	return Clock::GetSystemTime() - m_DefaultTime;
 }
 
 Time Clock::GetSystemTime()

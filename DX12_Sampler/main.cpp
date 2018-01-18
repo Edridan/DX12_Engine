@@ -30,11 +30,10 @@ int WINAPI WinMain(
 
 	// Initialize game scene
 	GameScene::GameSceneDesc gameSceneDesc;
-	gameSceneDesc.CameraPosition	= XMFLOAT4(0.0, 0.f, -1.f, 0.f);
+	gameSceneDesc.CameraPosition	= XMFLOAT4(0.0, 0.f, -5.f, 0.f);
 	gameSceneDesc.CameraTarget		= XMFLOAT4(0.f, 0.f, 0.f, 0.f);
 
 	GameScene game(gameSceneDesc);
-	Clock time;	// time for frame
 
 	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/cube.obj", "resources/obj/");
 	DX12Mesh * cube = DX12Mesh::GeneratePrimitiveMesh(DX12Mesh::eTriangle);
@@ -50,12 +49,12 @@ int WINAPI WinMain(
 
 	while (renderEngine.GetWindow().IsOpen())
 	{
-		float elapsedTime = time.Restart().ToSeconds();
+		float elapsedTime = game.TickFrame();
 		// Update inputs and window position, and prepare command list to render
 		renderEngine.UpdateWindow();
 
 		// Update logic of the engine
-		game.UpdateScene(elapsedTime);
+		game.UpdateScene();
 
 		// prepare buffer and command list for rendering
 		renderEngine.PrepareForRender();
