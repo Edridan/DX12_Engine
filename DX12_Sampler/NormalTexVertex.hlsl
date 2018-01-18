@@ -25,9 +25,6 @@ VS_OUTPUT main(VS_INPUT input)
 	pos = mul(pos, view);
 	pos = mul(pos, projection);
 
-	// test : to delete
-	pos.y += sin(time + (pos.z));
-
 	// Return 
 	output.pos = pos;
 	output.uv = input.uv;
