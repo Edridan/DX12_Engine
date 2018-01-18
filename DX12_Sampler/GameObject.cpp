@@ -5,6 +5,8 @@
 // DX12
 #include "DX12Mesh.h"
 #include "DX12MeshBuffer.h"
+#include "DX12Texture.h"
+#include "DX12Material.h"
 
 // initialize game object
 GameObject::GameObject(GameScene * const i_Scene)
@@ -61,6 +63,11 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 		// Setup the pipeline state
 		i_CommandList->SetPipelineState(m_PipelineState);
 
+		for (size_t i = 0; i < m_Textures.size(); ++i)
+		{
+			m_Textures[i]->PushOnCommandList(i_CommandList);
+		}
+
 		// push the mesh on the commandlist
 		m_Mesh->PushOnCommandList(i_CommandList);
 	}
@@ -78,14 +85,27 @@ void GameObject::SetMesh(DX12Mesh * i_Mesh)
 {
 	if (i_Mesh == nullptr)	return;
 
-	// setup the root mesh into the game object
-	SetMeshBuffer(i_Mesh->GetRootMesh());
+	const DX12MeshBuffer * mesh = i_Mesh->GetRootMesh();
+
+	if (mesh != nullptr)
+	{
+		std::vector <DX12Texture*> textures;
+		// setup the root mesh into the game object
+		SetMeshBuffer(i_Mesh->GetRootMesh());
+		i_Mesh->GetTextures(textures);
+		SetTextures(textures);
+	}
+	
 
 	// push submesh in different game objects
 	for (UINT32 subMesh = 0; i_Mesh->SubMeshesCount(); ++subMesh)
 	{
 		GameObject * subGameObject = m_Scene->CreateGameObject(this);
-		subGameObject->SetMeshBuffer(i_Mesh->GetSubMeshes()[subMesh]);
+
+		std::vector <DX12Texture*> textures;
+		i_Mesh->GetTextures(textures, subMesh);
+		subGameObject->SetMeshBuffer(i_Mesh->GetSubMeshes(subMesh));
+		subGameObject->SetTextures(textures);
 	}
 }
 
@@ -123,6 +143,20 @@ void GameObject::SetMeshBuffer(const DX12MeshBuffer * i_MeshBuffer)
 	{
 		DX12RenderEngine::GetInstance().ReleaseConstantBufferVirtualAddress(m_ConstBuffer);
 	}
+}
+
+void GameObject::SetTextures(const std::vector<DX12Texture*>& i_Textures)
+{
+	// update textures
+	m_Textures.clear();
+	m_Textures = i_Textures;
+}
+
+void GameObject::SetMaterials(const std::vector<DX12Material*>& i_Materials)
+{
+	// update materials
+	m_Materials.clear();
+	m_Materials = i_Materials;
 }
 
 bool GameObject::IsRoot() const

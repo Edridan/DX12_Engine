@@ -32,7 +32,7 @@ int WINAPI WinMain(
 	GameScene game;
 	Clock time;	// time for frame
 
-	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/lowpolytree.obj", "resources/obj/");
+	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/cube.obj", "resources/obj/");
 	DX12Mesh * cube = DX12Mesh::GeneratePrimitiveMesh(DX12Mesh::eTriangle);
 
 	// push data to the GPU

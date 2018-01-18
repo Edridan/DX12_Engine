@@ -13,6 +13,8 @@ class GameScene;
 // dx12
 class DX12Mesh;
 class DX12MeshBuffer;
+class DX12Material;
+class DX12Texture;
 
 
 class GameObject
@@ -21,6 +23,8 @@ public:
 	// game object management
 	void		SetMesh(DX12Mesh * i_Mesh);	// this function can create children
 	void		SetMeshBuffer(const DX12MeshBuffer * i_MeshBuffer);
+	void		SetTextures(const std::vector < DX12Texture *> & i_Textures);
+	void		SetMaterials(const std::vector < DX12Material *> & i_Materials);
 
 	// information
 	bool	IsRoot() const;
@@ -51,10 +55,12 @@ private:
 	void			Render(ID3D12GraphicsCommandList* i_CommandList);
 
 	// rendering pipeline
-	const DX12MeshBuffer *	m_Mesh;
-	ID3D12PipelineState *	m_PipelineState;
-	ID3D12RootSignature *	m_RootSignature;
-	ADDRESS_ID				m_ConstBuffer;
+	const DX12MeshBuffer *		m_Mesh;
+	ID3D12PipelineState *		m_PipelineState;
+	ID3D12RootSignature *		m_RootSignature;
+	std::vector<DX12Texture *>	m_Textures;
+	std::vector<DX12Material *>	m_Materials;
+	ADDRESS_ID					m_ConstBuffer;
 
 	GameScene * const	m_Scene;
 

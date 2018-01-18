@@ -88,8 +88,7 @@ private:
 	std::vector<MeshBuffer*>		m_SubMeshBuffer;	// if there is multiple shapes per mesh, there are here (sometime there is only submeshes so the root mesh is null)
 
 	// material
-	DX12Material *					m_RootMeshMaterial;
-	std::vector<DX12Material*>		m_SubMeshMaterial;
+	std::vector<DX12Material*>		m_Materials;
 
 	// textures
 	std::map<std::string, DX12Texture *>	m_Textures;

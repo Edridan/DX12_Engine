@@ -1,7 +1,8 @@
 #include "DX12Mesh.h"
-#include "DX12Texture.h"
 #include "DX12RenderEngine.h"
 #include "DX12MeshBuffer.h"
+#include "DX12Texture.h"
+#include "DX12Material.h"
 
 #include "d3dx12.h"
 #include "Clock.h"
@@ -196,6 +197,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 	for (size_t sh = 0; sh < shapes.size(); ++sh)
 	{
 		// create buffer and initialize data
+		MeshBuffer * meshBuffer		= new MeshBuffer;	// mesh buffer
 		UINT stride					= 3;	// default stride in float (3 float for positions)
 		tinyobj::shape_t * shape	= &shapes[sh];
 		const size_t verticeCount	= shape->mesh.indices.size();
@@ -224,6 +226,27 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 
 		FLOAT * const verticeBuffer = new FLOAT[verticeCount * stride];
 		FLOAT * bufferItr = verticeBuffer;
+
+		if (flags & DX12Mesh::EElementFlags::eHaveTexcoord)
+		{
+			// retreive textures
+			std::vector<int> meshMaterials(shape->mesh.material_ids);
+			meshMaterials.erase(std::unique(meshMaterials.begin(), meshMaterials.end()), meshMaterials.end());
+
+			for (size_t i = 0; i < material.size(); ++i)
+			{
+				const char * texName = material[i].ambient_texname.c_str();
+
+				if (std::strcmp(texName, "") != 0)
+				{
+					DX12Texture * tex = mesh->m_Textures[texName];
+					if (tex != nullptr)
+					{
+						meshBuffer->Textures.push_back(tex);
+					}
+				}
+			}
+		}
 
 		for (size_t id = 0; id < shape->mesh.indices.size(); ++id)
 		{
@@ -265,13 +288,14 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		D3D12_INPUT_LAYOUT_DESC layout;
 		CreateInputLayoutFromFlags(layout, flags);
 
-		// create mesh and initialize it
-		mesh->m_SubMeshBuffer.push_back(new DX12MeshBuffer(
+		meshBuffer->Mesh = new DX12MeshBuffer(
 			layout,	// the generated layout depending on the flags
 			reinterpret_cast<BYTE*>(verticeBuffer),
 			(UINT)verticeCount,
-			wname.c_str()
-		));
+			wname.c_str());
+
+		// create mesh and initialize it
+		mesh->m_SubMeshBuffer.push_back(meshBuffer);
 		
 		// cleanup the resources
 		delete[] verticeBuffer;
@@ -315,6 +339,36 @@ DX12Mesh::DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffe
 
 DX12Mesh::~DX12Mesh()
 {
+	// cleanup resources
+	// clean textures
+	std::map<std::string, DX12Texture*>::iterator tex_itr = m_Textures.begin();
+	while (tex_itr != m_Textures.end())
+	{
+		delete (*tex_itr).second;
+		++tex_itr;
+	}
+
+	// clean materials
+	std::vector<DX12Material *>::iterator mat_itr = m_Materials.begin();
+	while (mat_itr != m_Materials.end())
+	{
+		delete (*mat_itr);
+		++mat_itr;
+	}
+
+	// clean meshes
+	std::vector<MeshBuffer*>::iterator sub_itr = m_SubMeshBuffer.begin();
+	while (sub_itr != m_SubMeshBuffer.end())
+	{
+		delete ((*sub_itr)->Mesh);
+		++sub_itr;
+	}
+
+	if (m_RootMeshBuffer != nullptr)
+	{
+		delete m_RootMeshBuffer->Mesh;
+	}
+
 }
 
 bool DX12Mesh::HaveSubMeshes() const
@@ -435,7 +489,7 @@ void DX12Mesh::CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_InputLayou
 	}
 	if (i_Flags & EElementFlags::eHaveTexcoord)
 	{
-		elements[index++] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+		elements[index++] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 		offset += 2 * sizeof(float);
 	}
 	if (i_Flags & EElementFlags::eHaveColor)
