@@ -35,16 +35,14 @@ int WINAPI WinMain(
 
 	GameScene game(gameSceneDesc);
 
+	// load data here
 	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/cube.obj", "resources/obj/");
-	DX12Mesh * cube = DX12Mesh::GeneratePrimitiveMesh(DX12Mesh::eTriangle);
 
+	// To do : create a commandlist specific for update resources on GPU and update when needed
 	// push data to the GPU
 	renderEngine.Render();
 
 	GameObject * gameObject = game.CreateGameObject();
-	/*gameObject->SetMesh(cube);
-
-	gameObject = game.CreateGameObject();*/
 	gameObject->SetMesh(mesh);
 
 	while (renderEngine.GetWindow().IsOpen())
