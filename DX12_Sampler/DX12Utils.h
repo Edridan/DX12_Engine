@@ -24,17 +24,23 @@ typedef UINT64 ADDRESS_ID;
 const ADDRESS_ID UnavailableAdressId = ((ADDRESS_ID)-1);
 
 // math
+// define values
 const DirectX::XMFLOAT3 Vec3Zero	= { 0.f, 0.f, 0.f };
 const DirectX::XMFLOAT3 Vec3One		= { 1.f, 1.f, 1.f };
 const DirectX::XMFLOAT3 Vec3Up		= { 0.f, 1.f, 0.f };
 const DirectX::XMFLOAT3 Vec3Right	= { 1.f, 0.f, 0.f };
 
-const FLOAT Zero	= 0.f;
-const FLOAT One		= 1.f;
+const DirectX::XMFLOAT4 Vec4Zero	= { 0.f, 0.f, 0.f, 0.f };
+const DirectX::XMFLOAT4 Vec4One		= { 1.f, 1.f, 1.f, 1.f };
+const DirectX::XMFLOAT4 Vec4Up		= { 0.f, 1.f, 0.f, 1.f };
+const DirectX::XMFLOAT4 Vec4Right	= { 1.f, 0.f, 0.f, 1.f };
 
+const FLOAT Zero = 0.f;
+const FLOAT One = 1.f;
 
-const float DegToRad = 0.01745329238f; // retreived from google
-const float RadToDeg = 57.29578f;
+const float DegToRad	= 0.01745329238f; // retreived from google
+const float RadToDeg	= 57.29578f;
+const float Pi			= 3.14159265358f;	// taken from http://www.geom.uiuc.edu/~huberty/math5337/groupe/digits.html
 
 // struct
 struct IntVec2
@@ -107,13 +113,13 @@ WICPixelFormatGUID GetConvertToWICFormat(WICPixelFormatGUID & i_WicFormat);
 // get the number of bits per pixel for a dxgi format
 int GetDXGIFormatBitsPerPixel(DXGI_FORMAT & i_DxGIFormat);
 
+// debug management
 enum PopUpIcon
 {
 	eError		= MB_ICONERROR,
 	eWarning	= MB_ICONWARNING,
 };
 
-// Debug
 #ifdef _DEBUG
 void OutputDebug(const char * i_Text, ...);
 void PopUpWindow(PopUpIcon i_Icon, const char * i_Notif, const char * i_Text, ...);
@@ -135,15 +141,17 @@ do {																\
 
 
 // Assert e
-#define ASSERT(i_Condition)												\
-do																		\
-{																		\
-	if (!i_Condition)													\
-	{																	\
-		PopUpWindow(eError, "Assert", "Assert error file : %s [%i]",	\
-				__FILE__, __LINE__);									\
-		Assert(i_Text, ...);											\
-	}																	\
+#define ASSERT(i_Condition)													\
+do																			\
+{																			\
+	if (!i_Condition)														\
+	{																		\
+		PRINT_DEBUG("%s assert an error file : %s, [%i]", #i_Condition,		\
+				__FILE__, __LINE__);										\
+		PopUpWindow(eError, "Assert", " %s Assert error file : %s [%i]",	\
+				#i_Condition, __FILE__, __LINE__);							\
+		Assert(i_Text, ...);												\
+	}																		\
 } while (false)
 
 #else

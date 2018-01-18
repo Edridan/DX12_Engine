@@ -29,7 +29,11 @@ int WINAPI WinMain(
 	renderEngine.InitializeDX12();
 
 	// Initialize game scene
-	GameScene game;
+	GameScene::GameSceneDesc gameSceneDesc;
+	gameSceneDesc.CameraPosition	= XMFLOAT4(0.0, 0.f, -1.f, 0.f);
+	gameSceneDesc.CameraTarget		= XMFLOAT4(0.f, 0.f, 0.f, 0.f);
+
+	GameScene game(gameSceneDesc);
 	Clock time;	// time for frame
 
 	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/cube.obj", "resources/obj/");

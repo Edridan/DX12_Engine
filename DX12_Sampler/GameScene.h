@@ -9,7 +9,17 @@ class GameObject;
 class GameScene
 {
 public:
-	GameScene();
+	struct GameSceneDesc
+	{
+		// initial camera position
+		XMFLOAT4		CameraPosition				= XMFLOAT4(0.f, 0.f, -1.f, 1.f);
+		XMFLOAT4		CameraTarget				= XMFLOAT4(0.f, 0.f, 0.f, 1.f);
+		bool			UseCameraProjection			= false;
+		XMMATRIX		CameraProjection			= XMMatrixIdentity();
+
+	};
+
+	GameScene(const GameSceneDesc & i_GameSceneDesc);
 	~GameScene();
 
 	// game scene management

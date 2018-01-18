@@ -27,7 +27,7 @@ DX12Camera::DX12Camera()
 	DX12Window & wnd = DX12RenderEngine::GetInstance().GetWindow();
 
 	const float windowRatio = (float)((float)wnd.GetWidth() / (float)wnd.GetHeight());
-	XMMATRIX tmpProj = XMMatrixPerspectiveFovLH(90.f, windowRatio, 0.05f, 1000.f);
+	XMMATRIX tmpProj = XMMatrixPerspectiveFovLH(45.f * (Pi / 180.f), windowRatio, 0.1f, 1000.f);
 
 	XMStoreFloat4x4(&m_Projection, tmpProj);
 }
@@ -118,6 +118,11 @@ void DX12Camera::Update(FLOAT i_ElapsedTime)
 
 	XMMATRIX tmpMat = XMMatrixLookAtLH(cPos, cTarg, cUp);
 	XMStoreFloat4x4(&m_View, tmpMat);
+}
+
+void DX12Camera::SetProjectionMatrix(const XMMATRIX & i_Projection)
+{
+	XMStoreFloat4x4(&m_Projection, i_Projection);
 }
 
 XMFLOAT4X4 DX12Camera::GetViewMatrix() const

@@ -5,15 +5,22 @@
 
 // DX12 engine
 #include "DX12RenderEngine.h"
+#include "DX12Utils.h"
 
-GameScene::GameScene()
+GameScene::GameScene(const GameSceneDesc & i_GameSceneDesc)
 	:m_AllGameObjects()
 	,m_RootGameObjects()
 {
-	// create default camera
-	m_Camera.m_Position = XMFLOAT4(1.f, 0.f, -1.f, 0.f);
-	m_Camera.m_Target = XMFLOAT4(0.f, 0.f, 0.f, 0.f);
+	// setup default
+	m_Camera.m_Position = i_GameSceneDesc.CameraPosition;
+	m_Camera.m_Target =i_GameSceneDesc.CameraTarget;
+
 	m_Camera.m_Up = XMFLOAT4(0.f, 1.f, 0.f, 0.f);
+
+	if (i_GameSceneDesc.UseCameraProjection)
+	{
+		m_Camera.SetProjectionMatrix(i_GameSceneDesc.CameraProjection);
+	}
 
 	// debug mode activated
 	m_Camera.SetFreecamEnabled(true);

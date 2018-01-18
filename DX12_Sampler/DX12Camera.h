@@ -21,6 +21,8 @@ public:
 	XMFLOAT4	m_Target;
 	XMFLOAT4	m_Up;
 
+	void		SetProjectionMatrix(const XMMATRIX & i_Projection);
+
 	XMFLOAT4X4	GetViewMatrix() const;
 	XMFLOAT4X4	GetProjMatrix() const;
 
