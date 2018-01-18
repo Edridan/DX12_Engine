@@ -89,11 +89,9 @@ void GameObject::SetMesh(DX12Mesh * i_Mesh)
 
 	if (mesh != nullptr)
 	{
-		std::vector <DX12Texture*> textures;
 		// setup the root mesh into the game object
 		SetMeshBuffer(i_Mesh->GetRootMesh());
-		i_Mesh->GetTextures(textures);
-		SetTextures(textures);
+		i_Mesh->GetTextures(m_Textures);
 	}
 	
 
@@ -102,10 +100,8 @@ void GameObject::SetMesh(DX12Mesh * i_Mesh)
 	{
 		GameObject * subGameObject = m_Scene->CreateGameObject(this);
 
-		std::vector <DX12Texture*> textures;
-		i_Mesh->GetTextures(textures, subMesh);
 		subGameObject->SetMeshBuffer(i_Mesh->GetSubMeshes(subMesh));
-		subGameObject->SetTextures(textures);
+		i_Mesh->GetTextures(subGameObject->m_Textures, subMesh);
 	}
 }
 

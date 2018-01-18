@@ -53,12 +53,12 @@ public:
 	UINT	SubMeshesCount() const;
 
 	// get the textures for the meshes (future : will be stocked directly into the materials)
-	int		GetTextures(std::vector<DX12Texture*> o_Textures, size_t i_SubMeshId);	// specific for the submeshes
-	int		GetTextures(std::vector<DX12Texture*> o_Textures);	// root mesh
+	int		GetTextures(std::vector<DX12Texture*>& o_Textures, size_t i_SubMeshId);	// specific for the submeshes
+	int		GetTextures(std::vector<DX12Texture*>& o_Textures);	// root mesh
 	// get material for the meshes
 	// to do : implement
-	int		GetMaterial(std::vector<DX12Material*> o_Mat, size_t i_SubMeshId);	// specific for the submeshes
-	int		GetMaterial(std::vector<DX12Material*> o_Mat);	// root mesh
+	int		GetMaterial(std::vector<DX12Material*>& o_Mat, size_t i_SubMeshId);	// specific for the submeshes
+	int		GetMaterial(std::vector<DX12Material*>& o_Mat);	// root mesh
 
 	const DX12MeshBuffer *		GetRootMesh() const;
 	const DX12MeshBuffer*		GetSubMeshes(size_t i_Index) const;

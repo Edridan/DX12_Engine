@@ -381,24 +381,29 @@ UINT DX12Mesh::SubMeshesCount() const
 	return (UINT)(m_SubMeshBuffer.size());
 }
 
-int DX12Mesh::GetTextures(std::vector<DX12Texture*> o_Textures, size_t i_SubMeshId)
+int DX12Mesh::GetTextures(std::vector<DX12Texture*>& o_Textures, size_t i_SubMeshId)
 {
+	if (i_SubMeshId < m_SubMeshBuffer.size())
+	{
+		return 0;
+	}
 
+	o_Textures = m_SubMeshBuffer[i_SubMeshId]->Textures;
+	return (int)o_Textures.size();
+}
 
+int DX12Mesh::GetTextures(std::vector<DX12Texture*>& o_Textures)
+{
+	o_Textures = m_RootMeshBuffer->Textures;
+	return (int)o_Textures.size();
+}
+
+int DX12Mesh::GetMaterial(std::vector<DX12Material*>& o_Mat, size_t i_SubMeshId)
+{
 	return 0;
 }
 
-int DX12Mesh::GetTextures(std::vector<DX12Texture*> o_Textures)
-{
-	return 0;
-}
-
-int DX12Mesh::GetMaterial(std::vector<DX12Material*> o_Mat, size_t i_SubMeshId)
-{
-	return 0;
-}
-
-int DX12Mesh::GetMaterial(std::vector<DX12Material*> o_Mat)
+int DX12Mesh::GetMaterial(std::vector<DX12Material*>& o_Mat)
 {
 	return 0;
 }

@@ -188,4 +188,9 @@
       <Filter>Resource Files\Obj</Filter>
     </Object>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="EffectLib.hlsli">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+  </ItemGroup>
 </Project>
