@@ -38,12 +38,19 @@ private:
 
 	std::wstring m_Text;		// Text to display
 
+	// static
+	static const UINT		s_MaxTextCharacter;
+
+	// dx12
+	ID3D12Resource **		m_BufferUploadHeap;
+	static UINT8 **			m_TextVBGPUAddress;
+
+
 	static HRESULT			CreateTextPipelineStateObject();	// Create the default text pipeline state object
 
 	// static
 	static ID3D12PipelineState *		s_TextPipelineState;
 	static ID3D12RootSignature *		s_RootSignature;
-
 
 	static DX12Shader *		s_PixelShader;
 	static DX12Shader *		s_VertexShader;

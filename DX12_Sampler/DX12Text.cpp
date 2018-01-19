@@ -4,6 +4,9 @@
 #include "DX12Shader.h"
 #include "DX12RenderEngine.h"
 
+// static text
+const UINT DX12Text::s_MaxTextCharacter = 256;
+
 // static dx12
 ID3D12PipelineState * DX12Text::s_TextPipelineState = nullptr;
 ID3D12RootSignature * DX12Text::s_RootSignature		= nullptr;
@@ -25,12 +28,38 @@ const D3D12_INPUT_LAYOUT_DESC	DX12Text::s_TextInputLayout =
 };
 
 DX12Text::DX12Text(const wchar_t * i_Text)
+	:m_Text()
 {
+	m_Text.reserve(s_MaxTextCharacter);
+
 	// we need to create root signature and pipeline state
 	if (s_RootSignature == nullptr || s_TextPipelineState == nullptr)
 	{
 		CreateTextPipelineStateObject();
 	}
+
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
+	ID3D12Device * device						= render.GetDevice();
+	ID3D12GraphicsCommandList * commandList		= render.GetCommandList();
+	UINT frameCount								= render.GetFrameBufferCount();
+
+	// create the upload heap for text
+	HRESULT hr;
+	hr = device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // upload heap
+		D3D12_HEAP_FLAG_NONE, // no flags
+		&CD3DX12_RESOURCE_DESC::Buffer(s_MaxTextCharacter * sizeof(TextVertex)), // resource description for a buffer
+		D3D12_RESOURCE_STATE_GENERIC_READ, // GPU will read from this buffer and copy its contents to the default heap
+		nullptr,
+		IID_PPV_ARGS(&m_BufferUploadHeap));
+
+	m_BufferUploadHeap->SetName(L"Text buffer upload heap");
+
+	CD3DX12_RANGE readRange(0, 0);	// We do not intend to read from this resource on the CPU. (so end is less than or equal to begin)
+
+	// map the resource heap to get a gpu virtual address to the beginning of the heap
+	hr = m_BufferUploadHeap->Map(0, &readRange, reinterpret_cast<void**>(&s_TextVBGPUAddress[0]));
 
 	// setup the text
 	SetText(i_Text);
@@ -97,19 +126,19 @@ inline HRESULT DX12Text::CreateTextPipelineStateObject()
 
 	// create a static sampler
 	D3D12_STATIC_SAMPLER_DESC sampler = {};
-	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-	sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-	sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-	sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-	sampler.MipLODBias = 0;
-	sampler.MaxAnisotropy = 0;
-	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-	sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
-	sampler.MinLOD = 0.0f;
-	sampler.MaxLOD = D3D12_FLOAT32_MAX;
-	sampler.ShaderRegister = 0;
-	sampler.RegisterSpace = 0;
-	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	sampler.Filter				= D3D12_FILTER_MIN_MAG_MIP_POINT;
+	sampler.AddressU			= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressV			= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressW			= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.MipLODBias			= 0;
+	sampler.MaxAnisotropy		= 0;
+	sampler.ComparisonFunc		= D3D12_COMPARISON_FUNC_NEVER;
+	sampler.BorderColor			= D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+	sampler.MinLOD				= 0.0f;
+	sampler.MaxLOD				= D3D12_FLOAT32_MAX;
+	sampler.ShaderRegister		= 0;
+	sampler.RegisterSpace		= 0;
+	sampler.ShaderVisibility	= D3D12_SHADER_VISIBILITY_PIXEL;
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
 	rootSignatureDesc.Init(_countof(rootParameters), // we have 2 root parameters
