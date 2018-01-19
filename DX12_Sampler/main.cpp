@@ -4,6 +4,8 @@
 // Engine
 #include "DX12RenderEngine.h"
 #include "DX12Mesh.h"
+#include "DX12Font.h"
+#include "DX12Text.h"
 
 // Game
 #include "GameScene.h"
@@ -37,6 +39,9 @@ int WINAPI WinMain(
 
 	// load data here
 	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/cube.obj");
+	DX12Font font(L"resources/font/Arial-font.fnt");
+
+	DX12Text renderText(L"Text");
 
 	// To do : create a commandlist specific for update resources on GPU and update when needed
 	// push data to the GPU

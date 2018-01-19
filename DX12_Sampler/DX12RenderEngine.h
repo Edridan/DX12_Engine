@@ -72,6 +72,7 @@ public:
 	// this is used for default basic rendering
 	// if you need other pipeline states (skinned objects for example) create a pipeline state objects on your side
 	PipelineStateObject *		GetPipelineStateObject(UINT64 i_Flag);
+	DXGI_SAMPLE_DESC			GetSampleDesc() const;
 	// get the shaders for default pipeline state objects
 	DX12Shader *				GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type);
 

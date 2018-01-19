@@ -102,6 +102,11 @@ const Color Red(0.f, 0.f, 0.f);
 const Color Blue(0.f, 0.f, 0.f);
 const Color Green(0.f, 0.f, 0.f);
 
+// padding definition
+struct Padding
+{
+	FLOAT top, right, bottom, left;
+};
 
 // Helpers
 // return the size of an DXGI_FORMAT element

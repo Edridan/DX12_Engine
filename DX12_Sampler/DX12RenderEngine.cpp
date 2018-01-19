@@ -548,6 +548,14 @@ DX12RenderEngine::PipelineStateObject * DX12RenderEngine::GetPipelineStateObject
 	return m_PipelineStateObjects[i_Flag];
 }
 
+DXGI_SAMPLE_DESC DX12RenderEngine::GetSampleDesc() const
+{
+	DXGI_SAMPLE_DESC sampleDesc = {};
+	sampleDesc.Count = 1; // multisample count (no multisampling, so we just put 1, since we still need 1 sample)
+
+	return sampleDesc;
+}
+
 DX12Shader * DX12RenderEngine::GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type)
 {
 	// return the shader depending the flag

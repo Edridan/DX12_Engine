@@ -46,6 +46,12 @@
     <Filter Include="Resource Files\Textures">
       <UniqueIdentifier>{70655fad-333f-4204-bf9a-3e07e03cac2b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Fonts">
+      <UniqueIdentifier>{cc447125-4554-4896-964d-8a67c5734530}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\Text">
+      <UniqueIdentifier>{a9a52a30-e568-445a-a371-43a35ea60c52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DX12Camera.cpp">
@@ -94,6 +100,12 @@
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="DX12Texture.cpp">
+      <Filter>Source Files\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12Font.cpp">
+      <Filter>Source Files\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12Text.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,6 +161,12 @@
     <ClInclude Include="DX12Texture.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
+    <ClInclude Include="DX12Text.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12Font.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="NormalVertex.hlsl">
@@ -166,6 +184,12 @@
     <FxCompile Include="NormalTexVertex.hlsl">
       <Filter>Resource Files\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="TextPixel.hlsl">
+      <Filter>Resource Files\Shaders\Text</Filter>
+    </FxCompile>
+    <FxCompile Include="TextVertex.hlsl">
+      <Filter>Resource Files\Shaders\Text</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico">
@@ -173,6 +197,9 @@
     </Image>
     <Image Include="resources\tex\box.bmp">
       <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="resources\fonts\Arial-font.png">
+      <Filter>Resource Files\Fonts</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
@@ -192,8 +219,8 @@
     <None Include="EffectLib.hlsli">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="Buffer.hlsli">
-      <Filter>Resource Files\Shaders</Filter>
+    <None Include="resources\fonts\Arial.fnt">
+      <Filter>Resource Files\Fonts</Filter>
     </None>
   </ItemGroup>
 </Project>
