@@ -2,19 +2,27 @@
 
 #include <string>
 #include <DirectXMath.h>
+#include "DX12Utils.h"
 #include "d3dx12.h"
 
 // class predef
 class DX12Shader;
+class DX12Font;
 
 class DX12Text
 {
 public:
-	DX12Text(const wchar_t * i_Text);
+	DX12Text(const wchar_t * i_Text, DX12Font * i_Font);
+	DX12Text(DX12Font * i_Font);
 	~DX12Text();
 
-	void			SetText(const wchar_t * i_Text);
+	void			SetText(const std::wstring & i_Text);
 	const wchar_t *	GetText() const;
+	void			SetColor(const Color & i_Color);
+	void			SetFont(DX12Font * i_Font);
+
+	// DX12
+	void		PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList);
 
 private:
 	// Struct definition
@@ -31,20 +39,31 @@ private:
 		,Pos(x, y, w, h)
 		{};
 
+		TextVertex() {};
+
 		DirectX::XMFLOAT4	Pos;
 		DirectX::XMFLOAT4	TexCoord;
 		DirectX::XMFLOAT4	Color;
 	};
 
-	std::wstring m_Text;		// Text to display
+	// Update frame buffer
+	void		UpdateGPUBuffer(int i_FrameIndex);
+
+	std::wstring	m_Text;		// Text to display
+	DX12Font *		m_Font;
+	Color			m_Color;
+
+	// computed data
+	TextVertex *		m_Vertices;
 
 	// static
 	static const UINT		s_MaxTextCharacter;
 
 	// dx12
+	UINT					m_FrameCount;
 	ID3D12Resource **		m_BufferUploadHeap;
-	static UINT8 **			m_TextVBGPUAddress;
-
+	UINT8 **				m_TextVBGPUAddress;
+	bool *					m_BufferUpdated;
 
 	static HRESULT			CreateTextPipelineStateObject();	// Create the default text pipeline state object
 

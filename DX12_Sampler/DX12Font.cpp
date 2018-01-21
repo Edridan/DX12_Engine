@@ -212,12 +212,34 @@ DX12Font::~DX12Font()
 
 float DX12Font::GetKerning(wchar_t i_First, wchar_t i_Second)
 {
+	for (UINT i = 0; i < m_KerningCount; ++i)
+	{
+		if ((wchar_t)m_KerningList[i].FirstId == i_First &&
+			(wchar_t)m_KerningList[i].SecondId == i_Second)
+			return m_KerningList[i].Amount;
+	}
+
+	// nothing found
 	return 0.0f;
 }
 
-DX12Font::FontChar * DX12Font::GetChar(wchar_t i_Char)
+DX12Font::FontChar * DX12Font::GetFontChar(wchar_t i_Char)
 {
+	for (UINT i = 0; i < m_NumCharacters; ++i)
+	{
+		if (i_Char == (wchar_t)m_CharList[i].Id)
+		{
+			return &m_CharList[i];
+		}
+	}
+
+	// nothing found
 	return nullptr;
+}
+
+Padding DX12Font::GetPadding() const
+{
+	return m_Padding;
 }
 
 bool DX12Font::IsLoaded() const

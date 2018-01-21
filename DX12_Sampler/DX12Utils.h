@@ -97,10 +97,14 @@ struct Color
 	}
 };
 
-const Color Black(0.f, 0.f, 0.f);
-const Color Red(0.f, 0.f, 0.f);
-const Color Blue(0.f, 0.f, 0.f);
-const Color Green(0.f, 0.f, 0.f);
+namespace color
+{
+	const Color White(1.f, 1.f, 1.f);
+	const Color Black(0.f, 0.f, 0.f);
+	const Color Red(0.f, 0.f, 0.f);
+	const Color Blue(0.f, 0.f, 0.f);
+	const Color Green(0.f, 0.f, 0.f);
+}
 
 // padding definition
 struct Padding

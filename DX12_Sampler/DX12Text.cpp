@@ -1,5 +1,6 @@
 #include "DX12Text.h"
 
+#include "DX12Font.h"
 #include "DX12Mesh.h"
 #include "DX12Shader.h"
 #include "DX12RenderEngine.h"
@@ -27,8 +28,11 @@ const D3D12_INPUT_LAYOUT_DESC	DX12Text::s_TextInputLayout =
 	sizeof(s_TextInputElement) / sizeof(D3D12_INPUT_ELEMENT_DESC),
 };
 
-DX12Text::DX12Text(const wchar_t * i_Text)
+DX12Text::DX12Text(const wchar_t * i_Text, DX12Font * i_Font)
 	:m_Text()
+	,m_Vertices(nullptr)
+	,m_Font(i_Font)
+	,m_Color(color::White)
 {
 	m_Text.reserve(s_MaxTextCharacter);
 
@@ -40,42 +44,175 @@ DX12Text::DX12Text(const wchar_t * i_Text)
 
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
-	ID3D12Device * device						= render.GetDevice();
-	ID3D12GraphicsCommandList * commandList		= render.GetCommandList();
-	UINT frameCount								= render.GetFrameBufferCount();
+	ID3D12Device * device = render.GetDevice();
+	ID3D12GraphicsCommandList * commandList = render.GetCommandList();
+	m_FrameCount = render.GetFrameBufferCount();
+
+	m_BufferUploadHeap = new ID3D12Resource*[m_FrameCount];
+	m_TextVBGPUAddress = new UINT8 *[m_FrameCount];
+
+	m_BufferUpdated = new bool[m_FrameCount];
 
 	// create the upload heap for text
 	HRESULT hr;
-	hr = device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // upload heap
-		D3D12_HEAP_FLAG_NONE, // no flags
-		&CD3DX12_RESOURCE_DESC::Buffer(s_MaxTextCharacter * sizeof(TextVertex)), // resource description for a buffer
-		D3D12_RESOURCE_STATE_GENERIC_READ, // GPU will read from this buffer and copy its contents to the default heap
-		nullptr,
-		IID_PPV_ARGS(&m_BufferUploadHeap));
 
-	m_BufferUploadHeap->SetName(L"Text buffer upload heap");
+	// create a buffer for each frame
+	for (size_t i = 0; i < m_FrameCount; ++i)
+	{
+		hr = device->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // upload heap
+			D3D12_HEAP_FLAG_NONE, // no flags
+			&CD3DX12_RESOURCE_DESC::Buffer(s_MaxTextCharacter * sizeof(TextVertex)), // resource description for a buffer
+			D3D12_RESOURCE_STATE_GENERIC_READ, // GPU will read from this buffer and copy its contents to the default heap
+			nullptr,
+			IID_PPV_ARGS(&m_BufferUploadHeap[i]));
 
-	CD3DX12_RANGE readRange(0, 0);	// We do not intend to read from this resource on the CPU. (so end is less than or equal to begin)
+		m_BufferUploadHeap[i]->SetName(L"Text buffer upload heap");
 
-	// map the resource heap to get a gpu virtual address to the beginning of the heap
-	hr = m_BufferUploadHeap->Map(0, &readRange, reinterpret_cast<void**>(&s_TextVBGPUAddress[0]));
+
+		CD3DX12_RANGE readRange(0, 0);	// We do not intend to read from this resource on the CPU. (so end is less than or equal to begin)
+
+		// map the resource heap to get a gpu virtual address to the beginning of the heap
+		hr = m_BufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_TextVBGPUAddress[0]));
+
+		m_BufferUpdated[i] = false;
+	}
+
+	// create vertices data
+	m_Vertices = new TextVertex[s_MaxTextCharacter];
 
 	// setup the text
 	SetText(i_Text);
 }
 
-DX12Text::~DX12Text()
+DX12Text::DX12Text(DX12Font * i_Font)
+	:DX12Text(L"", i_Font)
 {
 }
 
-void DX12Text::SetText(const wchar_t * i_Text)
+DX12Text::~DX12Text()
 {
+	for (UINT i = 0; i < m_FrameCount; ++i)
+	{
+		SAFE_RELEASE(m_BufferUploadHeap[i]);
+	}
+
+	delete[] m_BufferUploadHeap;
+	delete[] m_TextVBGPUAddress;
+}
+
+void DX12Text::SetText(const std::wstring & i_Text)
+{
+	// if the font is null we can't display the text
+	if (m_Font == nullptr)
+	{
+		return;
+	}
+
+	// retreive the text from input
+	if (i_Text.size() > s_MaxTextCharacter)
+	{
+		m_Text.clear();
+		m_Text.append(i_Text, s_MaxTextCharacter - 1);
+		m_Text.append(L'');
+	}
+	else
+	{
+		m_Text = i_Text;
+	}
+
+	wchar_t lastChar		= -1; // no last character to start with
+	UINT numChar			= 0;
+	const Padding padding	= m_Font->GetPadding();
+	const float	hPadding	= (padding.left + padding.right);
+	const float vPadding	= (padding.top + padding.bottom);
+
+	float x = 0, y = 0;
+
+	// recompute text vertices
+	for (size_t i = 0; i < m_Text.size(); ++i)
+	{
+		wchar_t c						= m_Text[i];
+		
+		// end of the text or buffer overflow
+		if (c == L'' || i >= s_MaxTextCharacter)
+			break;
+		
+		DX12Font::FontChar * fontChar	= m_Font->GetFontChar(c);
+
+		// the character is not in the char font
+		if (fontChar == nullptr)
+			continue;
+
+		// To do : manage new line
+		
+		// create vertices
+		float kerning = 0.f;
+		
+		if (i > 0)
+		{
+			kerning = m_Font->GetKerning(lastChar, c);
+		}
+
+		m_Vertices[numChar] = TextVertex(
+			m_Color.r, m_Color.g, m_Color.b, 1.f,
+			fontChar->U, fontChar->V,
+			fontChar->tWidth, fontChar->tHeight,
+			x + (fontChar->xOffset + kerning),
+			y - fontChar->yOffset,
+			fontChar->Width, fontChar->Height
+		);
+
+		// remove horizontal padding
+		x += fontChar->xAdvance - hPadding;
+
+		// increment values
+		++numChar;
+		lastChar = c;
+	}
+
+	// reset buffer updated
+	for (int i = 0; i < m_FrameCount; ++i)
+	{
+		m_BufferUpdated[i] = false;
+	}
 }
 
 const wchar_t * DX12Text::GetText() const
 {
-	return nullptr;
+	return m_Text.c_str();
+}
+
+void DX12Text::SetColor(const Color & i_Color)
+{
+	m_Color = i_Color;
+}
+
+void DX12Text::SetFont(DX12Font * i_Font)
+{
+	m_Font = i_Font;
+
+	SetText(m_Text.c_str());
+}
+
+void DX12Text::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
+{
+	int frameIndex = DX12RenderEngine::GetInstance().GetFrameIndex();
+	UpdateGPUBuffer(frameIndex);
+
+	i_CommandList->DrawInstanced(4, m_Text.size(), 0, 0);
+}
+
+void DX12Text::UpdateGPUBuffer(int i_FrameIndex)
+{
+	if (!m_BufferUpdated[i_FrameIndex])
+	{
+		// copy the vertice buffer to the needed frame index GPU buffer
+		size_t size = (m_Text.size() > s_MaxTextCharacter ? s_MaxTextCharacter : m_Text.size());
+		memcpy(m_TextVBGPUAddress[i_FrameIndex], m_Vertices, size * sizeof(DX12Text::TextVertex));
+
+		m_BufferUpdated[i_FrameIndex] = true;
+	}
 }
 
 inline HRESULT DX12Text::CreateTextPipelineStateObject()

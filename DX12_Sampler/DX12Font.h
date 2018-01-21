@@ -45,7 +45,8 @@ public:
 
 	// get information
 	float		GetKerning(wchar_t i_First, wchar_t i_Second);
-	FontChar *	GetChar(wchar_t i_Char);
+	FontChar *	GetFontChar(wchar_t i_Char);
+	Padding		GetPadding() const;
 
 	bool		IsLoaded() const;
 

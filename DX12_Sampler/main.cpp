@@ -41,7 +41,7 @@ int WINAPI WinMain(
 	DX12Mesh * mesh = DX12Mesh::LoadMeshObj("resources/obj/cube.obj");
 	DX12Font font(L"resources/font/Arial-font.fnt");
 
-	DX12Text renderText(L"Text");
+	//DX12Text renderText(L"Text");
 
 	// To do : create a commandlist specific for update resources on GPU and update when needed
 	// push data to the GPU
