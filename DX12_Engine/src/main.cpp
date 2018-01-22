@@ -31,6 +31,7 @@ int WINAPI WinMain(
 	// create objects...
 	Actor::ActorDesc actorDesc;
 	actorDesc.Mesh = L"resources/obj/cube.obj";
+	actorDesc.ActorTransform = Transform();
 
 	world->SpawnActor(actorDesc);
 

@@ -9,6 +9,7 @@ class Transform
 {
 public:
 	Transform();
+	Transform(XMFLOAT3 i_Translation, XMFLOAT3 i_Rotation = XMFLOAT3(0.f, 0.f, 0.f), XMFLOAT3 i_Scale = XMFLOAT3(1.f, 1.f, 1.f));
 	~Transform();
 	
 	// position management
@@ -23,6 +24,9 @@ public:
 	// Retreive the matrix of transform
 	XMFLOAT4X4		GetMatrix();
 	XMFLOAT4X4		GetTransposed();
+
+	// operator
+	Transform &	operator=(const Transform i_Other);
 
 private:
 	// recompute

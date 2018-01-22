@@ -89,7 +89,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc" />
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="src\dx12\DX12ConstantBuffer.cpp" />
     <ClCompile Include="src\dx12\DX12Font.cpp" />
     <ClCompile Include="src\dx12\DX12Material.cpp" />
@@ -110,7 +109,7 @@
     <ClCompile Include="src\game\Camera.cpp" />
     <ClCompile Include="src\game\RenderComponent.cpp" />
     <ClCompile Include="src\game\World.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h" />

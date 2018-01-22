@@ -22,7 +22,7 @@ public:
 	{
 		bool				NeedTick = false;
 		std::wstring		Mesh = L"";
-		
+		Transform			ActorTransform;
 	};
 
 	// public
