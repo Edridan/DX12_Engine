@@ -17,6 +17,7 @@ int WINAPI WinMain(
 
 	// define the engine setup
 	desc.HInstance = hInstance;
+	desc.FramePerSecondTargeted = 60;
 
 	// create the engine singleton
 	Engine::Create();
@@ -31,7 +32,7 @@ int WINAPI WinMain(
 	// create objects...
 	Actor::ActorDesc actorDesc;
 	actorDesc.Mesh = L"resources/obj/cube.obj";
-	actorDesc.ActorTransform = Transform();
+	actorDesc.ActorTransform = Transform(XMFLOAT3(0.f, 1.f, 0.f));
 
 	world->SpawnActor(actorDesc);
 

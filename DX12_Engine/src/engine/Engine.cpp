@@ -84,14 +84,14 @@ void Engine::Run()
 
 	while (!m_Exit)
 	{
-		float m_Elapsed = m_EngineClock->Restart().ToSeconds();
+		float elapsed = m_EngineClock->Restart().ToSeconds();
 
 		// input management and window update
 		m_RenderEngine->UpdateWindow();
 
 		// tick the world (update all actors and components)
 		ASSERT(m_CurrentWorld != nullptr);
-		m_CurrentWorld->TickWorld(m_Elapsed);
+		m_CurrentWorld->TickWorld(elapsed);
 
 		m_RenderEngine->PrepareForRender();
 
@@ -103,6 +103,20 @@ void Engine::Run()
 		if (!window.IsOpen())
 		{
 			m_Exit = true;
+		}
+
+		// wait before the next loop if we are too fast
+		if (m_FramePerSecondsTargeted != 0)
+		{
+			// sleep time
+			float frameTime = m_EngineClock->GetElaspedTime().ToSeconds();
+			const float fpsTime = (1.f / (float)m_FramePerSecondsTargeted);
+
+			if (frameTime < fpsTime)
+			{
+				DWORD sleepTime = (DWORD)((fpsTime - frameTime) * 1000.f);
+				Sleep(sleepTime);
+			}
 		}
 	}
 

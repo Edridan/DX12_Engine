@@ -71,6 +71,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 {
 	// initialize the object from the desc
 	m_NeedTick = i_Desc.NeedTick;
+	m_Transform = i_Desc.ActorTransform;
 
 	// the actor is a mesh renderer
 	if (i_Desc.Mesh != L"")
