@@ -58,6 +58,12 @@
     <Filter Include="Source Files\Engine">
       <UniqueIdentifier>{96c11660-ad29-42ab-a63e-d770b1e0f985}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game\Components">
+      <UniqueIdentifier>{fd896e92-c245-4da9-9264-5012d4a39039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Components">
+      <UniqueIdentifier>{215b6c0b-d412-4b2f-9015-44d94e15579c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
@@ -111,12 +117,6 @@
     <ClCompile Include="src\game\Actor.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\ActorComponent.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game\RenderComponent.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="src\game\Camera.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -125,6 +125,12 @@
     </ClCompile>
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\ActorComponent.cpp">
+      <Filter>Source Files\Game\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\RenderComponent.cpp">
+      <Filter>Source Files\Game\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -185,17 +191,17 @@
     <ClInclude Include="resource.h">
       <Filter>Resource Files\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\ActorComponent.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="src\game\RenderComponent.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="src\game\Camera.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\ResourcesManager.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\ActorComponent.h">
+      <Filter>Header Files\Game\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\RenderComponent.h">
+      <Filter>Header Files\Game\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
