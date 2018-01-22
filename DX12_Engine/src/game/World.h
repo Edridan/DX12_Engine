@@ -45,6 +45,9 @@ public:
 
 	Camera *	GetCurrentCamera() const;
 
+	// clear world
+	void		Clear();
+
 	friend class Engine;
 private:
 

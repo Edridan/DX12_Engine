@@ -20,9 +20,9 @@ public:
 	// this initialize an actor depending a basic description
 	struct ActorDesc
 	{
-		bool				NeedTick = false;
-		std::wstring		Mesh = L"";
-		Transform			ActorTransform;
+		bool NeedTick				= false;
+		std::wstring Mesh			= L"";
+		Transform ActorTransform	= Transform();
 	};
 
 	// public
@@ -44,8 +44,6 @@ public:
 	bool				DetachRenderComponent();
 	RenderComponent *	GetRenderComponent() const;
 
-
-
 	// friend class
 	friend class World;
 
@@ -62,6 +60,9 @@ private:
 
 	// virtual function
 	virtual void	Tick(float i_Elapsed);
+	// events
+	virtual void	Created();		// called right after creation
+	virtual void	Destroyed();	// called just before deletion
 
 	// specific render informations
 	void			Render();	// render component

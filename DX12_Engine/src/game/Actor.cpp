@@ -107,6 +107,16 @@ void Actor::Tick(float i_Elapsed)
 	// Basically do nothing (a default actor is not updated)
 }
 
+void Actor::Created()
+{
+	// Basically do nothing
+}
+
+void Actor::Destroyed()
+{
+	// Basically do nothing
+}
+
 void Actor::Render()
 {
 	// To do : 

@@ -27,6 +27,7 @@ World::World(const WorldDesc & i_WorldDesc)
 	}
 
 #ifdef _DEBUG
+	// enable freecam in debug
 	m_CurrentCamera->SetFreecamEnabled(true);
 #endif
 }
@@ -66,6 +67,9 @@ Actor * World::SpawnActor(const Actor::ActorDesc & i_Desc, Actor * i_Parent)
 		m_RootActors.push_back(newActor);
 	}
 
+	// call created event
+	newActor->Created();
+
 	return newActor;
 }
 
@@ -95,8 +99,32 @@ bool World::DeleteActor(Actor * i_ActorToRemove, bool i_RemoveChildren)
 		}
 
 		m_RootActors.erase(itr);
-
 	}
+
+	// manage children
+	if (i_ActorToRemove->HaveChild())
+	{
+		auto itr = i_ActorToRemove->m_Children.begin();
+
+		while (itr != i_ActorToRemove->m_Children.end())
+		{
+			if (i_RemoveChildren)
+			{
+				DeleteActor((*itr), i_RemoveChildren);
+			}
+			else
+			{
+				// the actor is now root
+				(*itr)->m_Parent = nullptr;
+				m_RootActors.push_back(*itr);
+			}
+
+			++itr;
+		}
+	}
+
+	// call event before deletion
+	i_ActorToRemove->Destroyed();
 
 	// To do : call to a Destroy event on Actor
 	// remove the actor from the memory
@@ -175,6 +203,25 @@ bool World::DetachActor(Actor * i_ActorToDetach)
 Camera * World::GetCurrentCamera() const
 {
 	return m_CurrentCamera;
+}
+
+void World::Clear()
+{
+	// clear all game objects
+	auto itr = m_Actors.begin();
+
+	while (itr != m_Actors.end())
+	{
+		// delete actors
+		(*itr)->Destroyed();
+		delete (*itr);
+
+		++itr;
+	}
+
+	// clear and reset vectors
+	m_RootActors.clear();
+	m_Actors.clear();
 }
 
 void World::TickWorld(float i_Elapsed)
