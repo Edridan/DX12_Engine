@@ -16,9 +16,11 @@
 
 
 # Compilation files
-DX12_Sampler/x64/Debug/*
+DX12_Engine/x64/Debug/*
 x64/Debug/*
 
+# file generated for resources by visual studio
+*.aps
 
 # Precompiled Headers
 *.gch
@@ -43,5 +45,7 @@ x64/Debug/*
 *.exe
 *.out
 *.app
+
+
 
 

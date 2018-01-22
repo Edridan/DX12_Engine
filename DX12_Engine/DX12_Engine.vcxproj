@@ -105,8 +105,11 @@
     <ClCompile Include="src\engine\Engine.cpp" />
     <ClCompile Include="src\engine\Transform.cpp" />
     <ClCompile Include="src\game\Actor.cpp" />
+    <ClCompile Include="src\game\ActorComponent.cpp" />
+    <ClCompile Include="src\game\Camera.cpp" />
     <ClCompile Include="src\game\GameObject.cpp" />
     <ClCompile Include="src\game\GameScene.cpp" />
+    <ClCompile Include="src\game\RenderComponent.cpp" />
     <ClCompile Include="src\game\World.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
@@ -130,8 +133,11 @@
     <ClInclude Include="src\engine\Engine.h" />
     <ClInclude Include="src\engine\Transform.h" />
     <ClInclude Include="src\game\Actor.h" />
+    <ClInclude Include="src\game\ActorComponent.h" />
+    <ClInclude Include="src\game\Camera.h" />
     <ClInclude Include="src\game\GameObject.h" />
     <ClInclude Include="src\game\GameScene.h" />
+    <ClInclude Include="src\game\RenderComponent.h" />
     <ClInclude Include="src\game\World.h" />
   </ItemGroup>
   <ItemGroup>
