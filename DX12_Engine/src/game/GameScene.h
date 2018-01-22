@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "dx12/DX12Camera.h"
+#include "Camera.h"
 #include "engine/Clock.h"
 
 class GameObject;
@@ -33,7 +33,7 @@ public:
 	// Render scene
 	void				UpdateScene();
 	void				RenderScene() const;
-	DX12Camera &		GetMainCamera();
+	Camera &			GetMainCamera();
 
 	// friend class
 	friend class GameObject;
@@ -41,7 +41,7 @@ private:
 	// game object internal management
 	void				UpdateGameObjectParenting(GameObject * i_GameObject);
 
-	DX12Camera			m_Camera;		// camera used for rendering
+	Camera				m_Camera;		// camera used for rendering
 	Clock				m_GameClock;	// game clock
 	float				m_ElapsedTime;
 

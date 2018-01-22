@@ -1,4 +1,4 @@
-#include "dx12/DX12Camera.h"
+#include "Camera.h"
 
 #include "dx12/DX12RenderEngine.h"
 #include "dx12/DX12Window.h"
@@ -6,7 +6,7 @@
 
 #include <math.h>
 
-DX12Camera::DX12Camera(const XMMATRIX & i_Projection)
+Camera::Camera(const XMMATRIX & i_Projection)
 	:m_Position(0.f, 0.f, 0.f, 0.f)
 	,m_Target(0.f, 0.f, 1.f, 0.f)
 	,m_Freecam(false)
@@ -16,7 +16,7 @@ DX12Camera::DX12Camera(const XMMATRIX & i_Projection)
 	XMStoreFloat4x4(&m_Projection, i_Projection);
 }
 
-DX12Camera::DX12Camera()
+Camera::Camera()
 	:m_Position(0.f, 0.f, 0.f, 0.f)
 	,m_Target(0.f, 0.f, 1.f, 0.f)
 	,m_Freecam(false)
@@ -32,11 +32,11 @@ DX12Camera::DX12Camera()
 	XMStoreFloat4x4(&m_Projection, tmpProj);
 }
 
-DX12Camera::~DX12Camera()
+Camera::~Camera()
 {
 }
 
-void DX12Camera::Update(FLOAT i_ElapsedTime)
+void Camera::Update(FLOAT i_ElapsedTime)
 {
 	// build view matrix
 	XMVECTOR cPos = XMLoadFloat4(&m_Position);
@@ -120,12 +120,12 @@ void DX12Camera::Update(FLOAT i_ElapsedTime)
 	XMStoreFloat4x4(&m_View, tmpMat);
 }
 
-void DX12Camera::SetProjectionMatrix(const XMMATRIX & i_Projection)
+void Camera::SetProjectionMatrix(const XMMATRIX & i_Projection)
 {
 	XMStoreFloat4x4(&m_Projection, i_Projection);
 }
 
-XMFLOAT4 DX12Camera::GetFoward() const
+XMFLOAT4 Camera::GetFoward() const
 {
 	const XMVECTOR cPos = XMLoadFloat4(&m_Position);
 	const XMVECTOR cTarg = XMLoadFloat4(&m_Target);
@@ -137,22 +137,22 @@ XMFLOAT4 DX12Camera::GetFoward() const
 	return forward;
 }
 
-XMFLOAT4X4 DX12Camera::GetViewMatrix() const
+XMFLOAT4X4 Camera::GetViewMatrix() const
 {
 	return m_View;
 }
 
-XMFLOAT4X4 DX12Camera::GetProjMatrix() const
+XMFLOAT4X4 Camera::GetProjMatrix() const
 {
 	return m_Projection;
 }
 
-void DX12Camera::SetFreecamEnabled(bool i_Enabled)
+void Camera::SetFreecamEnabled(bool i_Enabled)
 {
 	m_Freecam = i_Enabled;
 }
 
-bool DX12Camera::FreecamIsEnabled() const
+bool Camera::FreecamIsEnabled() const
 {
 	return m_Freecam;
 }

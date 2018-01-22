@@ -148,7 +148,7 @@ void GameScene::RenderScene() const
 	}
 }
 
-DX12Camera & GameScene::GetMainCamera()
+Camera & GameScene::GetMainCamera()
 {
 	return m_Camera;
 }

@@ -38,7 +38,7 @@ void GameObject::Render(ID3D12GraphicsCommandList * i_CommandList)
 
 		// update the model view transform matrix
 		DX12RenderEngine::DefaultConstantBuffer constantBuffer;
-		DX12Camera & cam = m_Scene->GetMainCamera();
+		Camera & cam = m_Scene->GetMainCamera();
 
 		XMMATRIX viewMat = XMLoadFloat4x4(&cam.GetViewMatrix()); // load view matrix
 		XMMATRIX projMat = XMLoadFloat4x4(&cam.GetProjMatrix()); // load projection matrix

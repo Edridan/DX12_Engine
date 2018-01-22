@@ -7,12 +7,12 @@
 
 using namespace DirectX;
 
-class DX12Camera
+class Camera
 {
 public:
-	DX12Camera(const XMMATRIX & i_Projection);
-	DX12Camera();
-	~DX12Camera();
+	Camera(const XMMATRIX & i_Projection);
+	Camera();
+	~Camera();
 
 	// camera management
 	void			Update(FLOAT i_ElapsedTime);
