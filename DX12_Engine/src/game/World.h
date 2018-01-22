@@ -16,7 +16,6 @@ public:
 
 	// world public functions can be called by actors
 	float GetFrameTime() const;	// get the last elapsed time
-	float GetCurrentFrameTime() const;	// get the current frame time (from last draw buffer)
 
 	// actor management
 	// spawn specific overriden actors
@@ -36,14 +35,27 @@ private:
 	// call by engine class (this tick each actor that need a tick)
 	void		TickWorld(float i_Elapsed);
 
-	
-
+	// actors management
 	std::vector<Actor *>	m_RootActors;
+	std::vector<Actor *>	m_Actors;
+
+	float			m_FrameTime;
 };
 
 // Implementation
 template <class _Actor>
 _Actor * World::SpawnActor(Actor * i_Parent /* = nullptr */)
 {
+	// create the actor
+	Actor * newActor = new _Actor(this);
+	m_Actors.push_back(newActor);
 
+	// add actor to the parent if needed
+	if (i_Parent = nullptr)
+	{
+		newActor->m_Parent = i_Parent;
+		i_Parent->m_Children.push_back(newActor);
+	}
+
+	return reinterpret_cast<_Actor*>newActor;
 }

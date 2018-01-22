@@ -78,9 +78,6 @@
     <ClCompile Include="src\dx12\DX12Window.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="src\dx12\DX12Camera.cpp">
-      <Filter>Source Files\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="src\dx12\DX12ConstantBuffer.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
@@ -147,9 +144,6 @@
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\dx12\d3dx12.h">
-      <Filter>Header Files\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\dx12\DX12Camera.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\dx12\DX12ConstantBuffer.h">

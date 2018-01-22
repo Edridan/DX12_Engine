@@ -45,7 +45,7 @@ protected:
 
 private:
 	// actor creation
-	Actor(World * i_World, Actor * i_Parent = nullptr);
+	Actor(World * i_World);
 	~Actor();
 
 	// virtual function

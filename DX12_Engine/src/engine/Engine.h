@@ -14,7 +14,6 @@ class DX12RenderEngine;
 class Engine
 {
 public:
-
 	struct EngineDesc
 	{
 		HINSTANCE	* HInstance = nullptr;

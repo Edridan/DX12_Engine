@@ -49,7 +49,7 @@ bool Actor::DetachRenderComponent()
 	return false;
 }
 
-Actor::Actor(World * i_World, Actor * i_Parent)
+Actor::Actor(World * i_World)
 	:m_Children()
 	,m_World(i_World)
 	,m_Parent(nullptr)
