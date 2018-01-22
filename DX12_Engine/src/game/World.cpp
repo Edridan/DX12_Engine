@@ -227,6 +227,7 @@ void World::Clear()
 void World::TickWorld(float i_Elapsed)
 {
 	Engine & engine = Engine::GetInstance();
+	RenderList * renderList = engine.GetRenderList();
 
 	// save elapsed time
 	m_FrameTime = i_Elapsed;
@@ -252,7 +253,7 @@ void World::TickWorld(float i_Elapsed)
 			// To do : push the render component to the specific list
 			if (actor->NeedRendering())
 			{
-				engine.GetRenderList()->PushRenderComponent(actor->GetRenderComponent());
+				renderList->PushRenderComponent(actor->GetRenderComponent());
 			}
 		}
 	}
