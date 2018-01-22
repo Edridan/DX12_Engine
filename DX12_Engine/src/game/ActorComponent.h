@@ -8,9 +8,12 @@ class Actor;
 class ActorComponent
 {
 public:
-	ActorComponent();
+	ActorComponent(Actor * i_Actor);
 	~ActorComponent();
 
-private:
+	// informations
+	Actor *		GetActor() const;
+
+protected:
 	Actor *		m_Actor;
 };

@@ -40,7 +40,9 @@ void DX12RenderEngine::Create(HINSTANCE & i_HInstance)
 void DX12RenderEngine::Delete()
 {
 	assert(s_Instance != nullptr);
+	s_Instance->CleanUp();
 	delete s_Instance;
+	s_Instance = nullptr;
 }
 
 HRESULT DX12RenderEngine::InitializeDX12()
@@ -635,6 +637,11 @@ DX12RenderEngine::DX12RenderEngine(HINSTANCE & i_HInstance)
 }
 
 DX12RenderEngine::~DX12RenderEngine()
+{
+	
+}
+
+void DX12RenderEngine::CleanUp()
 {
 	// Cleanup resources
 	// wait for the gpu to finish all frames

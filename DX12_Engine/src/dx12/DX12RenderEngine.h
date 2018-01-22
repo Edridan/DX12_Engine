@@ -96,6 +96,7 @@ private:
 	DX12RenderEngine(HINSTANCE & i_HInstance);
 	~DX12RenderEngine();
 
+	void		CleanUp();
 
 	// Engine implementation
 	DX12Window			m_Window;

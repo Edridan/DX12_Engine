@@ -89,6 +89,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="src\dx12\DX12ConstantBuffer.cpp" />
     <ClCompile Include="src\dx12\DX12Font.cpp" />
     <ClCompile Include="src\dx12\DX12Material.cpp" />
@@ -102,12 +103,11 @@
     <ClCompile Include="src\dx12\DX12Window.cpp" />
     <ClCompile Include="src\engine\Clock.cpp" />
     <ClCompile Include="src\engine\Engine.cpp" />
+    <ClCompile Include="src\engine\ResourcesManager.cpp" />
     <ClCompile Include="src\engine\Transform.cpp" />
     <ClCompile Include="src\game\Actor.cpp" />
     <ClCompile Include="src\game\ActorComponent.cpp" />
     <ClCompile Include="src\game\Camera.cpp" />
-    <ClCompile Include="src\game\GameObject.cpp" />
-    <ClCompile Include="src\game\GameScene.cpp" />
     <ClCompile Include="src\game\RenderComponent.cpp" />
     <ClCompile Include="src\game\World.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -129,12 +129,11 @@
     <ClInclude Include="src\dx12\DX12Window.h" />
     <ClInclude Include="src\engine\Clock.h" />
     <ClInclude Include="src\engine\Engine.h" />
+    <ClInclude Include="src\engine\ResourcesManager.h" />
     <ClInclude Include="src\engine\Transform.h" />
     <ClInclude Include="src\game\Actor.h" />
     <ClInclude Include="src\game\ActorComponent.h" />
     <ClInclude Include="src\game\Camera.h" />
-    <ClInclude Include="src\game\GameObject.h" />
-    <ClInclude Include="src\game\GameScene.h" />
     <ClInclude Include="src\game\RenderComponent.h" />
     <ClInclude Include="src\game\World.h" />
   </ItemGroup>

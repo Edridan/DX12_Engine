@@ -1,11 +1,34 @@
 #include "World.h"
 
 #include "Actor.h"
-
 #include "dx12/DX12Utils.h"
 
-World::World()
+#include "game/Camera.h"
+#include "engine/Engine.h"
+
+World::World(const WorldDesc & i_WorldDesc)
+	:m_CurrentCamera(new Camera)
+	,m_LimitedActorCount(false)
 {
+	if (i_WorldDesc.MaxActors != 0)
+	{
+		m_LimitedActorCount = true;
+		m_Actors.reserve(i_WorldDesc.MaxActors);
+	}
+
+	// initialize camera
+	m_CurrentCamera->m_Position		= i_WorldDesc.CameraPosition;
+	m_CurrentCamera->m_Target		= i_WorldDesc.CameraTarget;
+	m_CurrentCamera->m_Up			= Vec4Up;
+
+	if (i_WorldDesc.UseCameraProjection)
+	{
+		m_CurrentCamera->SetProjectionMatrix(i_WorldDesc.CameraProjection);
+	}
+
+#ifdef _DEBUG
+	m_CurrentCamera->SetFreecamEnabled(true);
+#endif
 }
 
 World::~World()
@@ -17,9 +40,17 @@ float World::GetFrameTime() const
 	return m_FrameTime;
 }
 
-Actor * World::SpawnActor(Actor * i_Parent)
+
+Actor * World::SpawnActor(const Actor::ActorDesc & i_Desc, Actor * i_Parent)
 {
-	Actor * newActor = new Actor(this);
+	if (m_LimitedActorCount && (m_Actors.size() == m_Actors.capacity()))
+	{
+		// we alerady have the max actors
+		PRINT_DEBUG("Actors count have reached the limit");
+		return nullptr;
+	}
+
+	Actor * newActor = new Actor(i_Desc, this);
 	m_Actors.push_back(newActor);
 
 	// add actor to the parent if needed
@@ -141,10 +172,20 @@ bool World::DetachActor(Actor * i_ActorToDetach)
 	return true;
 }
 
+Camera * World::GetCurrentCamera() const
+{
+	return m_CurrentCamera;
+}
+
 void World::TickWorld(float i_Elapsed)
 {
+	Engine & engine = Engine::GetInstance();
+
 	// save elapsed time
 	m_FrameTime = i_Elapsed;
+
+	// update camera
+	m_CurrentCamera->Update(i_Elapsed);	
 
 	// update components
 	for (size_t i = 0; i < m_Actors.size(); ++i)
@@ -164,7 +205,7 @@ void World::TickWorld(float i_Elapsed)
 			// To do : push the render component to the specific list
 			if (actor->NeedRendering())
 			{
-
+				engine.GetRenderList()->PushRenderComponent(actor->GetRenderComponent());
 			}
 		}
 	}

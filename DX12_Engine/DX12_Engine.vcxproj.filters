@@ -105,12 +105,6 @@
     <ClCompile Include="src\engine\Clock.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\GameObject.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game\GameScene.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="src\game\World.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
@@ -128,6 +122,12 @@
     </ClCompile>
     <ClCompile Include="src\game\Camera.cpp">
       <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\ResourcesManager.cpp">
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -179,16 +179,10 @@
     <ClInclude Include="src\engine\Transform.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\GameScene.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="src\game\World.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="src\game\Actor.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="src\game\GameObject.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -202,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="src\game\Camera.h">
       <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\ResourcesManager.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

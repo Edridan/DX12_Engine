@@ -9,15 +9,22 @@
 #include <string>
 
 #include "engine/Transform.h"
+#include "RenderComponent.h"
 
 // class predef
 class World;	// world of the actor
-class ActorComponent;
-class RenderComponent;
 
 class Actor
 {
 public:
+	// this initialize an actor depending a basic description
+	struct ActorDesc
+	{
+		bool				NeedTick = false;
+		std::wstring		Mesh = L"";
+		
+	};
+
 	// public
 	Transform	m_Transform;
 
@@ -30,10 +37,14 @@ public:
 	bool	IsEnabled() const;
 	bool	NeedTick() const;
 	bool	NeedRendering() const;
+	World *	GetWorld() const;
 
-	// Rendering process
-	void	AttachRenderComponent(const RenderComponent * i_ComponentToCopy);	// Take the render component and make a copy for the game object
-	bool	DetachRenderComponent();
+	// rendering process (manage attach and detach render component)
+	void				AttachRenderComponent(const RenderComponent::RenderComponentDesc & i_ComponentDesc);	// Take the render component and make a copy for the game object
+	bool				DetachRenderComponent();
+	RenderComponent *	GetRenderComponent() const;
+
+
 
 	// friend class
 	friend class World;
@@ -45,11 +56,14 @@ protected:
 
 private:
 	// actor creation
-	Actor(World * i_World);
+	Actor(const ActorDesc & i_Desc, World * i_World);
+	Actor(World * i_World);	// this constructor is used for special Actors (overriden actors that don't need description)
 	~Actor();
 
 	// virtual function
 	virtual void	Tick(float i_Elapsed);
+
+	// specific render informations
 	void			Render();	// render component
 
 	// parenting system

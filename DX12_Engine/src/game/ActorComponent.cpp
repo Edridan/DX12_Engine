@@ -1,9 +1,15 @@
 #include "ActorComponent.h"
 
-ActorComponent::ActorComponent()
+ActorComponent::ActorComponent(Actor * i_Actor)
+	:m_Actor(i_Actor)
 {
 }
 
 ActorComponent::~ActorComponent()
 {
+}
+
+Actor * ActorComponent::GetActor() const
+{
+	return m_Actor;
 }
