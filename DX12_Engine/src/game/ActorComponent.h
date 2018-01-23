@@ -1,10 +1,13 @@
 // an actor component is a component that can be attached to an actor
-
+// a component is only data, it contains almost no logic (some logic are required for some components)
+// this can be used for rendering objects, attaching sockets or some AI behavior state or setup holder
+// the logic for actors are defined into the actors directly (by overriding them)
 #pragma once
 
 // class predef
 class Actor;
 
+// this is a base class for a component
 class ActorComponent
 {
 public:

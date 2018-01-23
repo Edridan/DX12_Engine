@@ -20,9 +20,14 @@ public:
 	// this initialize an actor depending a basic description
 	struct ActorDesc
 	{
-		bool NeedTick				= false;
-		std::wstring Mesh			= L"";
+		// actor definition
+		std::wstring Name			= L"Unnamed Actor";
+		UINT64 Id					= (UINT64)-1;
 		Transform ActorTransform	= Transform();
+		// actor logic
+		bool NeedTick				= false;
+		// actor rendering
+		std::wstring Mesh			= L"";
 	};
 
 	// public
@@ -36,8 +41,12 @@ public:
 	bool	HaveChild() const;
 	bool	IsEnabled() const;
 	bool	NeedTick() const;
+	bool	IsHidden() const;
 	bool	NeedRendering() const;
-	World *	GetWorld() const;
+	// actor specs
+	UINT64					GetId() const;
+	const std::wstring &	GetName() const;
+	World *					GetWorld() const;
 
 	// rendering process (manage attach and detach render component)
 	void				AttachRenderComponent(const RenderComponent::RenderComponentDesc & i_ComponentDesc);	// Take the render component and make a copy for the game object
@@ -51,6 +60,7 @@ protected:
 	// informations
 	bool			m_Enabled;	// can be managed in the child class
 	bool			m_NeedTick;
+	bool			m_Hidden;
 
 private:
 	// actor creation
@@ -70,10 +80,17 @@ private:
 	// parenting system
 	std::vector<Actor*>		m_Children;
 	Actor *					m_Parent;
+
+	// information
+	std::wstring			m_Name;
+	UINT64					m_Id;
 	
 	// components management
 	RenderComponent *		m_RenderComponent;
 
 	// world of the actor
 	World * const			m_World;
+
+	// id creator
+	static UINT64			s_ActorInstanced;
 };

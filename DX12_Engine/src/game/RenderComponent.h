@@ -1,6 +1,8 @@
 // this is used for rendering object as mesh
 // this is attached to an actor
 
+// To do : create specific components for rendering mesh, post process and other stuff
+
 #pragma once
 
 #include "ActorComponent.h"
@@ -28,7 +30,6 @@ public:
 	enum RenderFlags
 	{
 		eDepthEnabled		= 1 << 0,
-		
 	};
 
 	// struct definition

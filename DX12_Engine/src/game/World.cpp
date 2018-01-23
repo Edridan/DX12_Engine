@@ -205,6 +205,72 @@ Camera * World::GetCurrentCamera() const
 	return m_CurrentCamera;
 }
 
+Actor * World::GetActorById(UINT64 i_Id) const
+{
+	auto itr = m_Actors.begin();
+	while (itr != m_Actors.end())
+	{
+		if ((*itr)->GetId() == i_Id)
+		{
+			return (*itr);
+		}
+		++itr;
+	}
+	// actor not founded
+	return nullptr;
+}
+
+Actor * World::GetRootActorById(UINT64 i_Id) const
+{
+	auto itr = m_RootActors.begin();
+	while (itr != m_RootActors.end())
+	{
+		if ((*itr)->GetId() == i_Id)
+		{
+			return (*itr);
+		}
+		++itr;
+	}
+	// actor not founded
+	return nullptr;
+}
+
+UINT World::GetActorsByName(std::vector<Actor*> o_Array, std::wstring i_Name) const
+{
+	auto itr = m_Actors.begin();
+	UINT actorsFounded = 0;
+
+	while (itr != m_Actors.end())
+	{
+		if ((*itr)->GetName() == i_Name)
+		{
+			o_Array.push_back((*itr));
+			++actorsFounded;
+		}
+		++itr;
+	}
+	// return number of actors founded in the world
+	return actorsFounded;
+}
+
+UINT World::GetRootActorsByName(std::vector<Actor*> o_Array, std::wstring i_Name) const
+{
+	auto itr = m_RootActors.begin();
+	UINT actorsFounded = 0;
+
+	while (itr != m_RootActors.end())
+	{
+		if ((*itr)->GetName() == i_Name)
+		{
+			o_Array.push_back((*itr));
+			++actorsFounded;
+		}
+		++itr;
+	}
+	// return number of actors founded in the world
+	return actorsFounded;
+}
+
 void World::Clear()
 {
 	// clear all game objects

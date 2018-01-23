@@ -203,6 +203,9 @@
     <ClInclude Include="src\engine\Window.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="RenderList.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\tex\box.bmp">

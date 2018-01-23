@@ -45,6 +45,12 @@ public:
 
 	Camera *	GetCurrentCamera() const;
 
+	// actor request
+	Actor *		GetActorById(UINT64 i_Id) const;
+	Actor *		GetRootActorById(UINT64 i_Id) const;
+	UINT		GetActorsByName(std::vector<Actor*> o_Array, std::wstring i_Name) const;
+	UINT		GetRootActorsByName(std::vector<Actor *> o_Array, std::wstring i_Name) const;
+
 	// clear world
 	void		Clear();
 
