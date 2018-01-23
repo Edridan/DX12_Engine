@@ -640,7 +640,6 @@ void DX12RenderEngine::CleanUp()
 
 	// To do : release properly data : might have some crash here
 
-
 	SAFE_RELEASE(m_Device);
 	SAFE_RELEASE(m_SwapChain);
 	SAFE_RELEASE(m_CommandQueue);
@@ -828,9 +827,9 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	D3D12_ROOT_PARAMETER *  rootParameters = new D3D12_ROOT_PARAMETER[1 + textureCount]; // only one parameter right now
 
 	// first parameter is always the CBV
-	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
-	rootParameters[0].Descriptor = rootCBVDescriptor; // this is the root descriptor for this root parameter
-	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
+	rootParameters[0].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
+	rootParameters[0].Descriptor		= rootCBVDescriptor; // this is the root descriptor for this root parameter
+	rootParameters[0].ShaderVisibility	= D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
 
 	// setup the root parameters for textures
 	for (UINT i = 0; i < textureCount; ++i) 
@@ -879,19 +878,19 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	// Create default pso
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineDesc = {};
 
-	pipelineDesc.InputLayout = desc; // the structure describing our input layout
-	pipelineDesc.pRootSignature = rootSignature; // the root signature that describes the input data this pso needs
-	pipelineDesc.VS = vertexShader->GetByteCode(); // structure describing where to find the vertex shader bytecode and how large it is	(thx ZELDARCK)
-	pipelineDesc.PS = pixelShader->GetByteCode(); // same as VS but for pixel shader
-	pipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // type of topology we are drawing
-	pipelineDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // format of the render target
-	pipelineDesc.SampleDesc = sampleDesc; // must be the same sample description as the swapchain and depth/stencil buffer
-	pipelineDesc.SampleMask = 0xffffffff; // sample mask has to do with multi-sampling. 0xffffffff means point sampling is done
-	pipelineDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // a default rasterizer state.
-	pipelineDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
-	pipelineDesc.NumRenderTargets = 1; // we are only binding one render target
-	pipelineDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-	pipelineDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
+	pipelineDesc.InputLayout			= desc; // the structure describing our input layout
+	pipelineDesc.pRootSignature			= rootSignature; // the root signature that describes the input data this pso needs
+	pipelineDesc.VS						= vertexShader->GetByteCode(); // structure describing where to find the vertex shader bytecode and how large it is	(thx ZELDARCK)
+	pipelineDesc.PS						= pixelShader->GetByteCode(); // same as VS but for pixel shader
+	pipelineDesc.PrimitiveTopologyType	= D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // type of topology we are drawing
+	pipelineDesc.RTVFormats[0]			= DXGI_FORMAT_R8G8B8A8_UNORM; // format of the render target
+	pipelineDesc.SampleDesc				= sampleDesc; // must be the same sample description as the swapchain and depth/stencil buffer
+	pipelineDesc.SampleMask				= 0xffffffff; // sample mask has to do with multi-sampling. 0xffffffff means point sampling is done
+	pipelineDesc.RasterizerState		= CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // a default rasterizer state.
+	pipelineDesc.BlendState				= CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
+	pipelineDesc.NumRenderTargets		= 1; // we are only binding one render target
+	pipelineDesc.DSVFormat				= DXGI_FORMAT_D32_FLOAT;
+	pipelineDesc.DepthStencilState		= CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
 
 	// Create the default pipeline state object
 	ID3D12PipelineState * pipelineState = nullptr;
@@ -904,7 +903,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 
 	// Create the pipeline state object
 	m_PipelineStateObjects[i_Flags] = new PipelineStateObject;
-	m_PipelineStateObjects[i_Flags]->m_PipelineState = pipelineState;
+	m_PipelineStateObjects[i_Flags]->m_PipelineState		= pipelineState;
 	m_PipelineStateObjects[i_Flags]->m_DefaultRootSignature = rootSignature;
 }
 
