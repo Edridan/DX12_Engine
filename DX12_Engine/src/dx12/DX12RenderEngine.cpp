@@ -559,6 +559,16 @@ DX12Shader * DX12RenderEngine::GetShader(UINT64 i_Flags, DX12Shader::EShaderType
 	return shader;
 }
 
+HRESULT DX12RenderEngine::Close()
+{
+	HRESULT hr;
+
+	CloseHandle(m_FenceEvent);
+	hr = WaitForPreviousFrame();
+
+	return hr;
+}
+
 int DX12RenderEngine::GetFrameIndex() const
 {
 	return m_FrameIndex;
@@ -630,7 +640,7 @@ void DX12RenderEngine::CleanUp()
 	for (int i = 0; i < m_FrameBufferCount; ++i)
 	{
 		m_FrameIndex = i;
-		//WaitForPreviousFrame();
+		WaitForPreviousFrame();
 	}
 
 	// get swapchain out of full screen before exiting

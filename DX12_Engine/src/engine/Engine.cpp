@@ -208,6 +208,8 @@ void Engine::CleanUpResources()
 
 void Engine::CleanUpModules()
 {
+	m_RenderEngine->Close();
+
 	// delete the render engine
 	DX12RenderEngine::Delete();
 }

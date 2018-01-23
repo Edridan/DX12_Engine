@@ -76,7 +76,8 @@ public:
 	DXGI_SAMPLE_DESC			GetSampleDesc() const;
 	// get the shaders for default pipeline state objects
 	DX12Shader *				GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type);
-
+	// close the render engine
+	HRESULT						Close();
 	// Get/Set
 	int								GetFrameIndex() const;
 	int								GetFrameBufferCount() const;

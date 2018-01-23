@@ -31,11 +31,11 @@ int WINAPI WinMain(
 	World * world = engine.GetWorld();
 
 	// create objects...
-	Actor::ActorDesc actorDesc;
-	actorDesc.Mesh = L"resources/obj/cube.obj";
-	actorDesc.ActorTransform = Transform(XMFLOAT3(0.f, 0.f, 0.f));
+	Actor::ActorDesc cubeActor;
+	cubeActor.Mesh = L"resources/obj/cube.obj";
+	cubeActor.ActorTransform = Transform(XMFLOAT3(0.f, 0.f, 0.f));
 
-	world->SpawnActor(actorDesc);
+	world->SpawnActor(cubeActor);
 
 	engine.Run();
 }
