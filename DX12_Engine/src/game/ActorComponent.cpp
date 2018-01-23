@@ -9,6 +9,11 @@ ActorComponent::~ActorComponent()
 {
 }
 
+bool ActorComponent::IsValid() const
+{
+	return (m_Actor != nullptr);
+}
+
 Actor * ActorComponent::GetActor() const
 {
 	return m_Actor;

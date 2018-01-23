@@ -15,6 +15,7 @@ public:
 	~ActorComponent();
 
 	// informations
+	bool		IsValid() const;	// return false if the component is not attached to an actor
 	Actor *		GetActor() const;
 
 protected:

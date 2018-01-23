@@ -10,6 +10,7 @@
 #include "engine/Clock.h"
 #include "engine/Window.h"
 #include "engine/ResourcesManager.h"
+#include "engine/RenderList.h"
 
 Engine *		Engine::s_Instance = nullptr;
 
@@ -35,6 +36,11 @@ void Engine::Delete()
 float Engine::GetLifeTime() const
 {
 	return m_EngineClock->GetElapsedFromStart().ToSeconds();
+}
+
+UINT Engine::GetFramePerSecond() const
+{
+	return m_FramePerSecond;
 }
 
 void Engine::Initialize(EngineDesc & i_Desc)
@@ -66,7 +72,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_CurrentWorld = new World(worldDesc);
 
 	// create managers
-	m_RenderList = new RenderList(m_CurrentWorld);
+	m_RenderList = new RenderList;
 	m_ResourcesManager = new ResourcesManager;
 
 	// setup settings
@@ -85,21 +91,55 @@ void Engine::Run()
 
 	while (!m_Exit)
 	{
+		// pre update management
 		float elapsed = m_EngineClock->Restart().ToSeconds();
 
-		// input management and window update
+		// retreive performance data
+		if (elapsed != 0.f)
+		{
+			m_FramePerSecond = 1 / elapsed;
+		}
+
+		/* -- Update -- */
+
+		// update input and window callbacks
 		m_Window->Update();
 
 		// tick the world (update all actors and components)
 		ASSERT(m_CurrentWorld != nullptr);
 		m_CurrentWorld->TickWorld(elapsed);
 
-		m_RenderEngine->PrepareForRender();
+		/* -- Render -- */
 
-		m_RenderList->Render(m_RenderEngine->GetCommandList());
-		
+		// prepare the render engine
+		m_RenderEngine->PrepareForRender();	// intialize the command list and other stuff
+
+		// setup and push render list on the commandlist
+		{
+			RenderList::RenderListSetup setup;
+			Camera * cam = m_CurrentWorld->GetCurrentCamera();
+
+			// dx12 related
+			setup.CommandList = m_RenderEngine->GetCommandList();
+			// camera related
+			setup.ProjectionMatrix	= XMLoadFloat4x4(&cam->GetProjMatrix());
+			setup.ViewMatrix		= XMLoadFloat4x4(&cam->GetViewMatrix());
+
+			// setup render list
+			m_RenderList->Reset();	// reset the render list of the previous frame
+			m_RenderList->SetupRenderList(setup);
+
+			// render world
+			m_CurrentWorld->RenderWorld(m_RenderList);
+
+			// push the components on the commandlist to prepare for a render
+			m_RenderList->PushOnCommandList();
+		}
+
+		// update and display backbuffer, also swap buffer and manage commandqueue
 		m_RenderEngine->Render();
 
+		/* -- End of the loop -- */
 		// update exit 
 		if (!m_Window->IsOpen())
 		{
@@ -170,65 +210,4 @@ void Engine::CleanUpModules()
 {
 	// delete the render engine
 	DX12RenderEngine::Delete();
-}
-
-
-// render list implementation
-RenderList::RenderList(World * i_World)
-	:m_World(i_World)
-{
-}
-
-RenderList::~RenderList()
-{
-}
-
-void RenderList::PushRenderComponent(RenderComponent * i_RenderComponent)
-{
-	ASSERT(i_RenderComponent->GetActor()->GetWorld() == m_World);
-	m_Components.push_back(i_RenderComponent);
-}
-
-void RenderList::Render(ID3D12GraphicsCommandList * i_CommandList)
-{
-	Camera * cam = m_World->GetCurrentCamera();
-	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
-
-	// render the opaque geometry
-	for (size_t i = 0; i < m_Components.size(); ++i)
-	{
-		// retreive and update the constant buffer
-		ADDRESS_ID constBuffer	= m_Components[i]->GetConstBufferAddress();
-		Actor *	actor			= m_Components[i]->GetActor();
-
-		// update the model view transform matrix
-		DX12RenderEngine::DefaultConstantBuffer constantBuffer;
-
-		// error 
-		if (constBuffer == UnavailableAdressId)
-		{
-			PRINT_DEBUG("Error, component doesn't have any const buffer mapped address");
-			continue;
-		}
-
-		XMMATRIX viewMat = XMLoadFloat4x4(&cam->GetViewMatrix()); // load view matrix
-		XMMATRIX projMat = XMLoadFloat4x4(&cam->GetProjMatrix()); // load projection matrix
-		XMMATRIX modelMat = actor->GetWorldTransform(); // create mvp matrix
-
-		// update data into the const buffer
-		XMStoreFloat4x4(&constantBuffer.m_Model, XMMatrixTranspose(modelMat));
-		XMStoreFloat4x4(&constantBuffer.m_View, XMMatrixTranspose(viewMat));
-		XMStoreFloat4x4(&constantBuffer.m_Projection, XMMatrixTranspose(projMat));
-
-		// other data
-		constantBuffer.m_CameraForward = XMFLOAT3((const float*)&cam->GetFoward());
-
-		// update the constant buffer
-		render.UpdateConstantBuffer(constBuffer, constantBuffer);
-
-		// push all needed data to the command list
-		m_Components[i]->PushOnCommandList(i_CommandList);
-	}
-
-	m_Components.clear();
 }

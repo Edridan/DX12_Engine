@@ -132,6 +132,9 @@
     <ClCompile Include="src\engine\Window.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\RenderList.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
@@ -203,7 +206,7 @@
     <ClInclude Include="src\engine\Window.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="RenderList.h">
+    <ClInclude Include="src\engine\RenderList.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>

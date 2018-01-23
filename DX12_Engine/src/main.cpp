@@ -17,7 +17,7 @@ int WINAPI WinMain(
 
 	// define the engine setup
 	desc.HInstance = hInstance;
-	desc.FramePerSecondTargeted = 60;
+	desc.FramePerSecondTargeted = 30;
 
 	// create the engine singleton
 	Engine::Create();

@@ -14,14 +14,16 @@
 using namespace DirectX;
 
 // class predef
+// game
 class World;
+// engine
 class Clock;
+class RenderList;
 class ResourcesManager;
+// dx12
 class DX12RenderEngine;
 
-// class defined in this file
-class RenderList;
-
+// class def
 class Engine
 {
 public:
@@ -48,6 +50,7 @@ public:
 
 	// informations
 	float		GetLifeTime() const;
+	UINT		GetFramePerSecond() const;
 
 	// intialize and run the engine
 	void		Initialize(EngineDesc & i_Desc);
@@ -78,9 +81,11 @@ private:
 	// engine management
 	bool			m_Exit;
 	UINT			m_FramePerSecondsTargeted;
+	UINT			m_FramePerSecond;
 
 	// DX12 rendering
 	DX12RenderEngine *		m_RenderEngine;
+	RenderList *			m_RenderList;	// render list to render components
 
 	// game management
 	World *				m_CurrentWorld;
@@ -88,27 +93,4 @@ private:
 
 	// managers
 	ResourcesManager *	m_ResourcesManager;
-	RenderList *		m_RenderList;
-};
-
-// class predef
-class RenderComponent;
-
-// this class is used by the engine to create and manage correclty components to draw for one frame
-// To do : clean this part of dirty code
-class RenderList
-{
-public:
-	RenderList(World * i_World);
-	~RenderList();
-
-	// push a render component to add to rendering pipeline
-	void PushRenderComponent(RenderComponent * i_RenderComponent);
-
-	// push the render list on the command list
-	void Render(ID3D12GraphicsCommandList * i_CommandList);
-
-private:
-	std::vector<RenderComponent*>	m_Components;
-	World *							m_World;
 };

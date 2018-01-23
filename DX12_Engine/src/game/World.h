@@ -9,6 +9,7 @@
 #include "dx12/DX12Utils.h"
 
 class Camera;
+class RenderList;
 
 class World
 {
@@ -59,6 +60,10 @@ private:
 
 	// call by engine class (this tick each actor that need a tick)
 	void		TickWorld(float i_Elapsed);
+	void		RenderWorld(RenderList * i_RenderList) const;
+
+	// internal call
+	void		RenderActor(const Actor * i_Actor, RenderList  * i_RenderList) const;
 
 	// actors management
 	std::vector<Actor *>	m_RootActors;

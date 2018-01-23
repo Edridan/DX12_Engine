@@ -638,7 +638,7 @@ void DX12RenderEngine::CleanUp()
 	if (m_SwapChain->GetFullscreenState(&fs, NULL))
 		m_SwapChain->SetFullscreenState(false, NULL);
 
-	// To do : release unordered map
+	// To do : release properly data : might have some crash here
 
 
 	SAFE_RELEASE(m_Device);

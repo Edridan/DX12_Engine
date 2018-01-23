@@ -2,9 +2,9 @@
 
 #include "Actor.h"
 #include "dx12/DX12Utils.h"
-
 #include "game/Camera.h"
 #include "engine/Engine.h"
+#include "engine/RenderList.h"
 
 World::World(const WorldDesc & i_WorldDesc)
 	:m_CurrentCamera(new Camera)
@@ -292,9 +292,6 @@ void World::Clear()
 
 void World::TickWorld(float i_Elapsed)
 {
-	Engine & engine = Engine::GetInstance();
-	RenderList * renderList = engine.GetRenderList();
-
 	// save elapsed time
 	m_FrameTime = i_Elapsed;
 
@@ -306,21 +303,49 @@ void World::TickWorld(float i_Elapsed)
 	{
 		Actor * actor = m_Actors[i];
 
-		if (actor->IsEnabled())
+		if (actor->NeedTick())
 		{
 			// first we need to update the actor
 			if (actor->NeedTick())
 			{
 				actor->Tick(m_FrameTime);
 			}
-
-			// then we need maybe to render the actor,
-			// this mean we push the render component to the render list
-			// To do : push the render component to the specific list
-			if (actor->NeedRendering())
-			{
-				renderList->PushRenderComponent(actor->GetRenderComponent());
-			}
 		}
+	}
+}
+
+void World::RenderWorld(RenderList * i_RenderList) const
+{
+	// take all root actors
+	for (size_t i = 0; i < m_RootActors.size(); ++i)
+	{
+		RenderActor(m_RootActors[i], i_RenderList);
+	}
+}
+
+void World::RenderActor(const Actor * i_Actor, RenderList * i_RenderList) const
+{
+	// if the actor is hidden, we do not render his other children
+	if (i_Actor->IsHidden())
+	{
+		return;
+	}
+
+	// render the actor
+	if (i_Actor->NeedRendering())
+	{
+		// then we need maybe to render the actor,
+		// this mean we push the render component to the render list
+		// To do : push the render component to the specific list
+		i_RenderList->PushRenderComponent(i_Actor->GetRenderComponent());
+	}
+
+	// render if needed the childs
+	const std::vector<Actor *> * const children = &(i_Actor->m_Children);
+
+	for (size_t i = 0; i < children->size(); ++i)
+	{
+		// render actor if needed
+		RenderActor((*children)[i], i_RenderList);
 	}
 }

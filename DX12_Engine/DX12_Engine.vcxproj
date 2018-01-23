@@ -101,6 +101,7 @@
     <ClCompile Include="src\dx12\DX12Utils.cpp" />
     <ClCompile Include="src\engine\Clock.cpp" />
     <ClCompile Include="src\engine\Engine.cpp" />
+    <ClCompile Include="src\engine\RenderList.cpp" />
     <ClCompile Include="src\engine\ResourcesManager.cpp" />
     <ClCompile Include="src\engine\Transform.cpp" />
     <ClCompile Include="src\engine\Window.cpp" />
@@ -113,7 +114,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h" />
-    <ClInclude Include="RenderList.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\dx12\d3dx12.h" />
     <ClInclude Include="src\dx12\DX12ConstantBuffer.h" />
@@ -128,6 +128,7 @@
     <ClInclude Include="src\dx12\DX12Utils.h" />
     <ClInclude Include="src\engine\Clock.h" />
     <ClInclude Include="src\engine\Engine.h" />
+    <ClInclude Include="src\engine\RenderList.h" />
     <ClInclude Include="src\engine\ResourcesManager.h" />
     <ClInclude Include="src\engine\Transform.h" />
     <ClInclude Include="src\engine\Window.h" />

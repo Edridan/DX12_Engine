@@ -56,7 +56,7 @@ RenderComponent::~RenderComponent()
 		render.ReleaseConstantBufferVirtualAddress(m_ConstBuffer);
 }
 
-void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
+void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
 {
 	if (m_Mesh != nullptr && m_Actor != nullptr)
 	{

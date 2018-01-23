@@ -43,7 +43,7 @@ public:
 	~RenderComponent();
 
 	// manage command list
-	virtual void PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList);
+	virtual void PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
 	
 	// information
 	RenderPass		GetRenderPass() const;

@@ -34,7 +34,7 @@ bool Actor::IsEnabled() const
 
 bool Actor::NeedTick() const
 {
-	return m_NeedTick;
+	return m_NeedTick && m_Enabled;
 }
 
 bool Actor::IsHidden() const
@@ -44,7 +44,7 @@ bool Actor::IsHidden() const
 
 bool Actor::NeedRendering() const
 {
-	return (m_RenderComponent != nullptr);
+	return (m_RenderComponent != nullptr) && (!m_Hidden);
 }
 
 UINT64 Actor::GetId() const
