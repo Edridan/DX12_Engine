@@ -4,9 +4,13 @@ A basic little game/rendering engine made on DX12
 
 
 # WIP
-- Displaying 2D text
-- Add code to DX12RenderEngine to create dynamically Pipeline render state and Root signature
-- Changing entity implementation
+- Start basic UI as 2D text rendering
+- Better constant buffer management
+- Create defered shading rendering
+  - Multithreaded rendering with the Defered rendering
+
+# Libs
+TinyobjLoader : https://github.com/syoyo/tinyobjloader
 
 # Resources
 Tutorial : https://www.braynzarsoft.net/viewtutorial/q16390-04-directx-12-braynzar-soft-tutorials
