@@ -16,8 +16,9 @@ int WINAPI WinMain(
 	Engine::EngineDesc desc;
 
 	// define the engine setup
-	desc.HInstance = hInstance;
-	desc.FramePerSecondTargeted = 30;
+	desc.HInstance				= hInstance;
+	desc.FramePerSecondTargeted = 60;
+	desc.CameraPosition = XMFLOAT4(-5.f, 0.f, 0.f, 0.f);
 
 	// create the engine singleton
 	Engine::Create();
@@ -32,7 +33,7 @@ int WINAPI WinMain(
 	// create objects...
 	Actor::ActorDesc actorDesc;
 	actorDesc.Mesh = L"resources/obj/cube.obj";
-	actorDesc.ActorTransform = Transform(XMFLOAT3(0.f, 1.f, 0.f));
+	actorDesc.ActorTransform = Transform(XMFLOAT3(0.f, 0.f, 0.f));
 
 	world->SpawnActor(actorDesc);
 

@@ -652,6 +652,7 @@ void DX12RenderEngine::CleanUp()
 		SAFE_RELEASE(m_CommandAllocator[i]);
 		SAFE_RELEASE(m_Fences[i]);
 
+		// To do : fix release of the constant buffer
 		SAFE_RELEASE(m_ConstantBufferUploadHeap[i]);
 	};
 
