@@ -64,6 +64,12 @@
     <Filter Include="Source Files\Game\Components">
       <UniqueIdentifier>{215b6c0b-d412-4b2f-9015-44d94e15579c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{08251dc1-fd5c-46a7-8df2-63de7402484f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI">
+      <UniqueIdentifier>{0700e06b-467a-4e9e-a717-c8f781a88f0e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">

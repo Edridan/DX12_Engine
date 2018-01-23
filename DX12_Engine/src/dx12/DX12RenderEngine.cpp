@@ -629,7 +629,6 @@ DX12RenderEngine::DX12RenderEngine(HINSTANCE & i_HInstance)
 
 DX12RenderEngine::~DX12RenderEngine()
 {
-	
 }
 
 void DX12RenderEngine::CleanUp()

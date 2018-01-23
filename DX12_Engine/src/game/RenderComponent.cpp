@@ -9,40 +9,24 @@
 
 RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor)
 	:ActorComponent(i_Actor)
-	,m_Mesh(nullptr)
+	,m_Mesh(i_Desc.Mesh)
+	,m_Textures(i_Desc.Textures)
 	,m_ConstBuffer(UnavailableAdressId)
 	,m_PipelineState(nullptr)
 	,m_RootSignature(nullptr)
 	,m_RenderPass(RenderPass::eOpaqueGeometry)
 {
 	// retreive the engine and load the mesh if needed
-	ResourcesManager * manager = Engine::GetInstance().GetResourcesManager();
-	DX12Mesh * mesh = manager->GetMesh(i_Desc.Mesh.c_str());
-
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
-	if (mesh != nullptr)
-	{
-		if (i_Desc.SubMeshId == (UINT)-1)
-		{
-			m_Mesh = mesh->GetRootMesh();
-			mesh->GetTextures(m_Textures);
-		}
-		else
-		{
-			m_Mesh = mesh->GetSubMeshes(i_Desc.SubMeshId);
-			mesh->GetTextures(m_Textures, i_Desc.SubMeshId);
-		}
+	// retreive the pipeline state object depending the elements flags
+	DX12RenderEngine::PipelineStateObject * pso = render.GetPipelineStateObject(m_Mesh->GetElementFlags());
 
-		// retreive the pipeline state object depending the elements flags
-		DX12RenderEngine::PipelineStateObject * pso = render.GetPipelineStateObject(m_Mesh->GetElementFlags());
+	m_PipelineState = pso->m_PipelineState;
+	m_RootSignature = pso->m_DefaultRootSignature;
 
-		m_PipelineState = pso->m_PipelineState;
-		m_RootSignature = pso->m_DefaultRootSignature;
-
-		// retreive a constant buffer address
-		m_ConstBuffer = render.ReserveConstantBufferVirtualAddress();
-	}
+	// retreive a constant buffer address
+	m_ConstBuffer = render.ReserveConstantBufferVirtualAddress();
 }
 
 RenderComponent::~RenderComponent()

@@ -35,8 +35,9 @@ public:
 	// struct definition
 	struct RenderComponentDesc
 	{
-		std::wstring	Mesh = L"";				// mesh filepath
-		UINT			SubMeshId = ((UINT)-1);	// submeshes id
+		// mesh
+		const DX12MeshBuffer * Mesh			= nullptr;				// mesh filepath
+		std::vector<DX12Texture *> Textures;
 	};
 
 	RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor);

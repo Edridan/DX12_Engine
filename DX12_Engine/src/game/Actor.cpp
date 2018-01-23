@@ -1,6 +1,15 @@
 #include "Actor.h"
 
-#include "RenderComponent.h"
+// components
+#include "game/RenderComponent.h"
+// game
+#include "game/World.h"
+// engine
+#include "engine/Engine.h"
+#include "engine/ResourcesManager.h"
+// dx12
+#include "dx12/DX12RenderEngine.h"
+#include "dx12/DX12Mesh.h"
 
 // static definition
 UINT64 Actor::s_ActorInstanced = 0;
@@ -89,9 +98,9 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 	,m_RenderComponent(nullptr)
 {
 	// initialize the object from the desc
-	m_NeedTick = i_Desc.NeedTick;
-	m_Transform = i_Desc.ActorTransform;
-	m_Name = i_Desc.Name;
+	m_NeedTick		= i_Desc.NeedTick;
+	m_Transform		= i_Desc.ActorTransform;
+	m_Name			= i_Desc.Name;
 
 	if (i_Desc.Id != (UINT64)-1)
 	{
@@ -104,13 +113,51 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 		m_Id = i_Desc.Id;
 	}
 
-	// the actor is a mesh renderer
+	// the actor have a mesh component attached to it
 	if (i_Desc.Mesh != L"")
 	{
-		RenderComponent::RenderComponentDesc component;
-		component.Mesh = i_Desc.Mesh;
-		// To do : add other actors with submeshes if needed
-		m_RenderComponent = new RenderComponent(component, this);
+		// component description
+		RenderComponent::RenderComponentDesc componentDesc;
+		// load the mesh
+		ResourcesManager * manager = Engine::GetInstance().GetResourcesManager();
+		DX12Mesh * mesh = manager->GetMesh(i_Desc.Mesh.c_str());	// load mesh if needed
+
+		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
+		if (mesh != nullptr)
+		{
+			// load root mesh or all submeshes in different actors
+			if (i_Desc.SubMeshId == (UINT)-1)
+			{
+				componentDesc.Mesh = mesh->GetRootMesh();
+				mesh->GetTextures(componentDesc.Textures);
+
+				// if the current mesh have some submesh
+				if (mesh->HaveSubMeshes())
+				{
+					// load them into other game objects
+					ActorDesc childDesc;
+
+					childDesc.ActorTransform = m_Transform;
+					childDesc.Mesh = i_Desc.Mesh;
+					childDesc.Name = m_Name.append(L"_SubObject");
+					
+					for (size_t i = 0; i < mesh->SubMeshesCount(); ++i)
+					{
+						// load submeshes
+						childDesc.SubMeshId = i;
+						m_World->SpawnActor(childDesc, this);
+					}
+				}
+			}
+			else
+			{
+				componentDesc.Mesh = mesh->GetSubMeshes(i_Desc.SubMeshId);
+				mesh->GetTextures(componentDesc.Textures, i_Desc.SubMeshId);
+			}
+
+			m_RenderComponent = new RenderComponent(componentDesc, this);
+		}
 	}
 }
 

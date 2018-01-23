@@ -32,6 +32,7 @@ int WINAPI WinMain(
 
 	// create objects...
 	Actor::ActorDesc cubeActor;
+	cubeActor.Name = L"Box";
 	cubeActor.Mesh = L"resources/obj/cube.obj";
 	cubeActor.ActorTransform = Transform(XMFLOAT3(0.f, 0.f, 0.f));
 
