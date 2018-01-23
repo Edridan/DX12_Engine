@@ -81,9 +81,6 @@
     <ClCompile Include="src\dx12\DX12Utils.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="src\dx12\DX12Window.cpp">
-      <Filter>Source Files\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="src\dx12\DX12ConstantBuffer.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
@@ -132,6 +129,9 @@
     <ClCompile Include="src\game\RenderComponent.cpp">
       <Filter>Source Files\Game\Components</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\Window.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
@@ -141,9 +141,6 @@
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\dx12\DX12Utils.h">
-      <Filter>Header Files\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\dx12\DX12Window.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\dx12\d3dx12.h">
@@ -202,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="src\game\RenderComponent.h">
       <Filter>Header Files\Game\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Window.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

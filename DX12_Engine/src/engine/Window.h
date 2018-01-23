@@ -3,13 +3,9 @@
 #pragma once
 
 #include <Windows.h>
-#include <d3d12.h>
-#include <dxgi1_4.h>
-#include <D3Dcompiler.h>
-
 #include "dx12/DX12Utils.h"
 
-class DX12Window
+class Window
 {
 public:
 	// Struct def
@@ -26,9 +22,9 @@ public:
 		UINT		m_Height, m_Width;
 	};
 
-	// DX12Window
-	DX12Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName = L"Default", const wchar_t * i_WindowTitle = L"Default", UINT i_Width = 800, UINT i_Height = 600, Icon i_Icon = Icon(L"Default", 0, 0));
-	~DX12Window();
+	// Window
+	Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName = L"Default", const wchar_t * i_WindowTitle = L"Default", UINT i_Width = 800, UINT i_Height = 600, Icon i_Icon = Icon(L"Default", 0, 0));
+	~Window();
 	
 	// Windows management
 	void	Update();

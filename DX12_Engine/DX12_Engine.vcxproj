@@ -14,20 +14,20 @@
     <ProjectGuid>{EBA5190B-BF7C-4A38-A8F3-F867BA79CA9F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>DX12_Sampler</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
     <ProjectName>DX12_Engine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -99,11 +99,11 @@
     <ClCompile Include="src\dx12\DX12Text.cpp" />
     <ClCompile Include="src\dx12\DX12Texture.cpp" />
     <ClCompile Include="src\dx12\DX12Utils.cpp" />
-    <ClCompile Include="src\dx12\DX12Window.cpp" />
     <ClCompile Include="src\engine\Clock.cpp" />
     <ClCompile Include="src\engine\Engine.cpp" />
     <ClCompile Include="src\engine\ResourcesManager.cpp" />
     <ClCompile Include="src\engine\Transform.cpp" />
+    <ClCompile Include="src\engine\Window.cpp" />
     <ClCompile Include="src\game\Actor.cpp" />
     <ClCompile Include="src\game\ActorComponent.cpp" />
     <ClCompile Include="src\game\Camera.cpp" />
@@ -125,11 +125,11 @@
     <ClInclude Include="src\dx12\DX12Text.h" />
     <ClInclude Include="src\dx12\DX12Texture.h" />
     <ClInclude Include="src\dx12\DX12Utils.h" />
-    <ClInclude Include="src\dx12\DX12Window.h" />
     <ClInclude Include="src\engine\Clock.h" />
     <ClInclude Include="src\engine\Engine.h" />
     <ClInclude Include="src\engine\ResourcesManager.h" />
     <ClInclude Include="src\engine\Transform.h" />
+    <ClInclude Include="src\engine\Window.h" />
     <ClInclude Include="src\game\Actor.h" />
     <ClInclude Include="src\game\ActorComponent.h" />
     <ClInclude Include="src\game\Camera.h" />

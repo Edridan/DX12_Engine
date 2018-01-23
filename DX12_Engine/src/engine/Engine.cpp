@@ -2,13 +2,13 @@
 
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12RenderEngine.h"
-#include "dx12/DX12Window.h"
 
 #include "game/World.h"
 #include "game/Camera.h"
 #include "game/RenderComponent.h"
 
 #include "engine/Clock.h"
+#include "engine/Window.h"
 #include "engine/ResourcesManager.h"
 
 Engine *		Engine::s_Instance = nullptr;
@@ -46,6 +46,9 @@ void Engine::Initialize(EngineDesc & i_Desc)
 		return;
 	}
 
+	// create the window
+	m_Window = new Window(i_Desc.HInstance, i_Desc.WindowName.c_str(), i_Desc.WindowName.c_str(), i_Desc.WindowSize.x, i_Desc.WindowSize.y, i_Desc.WindowIcon);
+
 	// retreive the render engine
 	DX12RenderEngine::Create(i_Desc.HInstance);
 	m_RenderEngine = &DX12RenderEngine::GetInstance();
@@ -53,10 +56,10 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 	World::WorldDesc worldDesc;
 	// create default camera parameters
-	worldDesc.CameraPosition		= i_Desc.DefaultCamera.CameraPosition;
-	worldDesc.CameraTarget			= i_Desc.DefaultCamera.CameraTarget;
-	worldDesc.UseCameraProjection	= i_Desc.DefaultCamera.UseCameraProjection;
-	worldDesc.CameraProjection		= i_Desc.DefaultCamera.CameraProjection;
+	worldDesc.CameraPosition		= i_Desc.CameraPosition;
+	worldDesc.CameraTarget			= i_Desc.CameraTarget;
+	worldDesc.UseCameraProjection	= i_Desc.UseCameraProjection;
+	worldDesc.CameraProjection		= i_Desc.CameraProjection;
 
 	// create game
 	m_EngineClock = new Clock;
@@ -76,8 +79,6 @@ void Engine::Run()
 {
 	m_EngineClock->Reset();
 
-	DX12Window & window = m_RenderEngine->GetWindow();
-
 	// To do : make a command list and a push to GPU
 	// Workaround : render before doing anything
 	m_RenderEngine->Render();
@@ -87,7 +88,7 @@ void Engine::Run()
 		float elapsed = m_EngineClock->Restart().ToSeconds();
 
 		// input management and window update
-		m_RenderEngine->UpdateWindow();
+		m_Window->Update();
 
 		// tick the world (update all actors and components)
 		ASSERT(m_CurrentWorld != nullptr);
@@ -100,7 +101,7 @@ void Engine::Run()
 		m_RenderEngine->Render();
 
 		// update exit 
-		if (!window.IsOpen())
+		if (!m_Window->IsOpen())
 		{
 			m_Exit = true;
 		}
@@ -125,6 +126,11 @@ void Engine::Run()
 	CleanUpModules();
 }
 
+Window * Engine::GetWindow() const
+{
+	return m_Window;
+}
+
 ResourcesManager * Engine::GetResourcesManager() const
 {
 	return m_ResourcesManager;
@@ -144,6 +150,7 @@ Engine::Engine()
 	:m_RenderEngine(nullptr)
 	,m_CurrentWorld(nullptr)
 	,m_EngineClock(nullptr)
+	,m_Window(nullptr)
 	// managers
 	,m_ResourcesManager(nullptr)
 	// setup

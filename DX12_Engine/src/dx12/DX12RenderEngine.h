@@ -7,9 +7,10 @@
 #include <Windows.h>
 #include <DirectXMath.h>
 #include <unordered_map>
+#include <dxgi1_4.h>
+#include <D3Dcompiler.h>
 
 #include "dx12/DX12Utils.h"
-#include "dx12/DX12Window.h"
 #include "dx12/DX12Shader.h"
 
 // define
@@ -88,18 +89,11 @@ public:
 	const DXGI_SWAP_CHAIN_DESC &	GetSwapChainDesc() const;
 	bool							IsDX12DebugEnabled() const;
 
-	// Engine
-	DX12Window &					GetWindow();
-	void							UpdateWindow();
-
 private:
 	DX12RenderEngine(HINSTANCE & i_HInstance);
 	~DX12RenderEngine();
 
 	void		CleanUp();
-
-	// Engine implementation
-	DX12Window			m_Window;
 
 	// DX12 Internal management
 	HRESULT				UpdatePipeline();

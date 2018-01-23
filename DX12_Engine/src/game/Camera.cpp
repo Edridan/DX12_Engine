@@ -1,8 +1,8 @@
 #include "Camera.h"
 
-#include "dx12/DX12RenderEngine.h"
-#include "dx12/DX12Window.h"
 #include "dx12/DX12Utils.h"
+#include "engine/Window.h"
+#include "engine/Engine.h"
 
 #include <math.h>
 
@@ -24,9 +24,9 @@ Camera::Camera()
 	,m_Yaw(0)
 {
 	// build projection matrix
-	DX12Window & wnd = DX12RenderEngine::GetInstance().GetWindow();
+	Window * wnd = Engine::GetInstance().GetWindow();
 
-	const float windowRatio = (float)((float)wnd.GetWidth() / (float)wnd.GetHeight());
+	const float windowRatio = (float)((float)wnd->GetWidth() / (float)wnd->GetHeight());
 	XMMATRIX tmpProj = XMMatrixPerspectiveFovLH(45.f * (Pi / 180.f), windowRatio, 0.1f, 1000.f);
 
 	XMStoreFloat4x4(&m_Projection, tmpProj);
@@ -53,7 +53,7 @@ void Camera::Update(FLOAT i_ElapsedTime)
 		const static FLOAT speed = 10.f;
 
 		// retreive the input concerning mouse
-		DX12Window & window = DX12RenderEngine::GetInstance().GetWindow();
+		Window * window = Engine::GetInstance().GetWindow();
 
 		// forward/backward
 		if		(GetAsyncKeyState('Z'))		velocity.z = speed;
@@ -72,7 +72,7 @@ void Camera::Update(FLOAT i_ElapsedTime)
 			// need to fix strange deformation of the screen's edges
 			static const float Sensivity = 0.1f;
 			// Retreive the current pitch and yaw of the camera
-			IntVec2 mouseMovement = window.GetMouseMove();
+			IntVec2 mouseMovement = window->GetMouseMove();
 			DirectX::XMFLOAT3 vForward;
 			XMStoreFloat3(&vForward, cForward);
 

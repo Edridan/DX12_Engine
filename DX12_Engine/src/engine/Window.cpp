@@ -1,10 +1,10 @@
-#include "dx12/DX12Window.h"
+#include "Window.h"
+
 #include <DirectXMath.h>
 #include <windowsx.h>
-
 #include "dx12/d3dx12.h"
 
-DX12Window::DX12Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_t * i_WindowTitle, UINT i_Width, UINT i_Height, Icon i_Icon)
+Window::Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_t * i_WindowTitle, UINT i_Width, UINT i_Height, Icon i_Icon)
 	:m_hInstance(i_hInstance)
 	,m_Hwnd(nullptr)
 	,m_Width(i_Width)
@@ -15,7 +15,7 @@ DX12Window::DX12Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, cons
 	// Window class definition
 	m_WindowClassX.cbSize			= sizeof(WNDCLASSEX);
 	m_WindowClassX.style			= CS_HREDRAW | CS_VREDRAW;
-	m_WindowClassX.lpfnWndProc		= DX12Window::WndProc;
+	m_WindowClassX.lpfnWndProc		= Window::WndProc;
 	m_WindowClassX.cbClsExtra		= NULL;
 	m_WindowClassX.cbWndExtra		= NULL;
 	m_WindowClassX.hInstance		= m_hInstance;
@@ -95,13 +95,13 @@ DX12Window::DX12Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, cons
 	m_IsOpen = true;
 }
 
-LRESULT CALLBACK DX12Window::WndProc(HWND hwnd,
+LRESULT CALLBACK Window::WndProc(HWND hwnd,
 	UINT msg,
 	WPARAM wParam,
 	LPARAM lParam)
 
 {
-	DX12Window* window = reinterpret_cast<DX12Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+	Window* window = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
 	switch (msg)
 	{
@@ -133,13 +133,13 @@ LRESULT CALLBACK DX12Window::WndProc(HWND hwnd,
 		lParam);
 }
 
-void DX12Window::RegisterMouseMove(const IntVec2 & i_NewPosition)
+void Window::RegisterMouseMove(const IntVec2 & i_NewPosition)
 {
 	m_MouseMove = m_MousePosition - i_NewPosition;
 	m_MousePosition = i_NewPosition;
 }
 
-void DX12Window::Update()
+void Window::Update()
 {
 	// reset state
 	m_MouseMove = IntVec2(0, 0);
@@ -157,38 +157,38 @@ void DX12Window::Update()
 	}
 }
 
-void DX12Window::Close()
+void Window::Close()
 {
 	m_IsOpen = false;
 	DestroyWindow(m_Hwnd);
 }
 
-bool DX12Window::IsOpen() const
+bool Window::IsOpen() const
 {
 	return m_IsOpen;
 }
 
-UINT DX12Window::GetWidth() const
+UINT Window::GetWidth() const
 {
 	return m_Width;
 }
 
-UINT DX12Window::GetHeight() const
+UINT Window::GetHeight() const
 {
 	return m_Height;
 }
 
-HWND DX12Window::GetHWnd() const
+HWND Window::GetHWnd() const
 {
 	return m_Hwnd;
 }
 
-IntVec2 DX12Window::GetMouseMove() const
+IntVec2 Window::GetMouseMove() const
 {
 	return m_MouseMove;
 }
 
-DX12Window::~DX12Window()
+Window::~Window()
 {
 	// To do : Close properly window
 }

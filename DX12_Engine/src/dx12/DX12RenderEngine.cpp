@@ -1,11 +1,9 @@
 #include "dx12/DX12RenderEngine.h"
 
-// Include
-#include "../resource.h"	// default icon resource
-
 #include <assert.h>
 #include "dx12/d3dx12.h"
 #include "dx12/DX12Mesh.h"
+#include "engine/Engine.h"
 
 
 #if (DEBUG_DX12_ENABLE) && defined(_DEBUG)
@@ -22,8 +20,7 @@ const int DX12RenderEngine::ConstantBufferPerObjectAlignedSize = (sizeof(Default
 
 #define ASSERT_ERROR(i_Text,...)		\
 	POPUP_ERROR(i_Text, __VA_ARGS__);	\
-	DEBUG_BREAK;						\
-	m_Window.Close()
+	DEBUG_BREAK
 
 DX12RenderEngine & DX12RenderEngine::GetInstance()
 {
@@ -49,7 +46,12 @@ HRESULT DX12RenderEngine::InitializeDX12()
 {
 	HRESULT hr;
 
+	// To do : clean this part of code
+	Window * window = Engine::GetInstance().GetWindow();
+
+
 	// -- Debug -- //
+
 
 #ifdef DX12_DEBUG
 	hr = D3D12GetDebugInterface(IID_PPV_ARGS(&m_DebugController));
@@ -138,8 +140,8 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	// -- Create the Swap Chain (double/tripple buffering) -- //
 
 	DXGI_MODE_DESC backBufferDesc = {}; // this is to describe our display mode
-	backBufferDesc.Width = m_Window.GetWidth(); // buffer width
-	backBufferDesc.Height = m_Window.GetHeight(); // buffer height
+	backBufferDesc.Width = window->GetWidth(); // buffer width
+	backBufferDesc.Height = window->GetHeight(); // buffer height
 	backBufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // format of the buffer (rgba 32 bits, 8 bits for each chanel)
 
 														// describe our multi-sampling. We are not multi-sampling, so we set the count to 1 (we need at least one sample of course)
@@ -152,7 +154,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_SwapChainDesc.BufferDesc = backBufferDesc; // our back buffer description
 	m_SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; // this says the pipeline will render to this swap chain
 	m_SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // dxgi will discard the buffer (data) after we call present
-	m_SwapChainDesc.OutputWindow = m_Window.GetHWnd(); // handle to our window
+	m_SwapChainDesc.OutputWindow = window->GetHWnd(); // handle to our window
 	m_SwapChainDesc.SampleDesc = sampleDesc; // our multi-sampling description
 	m_SwapChainDesc.Windowed = true; // set to true, then if in fullscreen must call SetFullScreenState with true for full screen to get uncapped fps
 
@@ -333,7 +335,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_Device->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_Window.GetWidth(), m_Window.GetHeight(), 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+		&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, window->GetWidth(), window->GetHeight(), 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
 		D3D12_RESOURCE_STATE_DEPTH_WRITE,
 		&depthOptimizedClearValue,
 		IID_PPV_ARGS(&m_DepthStencilBuffer)
@@ -351,15 +353,15 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	m_Viewport.TopLeftX = 0;
 	m_Viewport.TopLeftY = 0;
-	m_Viewport.Width = (FLOAT)m_Window.GetWidth();
-	m_Viewport.Height = (FLOAT)m_Window.GetHeight();
+	m_Viewport.Width = (FLOAT)window->GetWidth();
+	m_Viewport.Height = (FLOAT)window->GetHeight();
 	m_Viewport.MinDepth = 0.0f;
 	m_Viewport.MaxDepth = 1.0f;
 
 	m_ScissorRect.left = 0;
 	m_ScissorRect.top = 0;
-	m_ScissorRect.right = m_Window.GetWidth();
-	m_ScissorRect.bottom = m_Window.GetHeight();
+	m_ScissorRect.right = window->GetWidth();
+	m_ScissorRect.bottom = window->GetHeight();
 
 	return S_OK;
 }
@@ -441,8 +443,6 @@ HRESULT DX12RenderEngine::Render()
 	}
 	else
 	{
-		HRESULT hr;
-
 		// create an array of command lists (only one command list here)
 		ID3D12CommandList* ppCommandLists[] = { m_CommandList };
 
@@ -452,18 +452,10 @@ HRESULT DX12RenderEngine::Render()
 		// this command goes in at the end of our command queue. we will know when our command queue 
 		// has finished because the m_Fences value will be set to "m_FenceValue" from the GPU since the command
 		// queue is being executed on the GPU
-		hr = m_CommandQueue->Signal(m_Fences[m_FrameIndex], m_FenceValue[m_FrameIndex]);
-		if (FAILED(hr))
-		{
-			m_Window.Close();
-		}
+		DX12_ASSERT(m_CommandQueue->Signal(m_Fences[m_FrameIndex], m_FenceValue[m_FrameIndex]));
 
 		// present the current back buffer
-		hr = m_SwapChain->Present(0, 0);
-		if (FAILED(hr))
-		{
-			m_Window.Close();
-		}
+		DX12_ASSERT(m_SwapChain->Present(0, 0));
 	}
 
 	return S_OK;
@@ -621,18 +613,7 @@ bool DX12RenderEngine::IsDX12DebugEnabled() const
 #endif
 }
 
-DX12Window & DX12RenderEngine::GetWindow()
-{
-	return m_Window;
-}
-
-void DX12RenderEngine::UpdateWindow()
-{
-	m_Window.Update();
-}
-
 DX12RenderEngine::DX12RenderEngine(HINSTANCE & i_HInstance)
-	:m_Window(i_HInstance, L"dx12/DX12 Engine", L"dx12/DX12 Engine", 1600, 900, DX12Window::Icon((LPWSTR)IDI_ICON1, 32, 32))
 {
 }
 
@@ -645,10 +626,11 @@ void DX12RenderEngine::CleanUp()
 {
 	// Cleanup resources
 	// wait for the gpu to finish all frames
+	// To do : fix the infinite loop
 	for (int i = 0; i < m_FrameBufferCount; ++i)
 	{
 		m_FrameIndex = i;
-		WaitForPreviousFrame();
+		//WaitForPreviousFrame();
 	}
 
 	// get swapchain out of full screen before exiting
@@ -694,11 +676,6 @@ HRESULT DX12RenderEngine::UpdatePipeline()
 HRESULT DX12RenderEngine::WaitForPreviousFrame()
 {
 	HRESULT hr;
-
-	if (!m_Window.IsOpen())
-	{
-		return S_OK;
-	}
 
 	// swap the current rtv buffer index so we draw on the correct buffer
 	m_FrameIndex = m_SwapChain->GetCurrentBackBufferIndex();
