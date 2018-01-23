@@ -97,7 +97,7 @@ void Engine::Run()
 		// retreive performance data
 		if (elapsed != 0.f)
 		{
-			m_FramePerSecond = 1 / elapsed;
+			m_FramePerSecond = (UINT)(1.f / elapsed);
 		}
 
 		/* -- Update -- */

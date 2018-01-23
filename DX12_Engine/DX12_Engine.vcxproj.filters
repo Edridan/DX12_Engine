@@ -70,6 +70,12 @@
     <Filter Include="Header Files\UI">
       <UniqueIdentifier>{0700e06b-467a-4e9e-a717-c8f781a88f0e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders\Lib">
+      <UniqueIdentifier>{f87fe18e-e814-4eb0-8c23-befc7960e620}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\Default">
+      <UniqueIdentifier>{d5ba787a-102e-4290-bd9a-82179be14af5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
@@ -239,10 +245,39 @@
     <None Include="resources\fonts\Arial.fnt">
       <Filter>Resource Files\Fonts</Filter>
     </None>
+    <None Include="resources\shaders\Buffer.hlsli">
+      <Filter>Resource Files\Shaders\Lib</Filter>
+    </None>
+    <None Include="resources\shaders\EffectLib.hlsli">
+      <Filter>Resource Files\Shaders\Lib</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX12_Engine.rc">
       <Filter>Resource Files\Resources</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resources\shaders\TextVertex.hlsl">
+      <Filter>Resource Files\Shaders\Text</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\TextPixel.hlsl">
+      <Filter>Resource Files\Shaders\Text</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultPixel.hlsl">
+      <Filter>Resource Files\Shaders\Default</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\NormalColorVertex.hlsl">
+      <Filter>Resource Files\Shaders\Default</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\NormalTexPixel.hlsl">
+      <Filter>Resource Files\Shaders\Default</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\NormalTexVertex.hlsl">
+      <Filter>Resource Files\Shaders\Default</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\NormalVertex.hlsl">
+      <Filter>Resource Files\Shaders\Default</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
