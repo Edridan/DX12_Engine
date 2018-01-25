@@ -3,6 +3,9 @@
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12RenderEngine.h"
 
+// dx12 binding for imgui
+#include "dx12/DX12ImGui.h"
+
 #include "game/World.h"
 #include "game/Camera.h"
 #include "game/RenderComponent.h"
@@ -11,6 +14,7 @@
 #include "engine/Window.h"
 #include "engine/ResourcesManager.h"
 #include "engine/RenderList.h"
+
 
 Engine *		Engine::s_Instance = nullptr;
 
@@ -78,6 +82,9 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	// setup settings
 	m_FramePerSecondsTargeted = i_Desc.FramePerSecondTargeted;
 
+	// initialize ImGui library
+	ImGui::InitializeImGui(m_Window->GetHWnd());
+
 	m_Exit = false;
 }
 
@@ -104,6 +111,13 @@ void Engine::Run()
 
 		// update input and window callbacks
 		m_Window->Update();
+
+		// ui rendering
+		ImGui::PrepareForRenderImGui();
+
+		ImGui::Text("Hello");
+
+
 
 		// tick the world (update all actors and components)
 		ASSERT(m_CurrentWorld != nullptr);
@@ -135,6 +149,9 @@ void Engine::Run()
 			// push the components on the commandlist to prepare for a render
 			m_RenderList->PushOnCommandList();
 		}
+
+		ImGui::SetRenderDataImGui(m_RenderEngine->GetCommandList(), m_RenderEngine->GetRenderTarget());
+		ImGui::Render();
 
 		// update and display backbuffer, also swap buffer and manage commandqueue
 		m_RenderEngine->Render();

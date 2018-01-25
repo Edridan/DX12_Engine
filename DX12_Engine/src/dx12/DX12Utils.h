@@ -120,7 +120,7 @@ DXGI_FORMAT GetDXGIFormatFromWICFormat(WICPixelFormatGUID & i_WicFormat);
 // get a dxgi compatible wic format from another wic format
 WICPixelFormatGUID GetConvertToWICFormat(WICPixelFormatGUID & i_WicFormat);
 // get the number of bits per pixel for a dxgi format
-int GetDXGIFormatBitsPerPixel(DXGI_FORMAT & i_DxGIFormat);
+int GetDXGIFormatBitsPerPixel(const DXGI_FORMAT & i_DxGIFormat);
 
 // debug management
 enum PopUpIcon

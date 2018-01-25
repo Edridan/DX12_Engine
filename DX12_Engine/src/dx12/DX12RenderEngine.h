@@ -78,6 +78,29 @@ public:
 	DX12Shader *				GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type);
 	// close the render engine
 	HRESULT						Close();
+	
+	// dx12 helpers
+	// For creation of resources in the GPU
+	struct HeapProperty
+	{
+		enum Enum
+		{
+			Default,
+			Upload,
+			ReadBack,
+
+			Count
+		};
+
+		D3D12_HEAP_PROPERTIES m_properties;
+		D3D12_RESOURCE_STATES m_state;
+	};
+
+	static const HeapProperty s_HeapProperties[];
+	// create comitted resource
+	ID3D12Resource *			CreateComittedResource(HeapProperty::Enum i_HeapProperty, uint64_t i_Size, D3D12_RESOURCE_FLAGS i_Flags = D3D12_RESOURCE_FLAG_NONE) const;
+	ID3D12Resource *			CreateComittedResource(HeapProperty::Enum i_HeapProperty, D3D12_RESOURCE_DESC * i_ResourceDesc, D3D12_CLEAR_VALUE * i_ClearValue) const;
+
 	// Get/Set
 	int								GetFrameIndex() const;
 	int								GetFrameBufferCount() const;
@@ -88,6 +111,7 @@ public:
 	ID3D12GraphicsCommandList *		GetCommandList() const;;
 	ID3D12CommandQueue*				GetCommandQueue() const;
 	const DXGI_SWAP_CHAIN_DESC &	GetSwapChainDesc() const;
+	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTarget() const;
 	bool							IsDX12DebugEnabled() const;
 
 private:

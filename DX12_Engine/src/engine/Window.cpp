@@ -1,8 +1,10 @@
 #include "Window.h"
 
+#include "dx12/DX12ImGui.h"
+#include "dx12/d3dx12.h"
 #include <DirectXMath.h>
 #include <windowsx.h>
-#include "dx12/d3dx12.h"
+
 
 Window::Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_t * i_WindowTitle, UINT i_Width, UINT i_Height, Icon i_Icon)
 	:m_hInstance(i_hInstance)
@@ -102,6 +104,8 @@ LRESULT CALLBACK Window::WndProc(HWND hwnd,
 
 {
 	Window* window = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+
+	if (ImGui::UpdateInput(hwnd, msg, wParam, lParam));
 
 	switch (msg)
 	{

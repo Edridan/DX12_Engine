@@ -196,7 +196,7 @@ WICPixelFormatGUID GetConvertToWICFormat(WICPixelFormatGUID & i_WicFormat)
 	else return GUID_WICPixelFormatDontCare;
 }
 
-int GetDXGIFormatBitsPerPixel(DXGI_FORMAT & i_DxGIFormat)
+int GetDXGIFormatBitsPerPixel(const DXGI_FORMAT & i_DxGIFormat)
 {
 	if (i_DxGIFormat == DXGI_FORMAT_R32G32B32A32_FLOAT) return 128;
 	else if (i_DxGIFormat == DXGI_FORMAT_R16G16B16A16_FLOAT) return 64;

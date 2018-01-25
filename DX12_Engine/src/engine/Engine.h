@@ -10,6 +10,12 @@
 #include "dx12/d3dx12.h"
 #include "../resource.h"
 
+// precompilation define
+#define USE_IMGUI
+
+#ifdef USE_IMGUI
+
+#endif
 
 using namespace DirectX;
 

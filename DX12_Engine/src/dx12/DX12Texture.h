@@ -17,7 +17,20 @@ public:
 		int Height;
 	};
 
+	struct ImageDesc
+	{
+		// default image data
+		int Width;
+		int Height;
+		std::wstring Name = L"Unnamed";	// texture name for debug purpose
+		BYTE * Data = nullptr;	// data for the image (must be corresponding the size and format)
+
+		// dx12 information
+		DXGI_FORMAT Format		= DXGI_FORMAT_R8G8B8A8_UNORM;
+	};
+
 	DX12Texture(const wchar_t * i_Filename);
+	DX12Texture(const ImageDesc & i_Desc);
 	~DX12Texture();
 
 	// information
@@ -32,6 +45,10 @@ public:
 private:
 	// load image data helper
 	static int		LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, ImageDataDesc & o_Desc, LPCWSTR i_Filename);
+
+	// helpers
+	HRESULT			CreateTextureBufferResourceHeap(ID3D12Device * i_Device, const std::wstring & i_BufferName);
+	HRESULT			CreateTextureBufferUploadHeap(ID3D12Device * i_Device, const std::wstring & i_BufferName);
 
 	// information
 	D3D12_RESOURCE_DESC		m_Desc;

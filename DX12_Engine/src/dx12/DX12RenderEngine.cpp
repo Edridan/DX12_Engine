@@ -14,6 +14,13 @@
 DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
 const int DX12RenderEngine::ConstantBufferPerObjectAlignedSize = (sizeof(DefaultConstantBuffer) + 255) & ~255;
 
+const DX12RenderEngine::HeapProperty DX12RenderEngine::s_HeapProperties[] =
+{
+	{ { D3D12_HEAP_TYPE_DEFAULT,  D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 }, D3D12_RESOURCE_STATE_COMMON },
+	{ { D3D12_HEAP_TYPE_UPLOAD,   D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 }, D3D12_RESOURCE_STATE_GENERIC_READ },
+	{ { D3D12_HEAP_TYPE_READBACK, D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 }, D3D12_RESOURCE_STATE_COPY_DEST },
+};
+
 // Destructor
 #define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
 
@@ -569,6 +576,44 @@ HRESULT DX12RenderEngine::Close()
 	return hr;
 }
 
+ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_HeapProperty, uint64_t i_Size, D3D12_RESOURCE_FLAGS i_Flags) const
+{
+	if (i_HeapProperty >= HeapProperty::Enum::Count)	return nullptr;
+
+	// create the resource desc based on parmaters
+	D3D12_RESOURCE_DESC resourceDesc;
+	resourceDesc.Dimension	= D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Alignment	= 0;
+	resourceDesc.Width		= i_Size;
+	resourceDesc.Height		= 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels	= 1;
+	resourceDesc.Format		= DXGI_FORMAT_UNKNOWN;
+	resourceDesc.SampleDesc.Count	= 1;
+	resourceDesc.SampleDesc.Quality = 0;
+	resourceDesc.Layout		= D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags		= i_Flags;
+
+	return CreateComittedResource(i_HeapProperty, &resourceDesc, nullptr);
+}
+
+ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_HeapProperty, D3D12_RESOURCE_DESC * i_ResourceDesc, D3D12_CLEAR_VALUE * i_ClearValue) const
+{
+	const HeapProperty & heapProperty = s_HeapProperties[i_HeapProperty];
+	ID3D12Resource * resource;
+
+	m_Device->CreateCommittedResource(&heapProperty.m_properties
+		, D3D12_HEAP_FLAG_NONE
+		, i_ResourceDesc
+		, heapProperty.m_state
+		, i_ClearValue
+		, __uuidof(ID3D12Resource)
+		, (void**)&resource
+	);
+
+	return resource;
+}
+
 int DX12RenderEngine::GetFrameIndex() const
 {
 	return m_FrameIndex;
@@ -612,6 +657,13 @@ ID3D12CommandQueue * DX12RenderEngine::GetCommandQueue() const
 const DXGI_SWAP_CHAIN_DESC & DX12RenderEngine::GetSwapChainDesc() const
 {
 	return m_SwapChainDesc;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderEngine::GetRenderTarget() const
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE ret = m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	ret.ptr += (m_FrameIndex * m_RtvDescriptorSize);
+	return ret;
 }
 
 bool DX12RenderEngine::IsDX12DebugEnabled() const
