@@ -207,7 +207,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	// get a handle to the first descriptor in the descriptor heap. a handle is basically a pointer,
 	// but we cannot literally use it like a c++ pointer.
-	CD3DX12_CPU_DESCRIPTOR_HANDLE m_RtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 	// Create a RTV for each buffer (double buffering is two buffers, tripple buffering is 3).
 	for (int i = 0; i < m_FrameBufferCount; i++)
@@ -222,10 +222,10 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		}
 
 		// the we "create" a render target view which binds the swap chain buffer (ID3D12Resource[n]) to the rtv handle
-		m_Device->CreateRenderTargetView(m_RenderTargets[i], nullptr, m_RtvHandle);
+		m_Device->CreateRenderTargetView(m_RenderTargets[i], nullptr, rtvHandle);
 
 		// we increment the rtv handle by the rtv descriptor size we got above
-		m_RtvHandle.Offset(1, m_RtvDescriptorSize);
+		rtvHandle.Offset(1, m_RtvDescriptorSize);
 	}
 
 	// -- Create the Command Allocators -- //
@@ -574,6 +574,40 @@ HRESULT DX12RenderEngine::Close()
 	hr = WaitForPreviousFrame();
 
 	return hr;
+}
+
+HRESULT DX12RenderEngine::ResizeRenderTargets(const IntVec2 & i_NewSize)
+{
+	// resize window viewport
+	m_Viewport.Width = (FLOAT)i_NewSize.x;
+	m_Viewport.Height = (FLOAT)i_NewSize.y;
+	// resize scissor
+	m_ScissorRect.right = (LONG)i_NewSize.x;
+	m_ScissorRect.bottom = (LONG)i_NewSize.y;
+
+	for (int i = 0; i < m_FrameBufferCount; ++i)
+	{
+		// have to release the resources before calling ResizeBuffers
+		m_RenderTargets[i]->Release();
+	}
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+
+	for (int i = 0; i < m_FrameBufferCount; ++i)
+	{
+		DX12_ASSERT(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_RenderTargets[i])));
+
+		// the we "create" a render target view which binds the swap chain buffer (ID3D12Resource[n]) to the rtv handle
+		m_Device->CreateRenderTargetView(m_RenderTargets[i], nullptr, rtvHandle);
+
+		// we increment the rtv handle by the rtv descriptor size we got above
+		rtvHandle.Offset(1, m_RtvDescriptorSize);
+	}
+
+	m_SwapChain->ResizeBuffers(0, i_NewSize.x, i_NewSize.y, DXGI_FORMAT_UNKNOWN, 0);
+
+	return S_OK;
 }
 
 ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_HeapProperty, uint64_t i_Size, D3D12_RESOURCE_FLAGS i_Flags) const

@@ -78,6 +78,7 @@ public:
 	DX12Shader *				GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type);
 	// close the render engine
 	HRESULT						Close();
+	HRESULT						ResizeRenderTargets(const IntVec2 & i_NewSize);
 	
 	// dx12 helpers
 	// For creation of resources in the GPU

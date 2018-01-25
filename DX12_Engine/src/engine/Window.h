@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <vector>
+#include <functional>
 #include <Windows.h>
 #include "dx12/DX12Utils.h"
 
@@ -34,10 +36,17 @@ public:
 	// Get/Set
 	UINT	GetWidth() const;
 	UINT	GetHeight() const;
+	IntVec2	GetSize() const;
 	HWND	GetHWnd() const;
 
 	// input management
 	IntVec2	GetMouseMove() const;
+	IntVec2 GetResize() const;
+	bool	HasBeenResized() const;
+
+	// callback definition
+	typedef std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> InputFunc;
+	void	RegisterInputCallback(const InputFunc & i_Callback);
 
 private:
 
@@ -46,6 +55,8 @@ private:
 
 	// internal management
 	void		RegisterMouseMove(const IntVec2 & i_NewPosition);
+	void		RegisterResize(const IntVec2 & i_Resize);
+	void		CallInputCallbackFunc(HWND i_Window, UINT i_Msg, WPARAM i_wParam, LPARAM i_lParam);
 
 	// Window
 	HICON		m_Icon;
@@ -57,7 +68,13 @@ private:
 	bool		m_Fullscreen;
 	bool		m_IsOpen;
 
+	// callback inputs
+	std::vector<InputFunc>	m_Callbacks;
+
 	// input
 	IntVec2		m_MousePosition;
 	IntVec2		m_MouseMove;	// movement of the mouse on this frame
+	// resize event
+	bool		m_HasBeenResized;
+	IntVec2		m_Resized;
 };

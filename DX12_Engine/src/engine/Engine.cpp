@@ -84,6 +84,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 	// initialize ImGui library
 	ImGui::InitializeImGui(m_Window->GetHWnd());
+	m_Window->RegisterInputCallback(&ImGui::UpdateInput);	// push back event for inputs
 
 	m_Exit = false;
 }
@@ -111,6 +112,12 @@ void Engine::Run()
 
 		// update input and window callbacks
 		m_Window->Update();
+
+		// update buffer if needed
+		if (m_Window->HasBeenResized())
+		{
+			m_RenderEngine->ResizeRenderTargets(m_Window->GetSize());
+		}
 
 		// ui rendering
 		ImGui::PrepareForRenderImGui();

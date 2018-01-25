@@ -145,7 +145,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 					for (size_t i = 0; i < mesh->SubMeshesCount(); ++i)
 					{
 						// load submeshes
-						childDesc.SubMeshId = i;
+						childDesc.SubMeshId = (UINT)i;
 						m_World->SpawnActor(childDesc, this);
 					}
 				}
