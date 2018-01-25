@@ -30,7 +30,7 @@ namespace ImGui
 	void	RenderDrawListImGui(ImDrawData * i_DrawData);
 
 	// imgui input management
-	LRESULT UpdateInput(HWND i_Window, UINT i_Msg, WPARAM i_wParam, LPARAM i_lParam);	// callback for imgui event
+	LRESULT CALLBACK UpdateInput(HWND i_Window, UINT i_Msg, WPARAM i_wParam, LPARAM i_lParam);	// callback for imgui event
 
 	// dx12
 	static ID3D12RootSignature	*	RootSignature	= nullptr;

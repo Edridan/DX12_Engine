@@ -113,12 +113,6 @@ void Engine::Run()
 		// update input and window callbacks
 		m_Window->Update();
 
-		// update buffer if needed
-		if (m_Window->HasBeenResized())
-		{
-			m_RenderEngine->ResizeRenderTargets(m_Window->GetSize());
-		}
-
 		// ui rendering
 		ImGui::PrepareForRenderImGui();
 
@@ -236,4 +230,5 @@ void Engine::CleanUpModules()
 
 	// delete the render engine
 	DX12RenderEngine::Delete();
+	
 }

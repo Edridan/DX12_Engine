@@ -67,7 +67,7 @@ Window::Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_
 	m_Hwnd = CreateWindowEx(NULL,
 		i_WindowName,
 		i_WindowTitle,
-		WS_OVERLAPPEDWINDOW,
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		i_Width, i_Height,
 		NULL,
