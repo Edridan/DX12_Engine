@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#include "dx12/DX12Utils.h"
+#include "engine/Utils.h"
 #include "engine/Window.h"
 #include "engine/Engine.h"
 
@@ -26,7 +26,7 @@ Camera::Camera()
 	// build projection matrix
 	Window * wnd = Engine::GetInstance().GetWindow();
 
-	const float windowRatio = (float)((float)wnd->GetWidth() / (float)wnd->GetHeight());
+	const float windowRatio = (float)((float)wnd->GetBackSize().x / (float)wnd->GetBackSize().y);
 	XMMATRIX tmpProj = XMMatrixPerspectiveFovLH(45.f * (Pi / 180.f), windowRatio, 0.1f, 1000.f);
 
 	XMStoreFloat4x4(&m_Projection, tmpProj);

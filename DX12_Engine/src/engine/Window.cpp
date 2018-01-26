@@ -1,8 +1,12 @@
 #include "Window.h"
 
+#include "dx12/DX12ImGui.h"
+#include "dx12/d3dx12.h"
 #include <DirectXMath.h>
 #include <windowsx.h>
-#include "dx12/d3dx12.h"
+#include <functional>
+
+
 
 Window::Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_t * i_WindowTitle, UINT i_Width, UINT i_Height, Icon i_Icon)
 	:m_hInstance(i_hInstance)
@@ -11,6 +15,7 @@ Window::Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_
 	,m_Height(i_Height)
 	,m_Fullscreen(false)
 	,m_Icon(nullptr)
+	,m_Callbacks()
 {
 	// Window class definition
 	m_WindowClassX.cbSize			= sizeof(WNDCLASSEX);
@@ -62,7 +67,7 @@ Window::Window(HINSTANCE i_hInstance, const wchar_t * i_WindowName, const wchar_
 	m_Hwnd = CreateWindowEx(NULL,
 		i_WindowName,
 		i_WindowTitle,
-		WS_OVERLAPPEDWINDOW,
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_BORDER,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		i_Width, i_Height,
 		NULL,
@@ -103,6 +108,12 @@ LRESULT CALLBACK Window::WndProc(HWND hwnd,
 {
 	Window* window = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
+	if (window != nullptr)
+	{
+		// call each callback registered with the window
+		window->CallInputCallbackFunc(hwnd, msg, wParam, lParam);
+	}
+
 	switch (msg)
 	{
 	case WM_KEYDOWN:
@@ -122,8 +133,19 @@ LRESULT CALLBACK Window::WndProc(HWND hwnd,
 
 		PostQuitMessage(0);
 		return 0;
+
+		// internal registration
 	case WM_MOUSEMOVE:
-		window->RegisterMouseMove(IntVec2(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+		if (window != nullptr)
+			window->RegisterMouseMove(IntVec2(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+		break;
+
+	case WM_SIZE:
+		if (window != nullptr)
+		{
+			IntVec2 resize((UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
+			window->RegisterResize(resize);
+		}
 		break;
 	}
 
@@ -139,10 +161,27 @@ void Window::RegisterMouseMove(const IntVec2 & i_NewPosition)
 	m_MousePosition = i_NewPosition;
 }
 
+void Window::RegisterResize(const IntVec2 & i_Resize)
+{
+	m_HasBeenResized = true;
+	m_Width += i_Resize.x;
+	m_Height += i_Resize.y;
+}
+
+void Window::CallInputCallbackFunc(HWND i_Window, UINT i_Msg, WPARAM i_wParam, LPARAM i_lParam)
+{
+	// call each callback registered
+	for (size_t i = 0; i < m_Callbacks.size(); ++i)
+	{
+		(m_Callbacks[i])(i_Window, i_Msg, i_wParam, i_lParam);
+	}
+}
+
 void Window::Update()
 {
 	// reset state
 	m_MouseMove = IntVec2(0, 0);
+	m_Resized = IntVec2(0, 0);
 
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
@@ -178,6 +217,21 @@ UINT Window::GetHeight() const
 	return m_Height;
 }
 
+IntVec2 Window::GetSize() const
+{
+	return IntVec2(m_Width, m_Height);
+}
+
+IntVec2 Window::GetBackSize() const
+{
+	RECT rect;
+	GetClientRect(m_Hwnd, &rect);
+	return IntVec2(
+		rect.right - rect.left, 
+		rect.bottom - rect.top
+	);
+}
+
 HWND Window::GetHWnd() const
 {
 	return m_Hwnd;
@@ -188,7 +242,27 @@ IntVec2 Window::GetMouseMove() const
 	return m_MouseMove;
 }
 
+IntVec2 Window::GetResize() const
+{
+	return m_Resized;
+}
+
+bool Window::HasBeenResized() const
+{
+	return m_HasBeenResized;
+}
+
+void Window::RegisterInputCallback(const InputFunc & i_Callback)
+{
+	// push back the callback
+	m_Callbacks.push_back(i_Callback);
+}
+
 Window::~Window()
 {
-	// To do : Close properly window
+	// close the window if needed
+	if (IsOpen())	Close();
+
+	// clear callbacks vector (optionnal)
+	m_Callbacks.clear();
 }

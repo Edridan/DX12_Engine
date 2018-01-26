@@ -3,14 +3,18 @@
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12RenderEngine.h"
 
+// game include
 #include "game/World.h"
 #include "game/Camera.h"
 #include "game/RenderComponent.h"
-
+// engine
 #include "engine/Clock.h"
 #include "engine/Window.h"
 #include "engine/ResourcesManager.h"
 #include "engine/RenderList.h"
+// ui
+#include "ui/UILayer.h"
+
 
 Engine *		Engine::s_Instance = nullptr;
 
@@ -78,6 +82,10 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	// setup settings
 	m_FramePerSecondsTargeted = i_Desc.FramePerSecondTargeted;
 
+	// initialize UI
+	m_UILayer = new UILayer(m_Window);
+	m_UILayer->SetEnable(i_Desc.UIEnabled);
+
 	m_Exit = false;
 }
 
@@ -109,6 +117,12 @@ void Engine::Run()
 		ASSERT(m_CurrentWorld != nullptr);
 		m_CurrentWorld->TickWorld(elapsed);
 
+		// update and prepare the ui
+		{
+			// this create vertices and data for the UI layer
+			m_UILayer->DisplayUIOnLayer();
+		}
+
 		/* -- Render -- */
 
 		// prepare the render engine
@@ -134,6 +148,11 @@ void Engine::Run()
 
 			// push the components on the commandlist to prepare for a render
 			m_RenderList->PushOnCommandList();
+		}
+
+		// render ui
+		{
+			m_UILayer->PushOnCommandList(m_RenderEngine->GetCommandList());
 		}
 
 		// update and display backbuffer, also swap buffer and manage commandqueue
@@ -181,6 +200,11 @@ World * Engine::GetWorld() const
 	return m_CurrentWorld;
 }
 
+UILayer * Engine::GetUILayer() const
+{
+	return m_UILayer;
+}
+
 RenderList * Engine::GetRenderList() const
 {
 	return m_RenderList;
@@ -204,6 +228,8 @@ Engine::~Engine()
 
 void Engine::CleanUpResources()
 {
+	// clean resources
+	m_ResourcesManager->CleanUpResources();
 }
 
 void Engine::CleanUpModules()
@@ -212,4 +238,5 @@ void Engine::CleanUpModules()
 
 	// delete the render engine
 	DX12RenderEngine::Delete();
+	
 }

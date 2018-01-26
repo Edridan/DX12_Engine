@@ -10,6 +10,8 @@
 #include "dx12/d3dx12.h"
 #include "../resource.h"
 
+// precompilation define
+#define WITH_EDITOR			1	// editor is binded in the executable
 
 using namespace DirectX;
 
@@ -22,6 +24,8 @@ class RenderList;
 class ResourcesManager;
 // dx12
 class DX12RenderEngine;
+// ui
+class UILayer;	// layer for UI
 
 // class def
 class Engine
@@ -41,6 +45,8 @@ public:
 		XMFLOAT4 CameraTarget		= XMFLOAT4(0.f, 0.f, 0.f, 1.f);
 		bool UseCameraProjection	= false;
 		XMMATRIX CameraProjection	= XMMatrixIdentity();
+		// ui setup
+		bool UIEnabled				= true;
 	};
 
 	// singleton management
@@ -63,6 +69,7 @@ public:
 	ResourcesManager *	GetResourcesManager() const;
 	RenderList *		GetRenderList() const;
 	World *				GetWorld() const;
+	UILayer *			GetUILayer() const;
 
 private:
 	Engine();
@@ -90,6 +97,9 @@ private:
 	// game management
 	World *				m_CurrentWorld;
 	Clock *				m_EngineClock;
+
+	// ui
+	UILayer *			m_UILayer;
 
 	// managers
 	ResourcesManager *	m_ResourcesManager;

@@ -14,6 +14,13 @@
 DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
 const int DX12RenderEngine::ConstantBufferPerObjectAlignedSize = (sizeof(DefaultConstantBuffer) + 255) & ~255;
 
+const DX12RenderEngine::HeapProperty DX12RenderEngine::s_HeapProperties[] =
+{
+	{ { D3D12_HEAP_TYPE_DEFAULT,  D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 }, D3D12_RESOURCE_STATE_COMMON },
+	{ { D3D12_HEAP_TYPE_UPLOAD,   D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 }, D3D12_RESOURCE_STATE_GENERIC_READ },
+	{ { D3D12_HEAP_TYPE_READBACK, D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 }, D3D12_RESOURCE_STATE_COPY_DEST },
+};
+
 // Destructor
 #define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
 
@@ -48,7 +55,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	// To do : clean this part of code
 	Window * window = Engine::GetInstance().GetWindow();
-
+	IntVec2 bufferSize = window->GetBackSize();
 
 	// -- Debug -- //
 
@@ -140,8 +147,8 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	// -- Create the Swap Chain (double/tripple buffering) -- //
 
 	DXGI_MODE_DESC backBufferDesc = {}; // this is to describe our display mode
-	backBufferDesc.Width = window->GetWidth(); // buffer width
-	backBufferDesc.Height = window->GetHeight(); // buffer height
+	backBufferDesc.Width = bufferSize.x; // buffer width
+	backBufferDesc.Height = bufferSize.y; // buffer height
 	backBufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // format of the buffer (rgba 32 bits, 8 bits for each chanel)
 
 														// describe our multi-sampling. We are not multi-sampling, so we set the count to 1 (we need at least one sample of course)
@@ -200,7 +207,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	// get a handle to the first descriptor in the descriptor heap. a handle is basically a pointer,
 	// but we cannot literally use it like a c++ pointer.
-	CD3DX12_CPU_DESCRIPTOR_HANDLE m_RtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 	// Create a RTV for each buffer (double buffering is two buffers, tripple buffering is 3).
 	for (int i = 0; i < m_FrameBufferCount; i++)
@@ -215,10 +222,10 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		}
 
 		// the we "create" a render target view which binds the swap chain buffer (ID3D12Resource[n]) to the rtv handle
-		m_Device->CreateRenderTargetView(m_RenderTargets[i], nullptr, m_RtvHandle);
+		m_Device->CreateRenderTargetView(m_RenderTargets[i], nullptr, rtvHandle);
 
 		// we increment the rtv handle by the rtv descriptor size we got above
-		m_RtvHandle.Offset(1, m_RtvDescriptorSize);
+		rtvHandle.Offset(1, m_RtvDescriptorSize);
 	}
 
 	// -- Create the Command Allocators -- //
@@ -335,7 +342,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_Device->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, window->GetWidth(), window->GetHeight(), 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+		&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, bufferSize.x, bufferSize.y, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
 		D3D12_RESOURCE_STATE_DEPTH_WRITE,
 		&depthOptimizedClearValue,
 		IID_PPV_ARGS(&m_DepthStencilBuffer)
@@ -353,15 +360,15 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	m_Viewport.TopLeftX = 0;
 	m_Viewport.TopLeftY = 0;
-	m_Viewport.Width = (FLOAT)window->GetWidth();
-	m_Viewport.Height = (FLOAT)window->GetHeight();
+	m_Viewport.Width = (FLOAT)bufferSize.x;
+	m_Viewport.Height = (FLOAT)bufferSize.y;
 	m_Viewport.MinDepth = 0.0f;
 	m_Viewport.MaxDepth = 1.0f;
 
 	m_ScissorRect.left = 0;
 	m_ScissorRect.top = 0;
-	m_ScissorRect.right = window->GetWidth();
-	m_ScissorRect.bottom = window->GetHeight();
+	m_ScissorRect.right = bufferSize.x;
+	m_ScissorRect.bottom = bufferSize.y;
 
 	return S_OK;
 }
@@ -569,6 +576,78 @@ HRESULT DX12RenderEngine::Close()
 	return hr;
 }
 
+HRESULT DX12RenderEngine::ResizeRenderTargets(const IntVec2 & i_NewSize)
+{
+	// resize window viewport
+	m_Viewport.Width = (FLOAT)i_NewSize.x;
+	m_Viewport.Height = (FLOAT)i_NewSize.y;
+	// resize scissor
+	m_ScissorRect.right = (LONG)i_NewSize.x;
+	m_ScissorRect.bottom = (LONG)i_NewSize.y;
+
+	for (int i = 0; i < m_FrameBufferCount; ++i)
+	{
+		// have to release the resources before calling ResizeBuffers
+		m_RenderTargets[i]->Release();
+	}
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+
+	for (int i = 0; i < m_FrameBufferCount; ++i)
+	{
+		DX12_ASSERT(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_RenderTargets[i])));
+
+		// the we "create" a render target view which binds the swap chain buffer (ID3D12Resource[n]) to the rtv handle
+		m_Device->CreateRenderTargetView(m_RenderTargets[i], nullptr, rtvHandle);
+
+		// we increment the rtv handle by the rtv descriptor size we got above
+		rtvHandle.Offset(1, m_RtvDescriptorSize);
+	}
+
+	m_SwapChain->ResizeBuffers(0, i_NewSize.x, i_NewSize.y, DXGI_FORMAT_UNKNOWN, 0);
+
+	return S_OK;
+}
+
+ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_HeapProperty, uint64_t i_Size, D3D12_RESOURCE_FLAGS i_Flags) const
+{
+	if (i_HeapProperty >= HeapProperty::Enum::Count)	return nullptr;
+
+	// create the resource desc based on parmaters
+	D3D12_RESOURCE_DESC resourceDesc;
+	resourceDesc.Dimension	= D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Alignment	= 0;
+	resourceDesc.Width		= i_Size;
+	resourceDesc.Height		= 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels	= 1;
+	resourceDesc.Format		= DXGI_FORMAT_UNKNOWN;
+	resourceDesc.SampleDesc.Count	= 1;
+	resourceDesc.SampleDesc.Quality = 0;
+	resourceDesc.Layout		= D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags		= i_Flags;
+
+	return CreateComittedResource(i_HeapProperty, &resourceDesc, nullptr);
+}
+
+ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_HeapProperty, D3D12_RESOURCE_DESC * i_ResourceDesc, D3D12_CLEAR_VALUE * i_ClearValue) const
+{
+	const HeapProperty & heapProperty = s_HeapProperties[i_HeapProperty];
+	ID3D12Resource * resource;
+
+	m_Device->CreateCommittedResource(&heapProperty.m_properties
+		, D3D12_HEAP_FLAG_NONE
+		, i_ResourceDesc
+		, heapProperty.m_state
+		, i_ClearValue
+		, __uuidof(ID3D12Resource)
+		, (void**)&resource
+	);
+
+	return resource;
+}
+
 int DX12RenderEngine::GetFrameIndex() const
 {
 	return m_FrameIndex;
@@ -612,6 +691,13 @@ ID3D12CommandQueue * DX12RenderEngine::GetCommandQueue() const
 const DXGI_SWAP_CHAIN_DESC & DX12RenderEngine::GetSwapChainDesc() const
 {
 	return m_SwapChainDesc;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderEngine::GetRenderTarget() const
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE ret = m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	ret.ptr += (m_FrameIndex * m_RtvDescriptorSize);
+	return ret;
 }
 
 bool DX12RenderEngine::IsDX12DebugEnabled() const
