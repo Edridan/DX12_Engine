@@ -297,6 +297,7 @@ void ImGuiD3D12::RenderDrawListImGui(ImDrawData * i_DrawData)
 	D3D12_VIEWPORT viewport;
 	viewport.Width = ImGui::GetIO().DisplaySize.x;
 	viewport.Height = ImGui::GetIO().DisplaySize.y;
+
 	viewport.MinDepth = 0.f;
 	viewport.MaxDepth = 1.f;
 	viewport.TopLeftX = 0.f;

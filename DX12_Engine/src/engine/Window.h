@@ -5,7 +5,7 @@
 #include <vector>
 #include <functional>
 #include <Windows.h>
-#include "dx12/DX12Utils.h"
+#include "Utils.h"
 
 class Window
 {

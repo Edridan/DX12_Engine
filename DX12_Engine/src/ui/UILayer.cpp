@@ -1,9 +1,10 @@
 #include "UILayer.h"
 
 #include "dx12/DX12RenderEngine.h"
-#include "dx12/DX12Utils.h"
 #include "dx12/DX12ImGui.h"
 #include "engine/Window.h"
+#include "engine/Utils.h"
+#include "engine/Debug.h"
 
 
 // imgui
@@ -62,12 +63,7 @@ UILayer::UILayer(Window * i_Window, const LayerStyleDesc & i_Style)
 	// manage style
 	if (!m_Initialized) return;
 
-	// imgui reskin
-	ImGuiStyle & style = ImGui::GetStyle();
-
-	style.WindowRounding = 0.f;
-	// set colors
-	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.11f, 0.11f, 0.11f, 1.f);
+	SetUIStyle(i_Style);
 }
 
 UILayer::~UILayer()
@@ -77,6 +73,16 @@ UILayer::~UILayer()
 void UILayer::SetEnable(const bool i_Enable)
 {
 	m_Enabled = i_Enable;
+}
+
+void UILayer::SetUIStyle(const LayerStyleDesc & i_Style)
+{
+	// imgui reskin
+	ImGuiStyle & style = ImGui::GetStyle();
+
+	style.WindowRounding = 0.f;
+	// set colors
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.11f, 0.11f, 0.11f, 1.f);
 }
 
 bool UILayer::IsEnable() const

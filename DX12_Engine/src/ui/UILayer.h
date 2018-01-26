@@ -15,6 +15,13 @@ class UILayer
 public:
 	struct LayerStyleDesc
 	{
+		// global ui style
+		float Alpha				= 0.5f;
+		bool AntiAliasedLines	= true;
+		bool AntiAliasedShapes	= true;
+		// window style
+		float WindowRounding	= 0.f;
+
 
 	};
 
@@ -24,6 +31,7 @@ public:
 
 	// ui global management
 	void		SetEnable(const bool i_Enable);	// enable/disable ui layer
+	void		SetUIStyle(const LayerStyleDesc & i_Style);
 
 	// information
 	bool		IsEnable() const;

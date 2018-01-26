@@ -104,6 +104,7 @@
     <ClCompile Include="src\dx12\DX12Texture.cpp" />
     <ClCompile Include="src\dx12\DX12Utils.cpp" />
     <ClCompile Include="src\engine\Clock.cpp" />
+    <ClCompile Include="src\engine\Debug.cpp" />
     <ClCompile Include="src\engine\Engine.cpp" />
     <ClCompile Include="src\engine\RenderList.cpp" />
     <ClCompile Include="src\engine\ResourcesManager.cpp" />
@@ -139,10 +140,12 @@
     <ClInclude Include="src\dx12\DX12Texture.h" />
     <ClInclude Include="src\dx12\DX12Utils.h" />
     <ClInclude Include="src\engine\Clock.h" />
+    <ClInclude Include="src\engine\Debug.h" />
     <ClInclude Include="src\engine\Engine.h" />
     <ClInclude Include="src\engine\RenderList.h" />
     <ClInclude Include="src\engine\ResourcesManager.h" />
     <ClInclude Include="src\engine\Transform.h" />
+    <ClInclude Include="src\engine\Utils.h" />
     <ClInclude Include="src\engine\Window.h" />
     <ClInclude Include="src\game\Actor.h" />
     <ClInclude Include="src\game\ActorComponent.h" />
