@@ -3,17 +3,18 @@
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12RenderEngine.h"
 
-// dx12 binding for imgui
-#include "dx12/DX12ImGui.h"
-
+// game include
 #include "game/World.h"
 #include "game/Camera.h"
 #include "game/RenderComponent.h"
-
+// engine
 #include "engine/Clock.h"
 #include "engine/Window.h"
 #include "engine/ResourcesManager.h"
 #include "engine/RenderList.h"
+// ui
+#include "ui/UILayer.h"
+
 
 Engine *		Engine::s_Instance = nullptr;
 
@@ -81,10 +82,9 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	// setup settings
 	m_FramePerSecondsTargeted = i_Desc.FramePerSecondTargeted;
 
-	// initialize ImGui library
-	ImGui::InitializeImGui(m_Window->GetHWnd());
-	m_Window->RegisterInputCallback(&ImGui::UpdateInput);	// push back event for inputs
-
+	// initialize UI
+	m_UILayer = new UILayer(m_Window);
+	m_UILayer->SetEnable(i_Desc.UIEnabled);
 
 	m_Exit = false;
 }
@@ -119,7 +119,7 @@ void Engine::Run()
 
 		// update and prepare the ui
 		{
-			ImGui::BeginFrameImGui();
+			m_UILayer->BeginNewFrame();
 		}
 
 		/* -- Render -- */
@@ -151,9 +151,7 @@ void Engine::Run()
 
 		// render ui
 		{
-			// using Imgui to render ui
-			ImGui::SetRenderDataImGui(m_RenderEngine->GetCommandList(), m_RenderEngine->GetRenderTarget());
-			ImGui::Render();
+			m_UILayer->PushOnCommandList(m_RenderEngine->GetCommandList());
 		}
 
 		// update and display backbuffer, also swap buffer and manage commandqueue
@@ -199,6 +197,11 @@ ResourcesManager * Engine::GetResourcesManager() const
 World * Engine::GetWorld() const
 {
 	return m_CurrentWorld;
+}
+
+UILayer * Engine::GetUILayer() const
+{
+	return m_UILayer;
 }
 
 RenderList * Engine::GetRenderList() const

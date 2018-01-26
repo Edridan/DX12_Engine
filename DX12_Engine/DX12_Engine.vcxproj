@@ -115,6 +115,7 @@
     <ClCompile Include="src\game\RenderComponent.cpp" />
     <ClCompile Include="src\game\World.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\ui\UILayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\imgui-d3d12\imconfig.h" />
@@ -148,6 +149,7 @@
     <ClInclude Include="src\game\Camera.h" />
     <ClInclude Include="src\game\RenderComponent.h" />
     <ClInclude Include="src\game\World.h" />
+    <ClInclude Include="src\ui\UILayer.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\fonts\Arial-font.png" />

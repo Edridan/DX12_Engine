@@ -6,48 +6,8 @@
 #include "DX12Texture.h"
 #include "engine/Engine.h"
 
-HRESULT ImGui::InitializeImGui(HWND i_Window)
-{
-	ImGuiIO& io = ImGui::GetIO();
 
-	// Keyboard mapping ImGui will use those indices to peek into the io
-	// KeyDown[] array that we will update during the application lifetime.
-	io.KeyMap[ImGuiKey_Tab]			= VK_TAB;                              
-	io.KeyMap[ImGuiKey_LeftArrow]	= VK_LEFT;
-	io.KeyMap[ImGuiKey_RightArrow]	= VK_RIGHT;
-	io.KeyMap[ImGuiKey_UpArrow]		= VK_UP;
-	io.KeyMap[ImGuiKey_DownArrow]	= VK_DOWN;
-	io.KeyMap[ImGuiKey_PageUp]		= VK_PRIOR;
-	io.KeyMap[ImGuiKey_PageDown]	= VK_NEXT;
-	io.KeyMap[ImGuiKey_Home]		= VK_HOME;
-	io.KeyMap[ImGuiKey_End]			= VK_END;
-	io.KeyMap[ImGuiKey_Delete]		= VK_DELETE;
-	io.KeyMap[ImGuiKey_Backspace]	= VK_BACK;
-	io.KeyMap[ImGuiKey_Enter]		= VK_RETURN;
-	io.KeyMap[ImGuiKey_Escape]		= VK_ESCAPE;
-	
-	io.KeyMap[ImGuiKey_A] = 'A';
-	io.KeyMap[ImGuiKey_C] = 'C';
-	io.KeyMap[ImGuiKey_V] = 'V';
-	io.KeyMap[ImGuiKey_X] = 'X';
-	io.KeyMap[ImGuiKey_Y] = 'Y';
-	io.KeyMap[ImGuiKey_Z] = 'Z';
-
-	// setup imgui
-	ImGui::Wnd				= i_Window;	// window of the application
-	io.RenderDrawListsFn	= RenderDrawListImGui;	// callback for rendering
-	io.ImeWindowHandle		= i_Window;
-
-	if (FAILED(InitializeDX12ImGui()))
-	{
-		DEBUG_BREAK;
-		return E_FAIL;
-	}
-
-	return S_OK;
-}
-
-HRESULT ImGui::InitializeDX12ImGui()
+HRESULT ImGuiD3D12::InitializeDX12ImGui()
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 	ID3D12Device * device = render.GetDevice();
@@ -274,38 +234,13 @@ HRESULT ImGui::InitializeDX12ImGui()
 	return S_OK;
 }
 
-void ImGui::BeginFrameImGui()
-{
-	ImGuiIO& io = ImGui::GetIO();
-	Window * wnd = Engine::GetInstance().GetWindow();
-
-	// Setup display size (every frame to accommodate for window resizing)
-	RECT rect;
-	GetClientRect(Wnd, &rect);
-	//io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
-	io.DisplaySize = ImVec2((float)(wnd->GetWidth()), (float)(wnd->GetHeight()));
-
-	// Read keyboard modifiers inputs
-	io.KeyCtrl	= (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-	io.KeyShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-	io.KeyAlt	= (GetKeyState(VK_MENU) & 0x8000) != 0;
-
-	ImVec2 pos = io.MousePos;
-
-	// Hide OS mouse cursor if ImGui is drawing it
-	SetCursor(io.MouseDrawCursor ? NULL : LoadCursor(NULL, IDC_ARROW));
-
-	// Start the frame
-	ImGui::NewFrame();
-}
-
-void ImGui::SetRenderDataImGui(ID3D12GraphicsCommandList * i_CommandList, D3D12_CPU_DESCRIPTOR_HANDLE i_RenderTarget)
+void ImGuiD3D12::SetRenderDataImGui(ID3D12GraphicsCommandList * i_CommandList, D3D12_CPU_DESCRIPTOR_HANDLE i_RenderTarget)
 {
 	CommandList = i_CommandList;
 	RenderTarget = i_RenderTarget;
 }
 
-void ImGui::RenderDrawListImGui(ImDrawData * i_DrawData)
+void ImGuiD3D12::RenderDrawListImGui(ImDrawData * i_DrawData)
 {
 	// Range CPU will read from mapping the upload buffer
 	// End < Begin specifies CPU will not read the mapped buffer
@@ -369,7 +304,7 @@ void ImGui::RenderDrawListImGui(ImDrawData * i_DrawData)
 
 	// initialize commandlist for rendering UI
 	commandList->RSSetViewports(1, &viewport);
-	commandList->OMSetRenderTargets(1, &RenderTarget, FALSE, nullptr);
+	//commandList->OMSetRenderTargets(1, &RenderTarget, FALSE, nullptr);
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->SetGraphicsRootSignature(RootSignature);
 	commandList->SetPipelineState(PipelineState);
@@ -428,56 +363,4 @@ void ImGui::RenderDrawListImGui(ImDrawData * i_DrawData)
 		}
 		vtx_offset += (int)verticesCount;
 	}
-}
-
-LRESULT CALLBACK ImGui::UpdateInput(HWND i_Window, UINT i_Msg, WPARAM i_wParam, LPARAM i_lParam)
-{
-	ImGuiIO & io = ImGui::GetIO();
-
-	// update imgui input
-	switch (i_Msg)
-	{
-	case WM_LBUTTONDOWN:
-		io.MouseDown[0] = true;
-		return true;
-
-	case WM_LBUTTONUP:
-		io.MouseDown[0] = false;
-		return true;
-
-	case WM_RBUTTONDOWN:
-		io.MouseDown[1] = true;
-		return true;
-
-	case WM_RBUTTONUP:
-		io.MouseDown[1] = false;
-		return true;
-
-	case WM_MOUSEWHEEL:
-		io.MouseWheel += GET_WHEEL_DELTA_WPARAM(i_wParam) > 0 ? +1.0f : -1.0f;
-		return true;
-
-	case WM_MOUSEMOVE:
-		io.MousePos.x = (signed short)(i_lParam);
-		io.MousePos.y = (signed short)(i_lParam >> 16);
-		return true;
-
-	case WM_KEYDOWN:
-		if (i_wParam < 256)
-			io.KeysDown[i_wParam] = 1;
-		return true;
-
-	case WM_KEYUP:
-		if (i_wParam < 256)
-			io.KeysDown[i_wParam] = 0;
-		return true;
-
-	case WM_CHAR:
-		// You can also use ToAscii()+GetKeyboardState() to retrieve characters.
-		if (i_wParam > 0 && i_wParam < 0x10000)
-			io.AddInputCharacter((unsigned short)i_wParam);
-		return true;
-	}
-
-	return LRESULT(0);
 }
