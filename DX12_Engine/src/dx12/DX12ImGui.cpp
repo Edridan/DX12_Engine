@@ -304,7 +304,7 @@ void ImGuiD3D12::RenderDrawListImGui(ImDrawData * i_DrawData)
 
 	// initialize commandlist for rendering UI
 	commandList->RSSetViewports(1, &viewport);
-	//commandList->OMSetRenderTargets(1, &RenderTarget, FALSE, nullptr);
+	commandList->OMSetRenderTargets(1, &RenderTarget, FALSE, nullptr);
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->SetGraphicsRootSignature(RootSignature);
 	commandList->SetPipelineState(PipelineState);
