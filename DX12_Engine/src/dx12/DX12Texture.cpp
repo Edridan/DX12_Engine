@@ -132,7 +132,7 @@ DX12Texture::~DX12Texture()
 	// Clean resources
 	SAFE_RELEASE(m_TextureBufferUploadHeap);
 	SAFE_RELEASE(m_TextureBuffer);
-	SAFE_RELEASE(m_DescriptorHeap);
+	//SAFE_RELEASE(m_DescriptorHeap);	hack : crash
 }
 
 IntVec2 DX12Texture::GetSize() const

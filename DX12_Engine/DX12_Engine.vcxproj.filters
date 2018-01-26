@@ -85,6 +85,12 @@
     <Filter Include="Resource Files\Shaders\ImGui">
       <UniqueIdentifier>{85fc765a-f89b-4c26-bcb0-148e9513e0c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UI\Dev">
+      <UniqueIdentifier>{fa62cfa8-fb49-49ff-8857-48ec83504282}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UI\Dev">
+      <UniqueIdentifier>{be60fe8c-d370-4d78-b338-4c2539cf80fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
@@ -176,6 +182,9 @@
     </ClCompile>
     <ClCompile Include="src\ui\UIWindow.cpp">
       <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UIConsole.cpp">
+      <Filter>Source Files\UI\Dev</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -282,6 +291,12 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\ui\UIWindow.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UIConsole.h">
+      <Filter>Header Files\UI\Dev</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UI.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>

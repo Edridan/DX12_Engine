@@ -91,6 +91,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 void Engine::Run()
 {
+	// start engine clock
 	m_EngineClock->Reset();
 
 	// To do : make a command list and a push to GPU
@@ -180,6 +181,9 @@ void Engine::Run()
 		}
 	}
 
+	// close the dx12 commandlist
+	m_RenderEngine->Close();
+
 	// exit the engine
 	CleanUpResources();
 	CleanUpModules();
@@ -234,8 +238,6 @@ void Engine::CleanUpResources()
 
 void Engine::CleanUpModules()
 {
-	m_RenderEngine->Close();
-
 	// delete the render engine
 	DX12RenderEngine::Delete();
 	
