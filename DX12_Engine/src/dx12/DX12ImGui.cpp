@@ -36,6 +36,7 @@ HRESULT ImGui::InitializeImGui(HWND i_Window)
 	// setup imgui
 	ImGui::Wnd				= i_Window;	// window of the application
 	io.RenderDrawListsFn	= RenderDrawListImGui;	// callback for rendering
+	io.ImeWindowHandle		= i_Window;
 
 	if (FAILED(InitializeDX12ImGui()))
 	{
@@ -276,16 +277,20 @@ HRESULT ImGui::InitializeDX12ImGui()
 void ImGui::PrepareForRenderImGui()
 {
 	ImGuiIO& io = ImGui::GetIO();
+	Window * wnd = Engine::GetInstance().GetWindow();
 
 	// Setup display size (every frame to accommodate for window resizing)
 	RECT rect;
 	GetClientRect(Wnd, &rect);
-	io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+	//io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
+	io.DisplaySize = ImVec2((float)(wnd->GetWidth()), (float)(wnd->GetHeight()));
 
 	// Read keyboard modifiers inputs
 	io.KeyCtrl	= (GetKeyState(VK_CONTROL) & 0x8000) != 0;
 	io.KeyShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
 	io.KeyAlt	= (GetKeyState(VK_MENU) & 0x8000) != 0;
+
+	ImVec2 pos = io.MousePos;
 
 	// Hide OS mouse cursor if ImGui is drawing it
 	SetCursor(io.MouseDrawCursor ? NULL : LoadCursor(NULL, IDC_ARROW));
@@ -427,7 +432,7 @@ void ImGui::RenderDrawListImGui(ImDrawData * i_DrawData)
 
 LRESULT CALLBACK ImGui::UpdateInput(HWND i_Window, UINT i_Msg, WPARAM i_wParam, LPARAM i_lParam)
 {
-	ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO & io = ImGui::GetIO();
 
 	// update imgui input
 	switch (i_Msg)

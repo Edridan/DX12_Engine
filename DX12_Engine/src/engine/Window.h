@@ -37,6 +37,7 @@ public:
 	UINT	GetWidth() const;
 	UINT	GetHeight() const;
 	IntVec2	GetSize() const;
+	IntVec2	GetBackSize() const;
 	HWND	GetHWnd() const;
 
 	// input management

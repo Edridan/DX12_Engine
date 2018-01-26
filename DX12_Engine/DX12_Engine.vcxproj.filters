@@ -162,9 +162,6 @@
     <ClCompile Include="lib\imgui-d3d12\imgui.cpp">
       <Filter>Lib\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="lib\imgui-d3d12\imgui_demo.cpp">
-      <Filter>Lib\ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="lib\imgui-d3d12\imgui_draw.cpp">
       <Filter>Lib\ImGui</Filter>
     </ClCompile>

@@ -55,7 +55,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	// To do : clean this part of code
 	Window * window = Engine::GetInstance().GetWindow();
-
+	IntVec2 bufferSize = window->GetBackSize();
 
 	// -- Debug -- //
 
@@ -147,8 +147,8 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	// -- Create the Swap Chain (double/tripple buffering) -- //
 
 	DXGI_MODE_DESC backBufferDesc = {}; // this is to describe our display mode
-	backBufferDesc.Width = window->GetWidth(); // buffer width
-	backBufferDesc.Height = window->GetHeight(); // buffer height
+	backBufferDesc.Width = bufferSize.x; // buffer width
+	backBufferDesc.Height = bufferSize.y; // buffer height
 	backBufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // format of the buffer (rgba 32 bits, 8 bits for each chanel)
 
 														// describe our multi-sampling. We are not multi-sampling, so we set the count to 1 (we need at least one sample of course)
@@ -342,7 +342,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_Device->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, window->GetWidth(), window->GetHeight(), 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+		&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, bufferSize.x, bufferSize.y, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
 		D3D12_RESOURCE_STATE_DEPTH_WRITE,
 		&depthOptimizedClearValue,
 		IID_PPV_ARGS(&m_DepthStencilBuffer)
@@ -360,15 +360,15 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	m_Viewport.TopLeftX = 0;
 	m_Viewport.TopLeftY = 0;
-	m_Viewport.Width = (FLOAT)window->GetWidth();
-	m_Viewport.Height = (FLOAT)window->GetHeight();
+	m_Viewport.Width = (FLOAT)bufferSize.x;
+	m_Viewport.Height = (FLOAT)bufferSize.y;
 	m_Viewport.MinDepth = 0.0f;
 	m_Viewport.MaxDepth = 1.0f;
 
 	m_ScissorRect.left = 0;
 	m_ScissorRect.top = 0;
-	m_ScissorRect.right = window->GetWidth();
-	m_ScissorRect.bottom = window->GetHeight();
+	m_ScissorRect.right = bufferSize.x;
+	m_ScissorRect.bottom = bufferSize.y;
 
 	return S_OK;
 }

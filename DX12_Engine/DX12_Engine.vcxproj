@@ -90,7 +90,6 @@
   <ItemGroup>
     <ClCompile Include="lib\imgui-d3d12\extra_fonts\binary_to_compressed_c.cpp" />
     <ClCompile Include="lib\imgui-d3d12\imgui.cpp" />
-    <ClCompile Include="lib\imgui-d3d12\imgui_demo.cpp" />
     <ClCompile Include="lib\imgui-d3d12\imgui_draw.cpp" />
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc" />
     <ClCompile Include="src\dx12\DX12ConstantBuffer.cpp" />

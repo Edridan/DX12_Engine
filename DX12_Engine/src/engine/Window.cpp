@@ -222,6 +222,16 @@ IntVec2 Window::GetSize() const
 	return IntVec2(m_Width, m_Height);
 }
 
+IntVec2 Window::GetBackSize() const
+{
+	RECT rect;
+	GetClientRect(m_Hwnd, &rect);
+	return IntVec2(
+		rect.right - rect.left, 
+		rect.bottom - rect.top
+	);
+}
+
 HWND Window::GetHWnd() const
 {
 	return m_Hwnd;

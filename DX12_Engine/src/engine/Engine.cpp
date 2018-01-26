@@ -86,6 +86,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	ImGui::InitializeImGui(m_Window->GetHWnd());
 	m_Window->RegisterInputCallback(&ImGui::UpdateInput);	// push back event for inputs
 
+
 	m_Exit = false;
 }
 
@@ -116,9 +117,10 @@ void Engine::Run()
 		// ui rendering
 		ImGui::PrepareForRenderImGui();
 
+		ImGui::Begin("MyWindow");
 		ImGui::Text("Hello");
-
-
+		ImGui::Text("Mouse Position: (%.1f,%.1f)", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
+		ImGui::End();
 
 		// tick the world (update all actors and components)
 		ASSERT(m_CurrentWorld != nullptr);
