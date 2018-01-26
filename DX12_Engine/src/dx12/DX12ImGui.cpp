@@ -274,7 +274,7 @@ HRESULT ImGui::InitializeDX12ImGui()
 	return S_OK;
 }
 
-void ImGui::PrepareForRenderImGui()
+void ImGui::BeginFrameImGui()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	Window * wnd = Engine::GetInstance().GetWindow();

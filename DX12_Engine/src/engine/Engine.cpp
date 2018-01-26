@@ -15,7 +15,6 @@
 #include "engine/ResourcesManager.h"
 #include "engine/RenderList.h"
 
-
 Engine *		Engine::s_Instance = nullptr;
 
 Engine & Engine::GetInstance()
@@ -114,17 +113,14 @@ void Engine::Run()
 		// update input and window callbacks
 		m_Window->Update();
 
-		// ui rendering
-		ImGui::PrepareForRenderImGui();
-
-		ImGui::Begin("MyWindow");
-		ImGui::Text("Hello");
-		ImGui::Text("Mouse Position: (%.1f,%.1f)", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
-		ImGui::End();
-
 		// tick the world (update all actors and components)
 		ASSERT(m_CurrentWorld != nullptr);
 		m_CurrentWorld->TickWorld(elapsed);
+
+		// update and prepare the ui
+		{
+			ImGui::BeginFrameImGui();
+		}
 
 		/* -- Render -- */
 
@@ -153,8 +149,12 @@ void Engine::Run()
 			m_RenderList->PushOnCommandList();
 		}
 
-		ImGui::SetRenderDataImGui(m_RenderEngine->GetCommandList(), m_RenderEngine->GetRenderTarget());
-		ImGui::Render();
+		// render ui
+		{
+			// using Imgui to render ui
+			ImGui::SetRenderDataImGui(m_RenderEngine->GetCommandList(), m_RenderEngine->GetRenderTarget());
+			ImGui::Render();
+		}
 
 		// update and display backbuffer, also swap buffer and manage commandqueue
 		m_RenderEngine->Render();

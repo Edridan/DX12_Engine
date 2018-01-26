@@ -11,11 +11,7 @@
 #include "../resource.h"
 
 // precompilation define
-#define USE_IMGUI
-
-#ifdef USE_IMGUI
-
-#endif
+#define WITH_EDITOR			1	// editor is binded in the executable
 
 using namespace DirectX;
 

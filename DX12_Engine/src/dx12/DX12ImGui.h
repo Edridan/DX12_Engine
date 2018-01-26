@@ -25,7 +25,7 @@ namespace ImGui
 	HRESULT InitializeDX12ImGui();
 
 	// rendering
-	void	PrepareForRenderImGui();
+	void	BeginFrameImGui();
 	void	SetRenderDataImGui(ID3D12GraphicsCommandList * i_CommandList, D3D12_CPU_DESCRIPTOR_HANDLE i_RenderTarget);
 	void	RenderDrawListImGui(ImDrawData * i_DrawData);
 
