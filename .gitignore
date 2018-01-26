@@ -46,6 +46,5 @@ x64/Debug/*
 *.out
 *.app
 
-
-
-
+# Imgui init file
+*/imgui.ini
