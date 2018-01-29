@@ -100,6 +100,10 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	// push default command
 	m_Console->RegisterFunction(new CFClear);
 
+#ifdef _DEBUG
+	PRINT_DEBUG("DX12 engine initilization, version 0.1");
+#endif
+
 	m_Exit = false;
 }
 

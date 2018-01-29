@@ -102,7 +102,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 	m_Transform		= i_Desc.ActorTransform;
 	m_Name			= i_Desc.Name;
 
-	if (i_Desc.Id != (UINT64)-1)
+	if (i_Desc.Id == (UINT64)-1)
 	{
 		// create an id here
 		m_Id = s_ActorInstanced++;

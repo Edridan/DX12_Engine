@@ -170,8 +170,8 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 	// display debug message
 	std::replace(error.begin(), error.end(), '\n', ' ');
 	std::ostringstream stream;
-	stream << i_Filename << " : load time (" << loadTime << ")"
-		<< std::endl << (ret ? "[No Error]" : error) << std::endl;
+	stream << "load obj : " << i_Filename << " : load time (" << loadTime << " sec)" 
+		<< std::endl << (ret ? "[No Error]" : error);
 	
 	std::string message(stream.str());
 	PRINT_DEBUG(message.c_str());

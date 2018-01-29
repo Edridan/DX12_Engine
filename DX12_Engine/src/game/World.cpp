@@ -1,10 +1,11 @@
 #include "World.h"
 
-#include "Actor.h"
+#include "game/Actor.h"
 #include "dx12/DX12Utils.h"
 #include "game/Camera.h"
 #include "engine/Engine.h"
 #include "engine/RenderList.h"
+#include "engine/Debug.h"
 
 World::World(const WorldDesc & i_WorldDesc)
 	:m_CurrentCamera(new Camera)
@@ -52,6 +53,15 @@ Actor * World::SpawnActor(const Actor::ActorDesc & i_Desc, Actor * i_Parent)
 	}
 
 	Actor * newActor = new Actor(i_Desc, this);
+
+	// debug print
+	{
+		XMFLOAT3 pos = newActor->m_Transform.GetPosition();
+		PRINT_DEBUG("Spawn actor \"%S\"[%i] at location (%.3f, %.3f, %.3f)", 
+			newActor->GetName().c_str(), newActor->GetId(), 
+			pos.x, pos.y, pos.z);
+	}
+
 	m_Actors.push_back(newActor);
 
 	// add actor to the parent if needed
