@@ -49,6 +49,16 @@ UINT Engine::GetFramePerSecond() const
 	return m_FramePerSecond;
 }
 
+UINT Engine::GetFramePerSecondTarget() const
+{
+	return m_FramePerSecondsTargeted;
+}
+
+void Engine::SetFramePerSecondTarget(UINT i_Target)
+{
+	m_FramePerSecondsTargeted = i_Target;
+}
+
 void Engine::Initialize(EngineDesc & i_Desc)
 {
 	// create the DX12RenderEngine
@@ -99,6 +109,11 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_Console->RegisterPrintCallback(UIConsole::StaticPrint, m_UIConsole);
 	// push default command
 	m_Console->RegisterFunction(new CFClear);
+	m_Console->RegisterFunction(new CFActorCount);
+	m_Console->RegisterFunction(new CFHelp);
+	m_Console->RegisterFunction(new CFPrintParam);
+	m_Console->RegisterFunction(new CFSetFrameTarget);
+
 
 #ifdef _DEBUG
 	PRINT_DEBUG("DX12 engine initilization, version 0.1");
@@ -279,7 +294,17 @@ void Engine::CleanUpResources()
 
 void Engine::CleanUpModules()
 {
+
+	// delete UI
+	delete m_UILayer;
+	delete m_UIConsole;
+
+	// delete manager
+	delete m_Console;
+	delete m_ResourcesManager;
+
+	delete m_Window;
+
 	// delete the render engine
 	DX12RenderEngine::Delete();
-	
 }

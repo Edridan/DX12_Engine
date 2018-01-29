@@ -13,6 +13,13 @@
 // precompilation define
 #define WITH_EDITOR			1	// editor is binded in the executable
 
+#ifdef _DEBUG
+#define ENGINE_DEBUG	1
+#else
+#define ENGINE_DEBUG	0
+#endif
+
+
 using namespace DirectX;
 
 // class predef
@@ -59,6 +66,8 @@ public:
 	// informations
 	float		GetLifeTime() const;
 	UINT		GetFramePerSecond() const;
+	UINT		GetFramePerSecondTarget() const;
+	void		SetFramePerSecondTarget(UINT i_Target);
 
 	// intialize and run the engine
 	void		Initialize(EngineDesc & i_Desc);
@@ -107,6 +116,11 @@ private:
 	UILayer *			m_UILayer;	// manager
 	// ui windows for debug, editor and other
 	UIConsole *			m_UIConsole;
+
+#ifdef ENGINE_DEBUG
+	// debug purpose
+
+#endif
 
 	// managers
 	ResourcesManager *	m_ResourcesManager;

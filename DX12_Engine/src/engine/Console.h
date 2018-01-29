@@ -19,16 +19,40 @@ public:
 	class CommandLine
 	{
 	public:
+		enum EType
+		{
+			eInt,
+			eFloat,
+			eString,
+			// error
+			eNone,
+		};
+
+		struct Value
+		{
+			EType			m_Type;
+			std::string		m_Value;
+		};
+
 		// paramters of the commandline
-		std::map <std::string, std::string>		m_Parameters;
+		std::vector<Value>		m_Parameters;
 
 		// informations
-		const std::string &	GetFunctionName() const;
+		const std::string &		GetFunctionName() const;
+		bool					IsNumber(const Value & i_Value) const;
+
+		// get values
+		int					ToInt(const Value & i_Val) const;
+		float				ToFloat(const Value & i_Val) const;
+		std::string			ToString(const Value & i_Val) const;
 
 		// friend class
 		friend class Console;
 	private:
-		std::string m_FuncName;
+		std::string		m_FuncName;
+
+		// helpers
+		EType			ParseType(const std::string & i_Type) const;
 
 		CommandLine(const std::string & i_Line);
 		~CommandLine();
@@ -48,6 +72,8 @@ public:
 		const std::string & GetSummary() const;
 
 		friend class Console;
+	protected:
+		Console *		GetConsole() const;
 	private:
 		// virtual pure to override to create command
 		virtual bool		Execute(const CommandLine & i_CommandLine) = 0;
@@ -57,7 +83,7 @@ public:
 		const std::string	m_Helpers;	// param def
 		const std::string	m_Summary;	// summary of the function
 		// other
-		const Console *		m_Console;	// auto filled when added to a console
+		Console *			m_Console;	// auto filled when added to a console
 	};
 
 	Console();
@@ -66,6 +92,8 @@ public:
 	// console management
 	bool		RegisterFunction(Console::Function * i_Command);
 	bool		FunctionExist(const std::string & i_FuncName);
+
+	void		GetHelp(std::vector<std::string> & o_Help) const;
 
 	// push command
 	bool		PushCommand(const std::string & i_Command);
@@ -86,11 +114,49 @@ private:
 
 // create default command here
 // start by CF for CommandFunction class
+class CFHelp : public Console::Function
+{
+public:
+	CFHelp();
+private:
+	// virtual pure to override
+	virtual bool Execute(const Console::CommandLine & i_CommandLine) override;
+
+};
+
 class CFClear : public Console::Function
 {
 public:
 	CFClear();
 private:
 	// virtual pure to override to create command
-	virtual bool		Execute(const Console::CommandLine & i_CommandLine);
+	virtual bool		Execute(const Console::CommandLine & i_CommandLine) override;
+};
+
+class CFActorCount : public Console::Function
+{
+public:
+	CFActorCount();
+private:
+	// virtual pure to override
+	virtual bool Execute(const Console::CommandLine & i_CommandLine) override;
+
+};
+
+class CFSetFrameTarget : public Console::Function
+{
+public:
+	CFSetFrameTarget();
+private:
+	// virtual pure to override
+	virtual bool Execute(const Console::CommandLine & i_CommandLine) override;
+};
+
+class CFPrintParam : public Console::Function
+{
+public:
+	CFPrintParam();
+private:
+	// virtual pure to override
+	virtual bool Execute(const Console::CommandLine & i_CommandLine) override;
 };

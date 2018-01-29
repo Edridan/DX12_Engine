@@ -42,6 +42,11 @@ float World::GetFrameTime() const
 	return m_FrameTime;
 }
 
+UINT World::GetActorCount() const
+{
+	return m_Actors.size();
+}
+
 
 Actor * World::SpawnActor(const Actor::ActorDesc & i_Desc, Actor * i_Parent)
 {

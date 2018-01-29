@@ -30,7 +30,8 @@ public:
 	~World();
 
 	// world public functions can be called by actors
-	float GetFrameTime() const;	// get the last elapsed time
+	float	GetFrameTime() const;	// get the last elapsed time
+	UINT	GetActorCount() const;
 
 	// actor management
 	// spawn specific overriden actors
