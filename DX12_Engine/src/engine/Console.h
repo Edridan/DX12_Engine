@@ -22,7 +22,14 @@ public:
 		// paramters of the commandline
 		std::map <std::string, std::string>		m_Parameters;
 
+		// informations
+		const std::string &	GetFunctionName() const;
+
+		// friend class
+		friend class Console;
 	private:
+		std::string m_FuncName;
+
 		CommandLine(const std::string & i_Line);
 		~CommandLine();
 	};
@@ -43,7 +50,7 @@ public:
 		friend class Console;
 	private:
 		// virtual pure to override to create command
-		virtual void		Execute(const CommandLine & i_CommandLine) = 0;
+		virtual bool		Execute(const CommandLine & i_CommandLine) = 0;
 
 		// function helper
 		const std::string	m_Name;
@@ -78,3 +85,12 @@ private:
 
 
 // create default command here
+// start by CF for CommandFunction class
+class CFClear : public Console::Function
+{
+public:
+	CFClear();
+private:
+	// virtual pure to override to create command
+	virtual bool		Execute(const Console::CommandLine & i_CommandLine);
+};

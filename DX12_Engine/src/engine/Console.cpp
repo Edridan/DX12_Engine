@@ -4,6 +4,11 @@
 #include <cstdarg>
 #include <stdio.h>
 
+#include "engine/Debug.h"
+#include "engine/Engine.h"
+#include "ui/UILayer.h"
+#include "ui/UIConsole.h"
+
 Console::Console()
 {
 }
@@ -34,7 +39,28 @@ bool Console::FunctionExist(const std::string & i_FuncName)
 
 bool Console::PushCommand(const std::string & i_Command)
 {
-	return false;
+	// print the command
+	CommandLine line(i_Command.c_str());
+
+	Print(i_Command.c_str());
+
+	if (m_Functions[line.GetFunctionName()] == nullptr)
+	{
+		// print error
+		Print("[Error] Function %s does not exist", line.GetFunctionName().c_str());
+		return false;
+	}
+
+	// e
+	bool ret = m_Functions[line.GetFunctionName()]->Execute(line);
+
+	if (!ret)
+	{
+		// print error
+		Print("[Error] Function %s error when called", line.GetFunctionName().c_str());
+	}
+
+	return ret;
 }
 
 void Console::RegisterPrintCallback(const OutputFunc & i_Callback, void * i_Data /* = nullptr */ )
@@ -99,12 +125,50 @@ const std::string & Console::Function::GetSummary() const
 
 // command line decl
 
+const std::string & Console::CommandLine::GetFunctionName() const
+{
+	return m_FuncName;
+}
+
 Console::CommandLine::CommandLine(const std::string & i_Line)
 {
 	// create line with parameters
+	std::string buffer = i_Line;
+	size_t i = i_Line.find_first_of(' ');
 
+	// retreive function name
+	if (i == std::string::npos)	m_FuncName = i_Line;
+	else						m_FuncName = i_Line.substr(0, i);
+	
+	// erase all characters
+	buffer.erase(0, i + 1);
+
+	// get params
 }
 
 Console::CommandLine::~CommandLine()
 {
+}
+
+
+//////////////////////////////////////////////////
+
+CFClear::CFClear()
+	:Console::Function("clear", "", "clear console output")
+{
+}
+
+// basic function specific
+
+bool CFClear::Execute(const Console::CommandLine & i_CommandLine)
+{
+	UILayer * layer = Engine::GetInstance().GetUILayer();
+	UIConsole *	ui = dynamic_cast<UIConsole*>(layer->FindUIWindowByName("Console"));
+
+	if (ui)
+	{
+		ui->Clear();
+	}
+
+	return true;
 }

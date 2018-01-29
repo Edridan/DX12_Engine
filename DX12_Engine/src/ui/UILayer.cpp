@@ -90,6 +90,7 @@ void UILayer::SetUIStyle(const LayerStyleDesc & i_Style)
 	style.Colors[ImGuiCol_WindowBg]			= ImVec4(0.11f, 0.11f, 0.11f, 1.f);
 	style.Colors[ImGuiCol_TitleBg]			= ImVec4(0.31f, 0.07f, 0.01f, 1.f);
 	style.Colors[ImGuiCol_TitleBgActive]	= ImVec4(0.61f, 0.23f, 0.15f, 1.f);
+	style.Colors[ImGuiCol_FrameBg]			= ImVec4(0.21f, 0.21f, 0.21f, 1.f);
 }
 
 void UILayer::SetAlpha(const float i_Alpha)
@@ -159,6 +160,34 @@ void UILayer::PopUIWindowFromLayer(unsigned int i_Id)
 size_t UILayer::GetWindowCount() const
 {
 	return m_Windows.size();
+}
+
+UIWindow * UILayer::FindUIWindowByName(const std::string & i_Name)
+{
+	for (size_t i = 0; i < m_Windows.size(); ++i)
+	{
+		if (m_Windows[i]->GetName() == i_Name)
+		{
+			return m_Windows[i];
+		}
+	}
+
+	// we didn't find the window
+	return nullptr;
+}
+
+UIWindow * UILayer::FindUIWindowById(unsigned int i_Id)
+{
+	for (size_t i = 0; i < m_Windows.size(); ++i)
+	{
+		if (m_Windows[i]->GetId() == i_Id)
+		{
+			return m_Windows[i];
+		}
+	}
+
+	// we didn't find the window
+	return nullptr;
 }
 
 void UILayer::DisplayUIOnLayer()

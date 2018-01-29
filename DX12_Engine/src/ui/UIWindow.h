@@ -34,6 +34,7 @@ public:
 	void			SetActive(bool i_Active);
 	unsigned int	GetId() const;
 	const char *	GetName() const;
+	bool			IsFocused() const;
 
 	// Draw window using imgui, you can update the data here
 	void			StartDraw();
@@ -49,6 +50,7 @@ private:
 
 	// window management
 	bool			m_Active;
+	bool			m_Focused;
 	unsigned int	m_Id;
 	int				m_WindowFlags;
 	std::string		m_WindowName;

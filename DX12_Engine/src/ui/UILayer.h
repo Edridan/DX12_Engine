@@ -45,6 +45,10 @@ public:
 	void			PopUIWindowFromLayer(unsigned int i_Id);
 	size_t			GetWindowCount() const;
 
+	// find window
+	UIWindow *		FindUIWindowByName(const std::string & i_Name);
+	UIWindow *		FindUIWindowById(unsigned int i_Id);
+
 	// friend class
 	friend class Engine;
 private:

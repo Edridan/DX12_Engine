@@ -7,7 +7,7 @@
 #define BUFFER_SIZE		2048
 
 UIConsole::UIConsole()
-	:UIWindow("Console", UIWindow::eNoResize)
+	:UIWindow("Console", UIWindow::eNoCollapse)
 	,m_BufferSize(1024)
 {
 	m_History.reserve(HISTORY_BUFFER_SIZE);

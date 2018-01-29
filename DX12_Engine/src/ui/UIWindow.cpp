@@ -44,11 +44,19 @@ const char * UIWindow::GetName() const
 	return m_WindowName.c_str();
 }
 
+bool UIWindow::IsFocused() const
+{
+	return (m_Active && m_Focused);
+}
+
 void UIWindow::StartDraw()
 {
 	bool active = m_Active;
 
-	ImGui::Begin(m_WindowName.c_str(), &m_Active);
+	ImGui::Begin(m_WindowName.c_str(), &m_Active, m_WindowFlags);
+
+	// update data for the current window
+	m_Focused = ImGui::IsWindowFocused();
 
 	if (active != m_Active && (!m_Active))
 	{

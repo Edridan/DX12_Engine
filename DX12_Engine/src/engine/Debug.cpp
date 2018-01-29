@@ -1,6 +1,6 @@
 #include "Debug.h"
 
-#if PRINT_ON_CONSOLE
+#if PRINT_DEBUG_ON_CONSOLE
 #include "engine/Engine.h"
 #include "engine/Console.h"
 #endif
@@ -22,7 +22,7 @@ void OutputDebug(const char * i_Text, ...)
 	vsnprintf(buffer, 2048, i_Text, args);
 	va_end(args);
 
-#if PRINT_ON_CONSOLE
+#if PRINT_DEBUG_ON_CONSOLE
 	Console * console = Engine::GetInstance().GetConsole();
 	if (console)	
 		console->Print(buffer);

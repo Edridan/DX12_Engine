@@ -98,7 +98,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_Console = new Console;
 	m_Console->RegisterPrintCallback(UIConsole::StaticPrint, m_UIConsole);
 	// push default command
-	
+	m_Console->RegisterFunction(new CFClear);
 
 	m_Exit = false;
 }
@@ -123,6 +123,20 @@ void Engine::Run()
 			m_FramePerSecond = (UINT)(1.f / elapsed);
 		}
 
+#ifdef _DEBUG
+		// camera management depending if the windows are selected or not
+		Camera * const freeCam = m_CurrentWorld->GetCurrentCamera();
+		if (m_UIConsole->IsFocused() 
+			&& freeCam->FreecamIsEnabled())
+		{
+			m_CurrentWorld->GetCurrentCamera()->SetFreecamEnabled(false);
+		}
+		else if (!m_UIConsole->IsFocused() 
+			&& !freeCam->FreecamIsEnabled())
+		{
+			m_CurrentWorld->GetCurrentCamera()->SetFreecamEnabled(true);
+		}
+#endif
 		/* -- Update -- */
 
 		// update input and window callbacks

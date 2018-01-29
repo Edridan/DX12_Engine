@@ -4,9 +4,9 @@
 
 #include <Windows.h>
 
-#define ENABLE_DEBUG_BREAK		1
-#define SPAWN_POPUP				1
-#define PRINT_ON_CONSOLE		1
+#define ENABLE_DEBUG_BREAK			1
+#define SPAWN_POPUP					1
+#define PRINT_DEBUG_ON_CONSOLE		1
 
 #if (ENABLE_DEBUG_BREAK)
 #define DEBUG_BREAK		__debugbreak()
