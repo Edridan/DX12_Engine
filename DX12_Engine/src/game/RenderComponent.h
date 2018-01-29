@@ -32,12 +32,17 @@ public:
 		eDepthEnabled		= 1 << 0,
 	};
 
+	enum TextureDef
+	{
+		eAlbedo,
+	};
+
 	// struct definition
 	struct RenderComponentDesc
 	{
 		// mesh
-		const DX12MeshBuffer * Mesh			= nullptr;				// mesh filepath
-		std::vector<DX12Texture *> Textures;
+		const DX12MeshBuffer *		Mesh			= nullptr;				// mesh filepath
+		std::vector<DX12Texture *>	Textures;
 	};
 
 	RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor);
@@ -50,6 +55,10 @@ public:
 	RenderPass		GetRenderPass() const;
 	UINT64			GetRenderFlags() const;
 	ADDRESS_ID		GetConstBufferAddress() const;
+
+	// manage render stuff
+	void			SetTexture(DX12Texture * i_Texture);
+	//void			SetTexture(const DX12Texture * i_Texture, TextureDef i_Def);	// To do : implement
 
 private:
 	// dx12 rendering

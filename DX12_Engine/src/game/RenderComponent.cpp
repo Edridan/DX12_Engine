@@ -22,8 +22,18 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 	// retreive the pipeline state object depending the elements flags
 	DX12RenderEngine::PipelineStateObject * pso = render.GetPipelineStateObject(m_Mesh->GetElementFlags());
 
-	m_PipelineState = pso->m_PipelineState;
-	m_RootSignature = pso->m_DefaultRootSignature;
+	if (pso)
+	{
+		m_PipelineState = pso->m_PipelineState;
+		m_RootSignature = pso->m_DefaultRootSignature;
+	}
+	else
+	{
+		PRINT_DEBUG("Error when creating mesh : PSO do not exist for this type of vertex declaration");
+		POPUP_ERROR("Error when creating mesh : PSO do not exist for this type of vertex declaration");
+		DEBUG_BREAK;
+	}
+
 
 	// retreive a constant buffer address
 	m_ConstBuffer = render.ReserveConstantBufferVirtualAddress();
@@ -81,4 +91,10 @@ UINT64 RenderComponent::GetRenderFlags() const
 ADDRESS_ID RenderComponent::GetConstBufferAddress() const
 {
 	return m_ConstBuffer;
+}
+
+void RenderComponent::SetTexture(DX12Texture * i_Texture)
+{
+	m_Textures.clear();
+	m_Textures.push_back(i_Texture);
 }

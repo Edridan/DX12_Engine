@@ -20,12 +20,14 @@ using namespace DirectX;
 class World;
 // engine
 class Clock;
+class Console;	// console management
 class RenderList;
 class ResourcesManager;
 // dx12
 class DX12RenderEngine;
 // ui
 class UILayer;	// layer for UI
+class UIConsole;
 
 // class def
 class Engine
@@ -69,6 +71,8 @@ public:
 	ResourcesManager *	GetResourcesManager() const;
 	RenderList *		GetRenderList() const;
 	World *				GetWorld() const;
+	Console *			GetConsole() const;
+	// ui specs
 	UILayer *			GetUILayer() const;
 
 private:
@@ -97,9 +101,12 @@ private:
 	// game management
 	World *				m_CurrentWorld;
 	Clock *				m_EngineClock;
+	Console *			m_Console;
 
 	// ui
-	UILayer *			m_UILayer;
+	UILayer *			m_UILayer;	// manager
+	// ui windows for debug, editor and other
+	UIConsole *			m_UIConsole;
 
 	// managers
 	ResourcesManager *	m_ResourcesManager;

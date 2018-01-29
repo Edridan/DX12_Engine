@@ -114,6 +114,7 @@ public:
 	const DXGI_SWAP_CHAIN_DESC &	GetSwapChainDesc() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTarget() const;
 	bool							IsDX12DebugEnabled() const;
+	IntVec2							GetRenderSize() const;
 
 private:
 	DX12RenderEngine(HINSTANCE & i_HInstance);
@@ -163,6 +164,10 @@ private:
 	ID3D12Resource *			m_ConstantBufferUploadHeap[FRAME_BUFFER_COUNT];	// memory where constant buffers for each frame will be placed
 	UINT8 *						m_ConstantBufferGPUAdress[FRAME_BUFFER_COUNT];	// pointer for each of the resource buffer constant heap
 	bool						m_ConstantBufferReservedAddress[CONSTANT_BUFFER_HEAP_SIZE];	// internal constant buffer management
+
+	// size
+	IntVec2						m_WindowSize;
+
 
 	// Shader
 	DX12Shader *				m_DefaultPixelShader;

@@ -10,10 +10,12 @@
 // engine
 #include "engine/Clock.h"
 #include "engine/Window.h"
+#include "engine/Console.h"
 #include "engine/ResourcesManager.h"
 #include "engine/RenderList.h"
 // ui
 #include "ui/UILayer.h"
+#include "ui/UIConsole.h"
 
 
 Engine *		Engine::s_Instance = nullptr;
@@ -85,6 +87,18 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	// initialize UI
 	m_UILayer = new UILayer(m_Window);
 	m_UILayer->SetEnable(i_Desc.UIEnabled);
+
+	// ui dev initialization
+	m_UIConsole = new UIConsole;
+
+	// push windows on layer
+	m_UILayer->PushUIWindowOnLayer(m_UIConsole);
+
+	// initialize console
+	m_Console = new Console;
+	m_Console->RegisterPrintCallback(UIConsole::StaticPrint, m_UIConsole);
+	// push default command
+	
 
 	m_Exit = false;
 }
@@ -209,6 +223,11 @@ UILayer * Engine::GetUILayer() const
 	return m_UILayer;
 }
 
+Console * Engine::GetConsole() const
+{
+	return m_Console;
+}
+
 RenderList * Engine::GetRenderList() const
 {
 	return m_RenderList;
@@ -221,6 +240,10 @@ Engine::Engine()
 	,m_Window(nullptr)
 	// managers
 	,m_ResourcesManager(nullptr)
+	,m_Console(nullptr)
+	// ui
+	,m_UILayer(nullptr)
+	,m_UIConsole(nullptr)
 	// setup
 	,m_Exit(true)
 {

@@ -101,13 +101,14 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 DX12MeshBuffer::~DX12MeshBuffer()
 {
 	// cleanup resources
-	SAFE_RELEASE(m_VertexBuffer);
+	// To do : fix the crash when releasing the resources
+	//SAFE_RELEASE(m_VertexBuffer);
 
-	// release if needed the index buffer
-	if (m_HaveIndex)
-	{
-		SAFE_RELEASE(m_IndexBuffer);
-	}
+	//// release if needed the index buffer
+	//if (m_HaveIndex)
+	//{
+	//	SAFE_RELEASE(m_IndexBuffer);
+	//}
 }
 
 const D3D12_INPUT_LAYOUT_DESC & DX12MeshBuffer::GetInputLayout() const

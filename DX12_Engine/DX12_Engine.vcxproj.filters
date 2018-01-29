@@ -85,11 +85,11 @@
     <Filter Include="Resource Files\Shaders\ImGui">
       <UniqueIdentifier>{85fc765a-f89b-4c26-bcb0-148e9513e0c3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\UI\Dev">
-      <UniqueIdentifier>{fa62cfa8-fb49-49ff-8857-48ec83504282}</UniqueIdentifier>
+    <Filter Include="Source Files\UI\Editor">
+      <UniqueIdentifier>{2af5e8fd-e7b0-41ed-a312-3baa04cd7634}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\UI\Dev">
-      <UniqueIdentifier>{be60fe8c-d370-4d78-b338-4c2539cf80fb}</UniqueIdentifier>
+    <Filter Include="Header Files\UI\Editor">
+      <UniqueIdentifier>{fa9a2385-acf1-4254-9ba7-95d396c01dbf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -183,8 +183,14 @@
     <ClCompile Include="src\ui\UIWindow.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\dx12\DX12RenderTarget.cpp">
+      <Filter>Source Files\DX12</Filter>
+    </ClCompile>
     <ClCompile Include="src\ui\UIConsole.cpp">
-      <Filter>Source Files\UI\Dev</Filter>
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\Console.cpp">
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -293,10 +299,16 @@
     <ClInclude Include="src\ui\UIWindow.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
-    <ClInclude Include="src\ui\UIConsole.h">
-      <Filter>Header Files\UI\Dev</Filter>
-    </ClInclude>
     <ClInclude Include="src\ui\UI.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dx12\DX12RenderTarget.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Console.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UIConsole.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>

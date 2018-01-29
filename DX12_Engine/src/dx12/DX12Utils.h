@@ -61,5 +61,5 @@ do {																\
 	}																\
 } while(false)
 #else
-#define DX12_ASSERT(i_Hres)		void(0)
+#define DX12_ASSERT(i_Hres)		i_Hres
 #endif

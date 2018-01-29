@@ -1,5 +1,10 @@
 #include "Debug.h"
 
+#if PRINT_ON_CONSOLE
+#include "engine/Engine.h"
+#include "engine/Console.h"
+#endif
+
 // vsnprintf, sprintf_s
 #include <cstdarg>
 #include <stdio.h>
@@ -17,6 +22,11 @@ void OutputDebug(const char * i_Text, ...)
 	vsnprintf(buffer, 2048, i_Text, args);
 	va_end(args);
 
+#if PRINT_ON_CONSOLE
+	Console * console = Engine::GetInstance().GetConsole();
+	if (console)	
+		console->Print(buffer);
+#endif
 	OutputDebugStringA(buffer);
 }
 

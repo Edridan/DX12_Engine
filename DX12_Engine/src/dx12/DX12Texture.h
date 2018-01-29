@@ -42,6 +42,16 @@ public:
 	const ID3D12DescriptorHeap *	GetDescriptorHeap() const;
 	HRESULT							PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList);
 	
+protected:
+	// information
+	D3D12_RESOURCE_DESC		m_Desc;
+	ID3D12Resource *		m_TextureBuffer;
+	ID3D12Resource *		m_TextureBufferUploadHeap;
+	ID3D12DescriptorHeap *	m_DescriptorHeap;
+
+	// constructor for DX12RenderTarget
+	DX12Texture();
+
 private:
 	// load image data helper
 	static int		LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, ImageDataDesc & o_Desc, LPCWSTR i_Filename);
@@ -49,12 +59,6 @@ private:
 	// helpers
 	HRESULT			CreateTextureBufferResourceHeap(ID3D12Device * i_Device, const std::wstring & i_BufferName);
 	HRESULT			CreateTextureBufferUploadHeap(ID3D12Device * i_Device, const std::wstring & i_BufferName);
-
-	// information
-	D3D12_RESOURCE_DESC		m_Desc;
-	ID3D12Resource *		m_TextureBuffer;
-	ID3D12Resource *		m_TextureBufferUploadHeap;
-	ID3D12DescriptorHeap *	m_DescriptorHeap;
 
 	std::wstring		m_Name;
 	bool				m_IsLoaded;

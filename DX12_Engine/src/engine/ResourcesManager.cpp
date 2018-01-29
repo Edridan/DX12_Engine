@@ -20,9 +20,36 @@ DX12Mesh * ResourcesManager::GetMesh(const wchar_t * i_Filepath)
 	{
 		std::wstring fp = i_Filepath;
 		std::string filepath(fp.begin(), fp.end());
+		bool isPrimitive = false;
+		DX12Mesh::EPrimitiveMesh primitive;
+
+		// generate primitive mesh if necessary
+		if (filepath == "Plane")
+		{
+			primitive = DX12Mesh::ePlane;
+			isPrimitive = true;
+		}
+		else if (filepath == "Triangle")
+		{
+			primitive = DX12Mesh::eTriangle;
+			isPrimitive = true;
+		}
+		else if (filepath == "Cube")
+		{
+			primitive = DX12Mesh::eCube;
+			isPrimitive = true;
+		}
+
 
 		// load the mesh
-		mesh = DX12Mesh::LoadMeshObj(filepath.c_str());
+		if (!isPrimitive)
+		{
+			mesh = DX12Mesh::LoadMeshObj(filepath.c_str());
+		}
+		else
+		{
+			mesh = DX12Mesh::GeneratePrimitiveMesh(primitive);
+		}
 
 		if (mesh != nullptr)
 		{

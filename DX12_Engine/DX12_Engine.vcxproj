@@ -99,11 +99,13 @@
     <ClCompile Include="src\dx12\DX12Mesh.cpp" />
     <ClCompile Include="src\dx12\DX12MeshBuffer.cpp" />
     <ClCompile Include="src\dx12\DX12RenderEngine.cpp" />
+    <ClCompile Include="src\dx12\DX12RenderTarget.cpp" />
     <ClCompile Include="src\dx12\DX12Shader.cpp" />
     <ClCompile Include="src\dx12\DX12Text.cpp" />
     <ClCompile Include="src\dx12\DX12Texture.cpp" />
     <ClCompile Include="src\dx12\DX12Utils.cpp" />
     <ClCompile Include="src\engine\Clock.cpp" />
+    <ClCompile Include="src\engine\Console.cpp" />
     <ClCompile Include="src\engine\Debug.cpp" />
     <ClCompile Include="src\engine\Engine.cpp" />
     <ClCompile Include="src\engine\RenderList.cpp" />
@@ -137,11 +139,13 @@
     <ClInclude Include="src\dx12\DX12Mesh.h" />
     <ClInclude Include="src\dx12\DX12MeshBuffer.h" />
     <ClInclude Include="src\dx12\DX12RenderEngine.h" />
+    <ClInclude Include="src\dx12\DX12RenderTarget.h" />
     <ClInclude Include="src\dx12\DX12Shader.h" />
     <ClInclude Include="src\dx12\DX12Text.h" />
     <ClInclude Include="src\dx12\DX12Texture.h" />
     <ClInclude Include="src\dx12\DX12Utils.h" />
     <ClInclude Include="src\engine\Clock.h" />
+    <ClInclude Include="src\engine\Console.h" />
     <ClInclude Include="src\engine\Debug.h" />
     <ClInclude Include="src\engine\Engine.h" />
     <ClInclude Include="src\engine\RenderList.h" />

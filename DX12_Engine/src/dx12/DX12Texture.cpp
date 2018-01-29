@@ -169,6 +169,16 @@ HRESULT DX12Texture::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList
 	return S_OK;
 }
 
+DX12Texture::DX12Texture()
+	:m_Name(L"")
+	,m_IsLoaded(false)
+	,m_DescriptorHeap(nullptr)
+	,m_TextureBuffer(nullptr)
+	,m_TextureBufferUploadHeap(nullptr)
+	,m_Desc()
+{
+}
+
 // retreived from : https://www.braynzarsoft.net/viewtutorial/q16390-directx-12-textures-from-file
 int DX12Texture::LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, ImageDataDesc & o_Desc, LPCWSTR i_Filename)
 {
