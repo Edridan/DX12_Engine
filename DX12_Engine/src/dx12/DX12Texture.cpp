@@ -158,16 +158,24 @@ const ID3D12DescriptorHeap * DX12Texture::GetDescriptorHeap() const
 	return m_DescriptorHeap;
 }
 
-HRESULT DX12Texture::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
+const D3D12_GPU_DESCRIPTOR_HANDLE DX12Texture::GetDescriptorHandle() const
 {
-	// set the descriptor heap
-	ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap };
-	i_CommandList->SetDescriptorHeaps(1, descriptorHeaps);
-
-	i_CommandList->SetGraphicsRootDescriptorTable(1, m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-
-	return S_OK;
+	return m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 }
+/*
+const D3D12_GPU_DESCRIPTOR_HANDLE DX12Texture::GetDescriptorHandle() const
+{
+// set the descriptor heap
+ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap };
+i_CommandList->SetDescriptorHeaps(1, descriptorHeaps);
+
+i_CommandList->SetGraphicsRootDescriptorTable(1, m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+
+return S_OK;
+return m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+}
+*/
+
 
 DX12Texture::DX12Texture()
 	:m_Name(L"")

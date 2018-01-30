@@ -765,7 +765,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	D3D12_INPUT_LAYOUT_DESC desc;
 	DX12Shader * pixelShader = nullptr, *vertexShader = nullptr;
 	UINT textureCount = 0;
-	static const UINT bufferCount = 1;		// 3D transform, material specs
+	static const UINT bufferCount = 2;		// 3D transform, material specs
 
 	// sampler for textures
 	D3D12_STATIC_SAMPLER_DESC	* sampler			= nullptr;
@@ -847,9 +847,9 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	rootParameters[0].Descriptor		= rootCBVDescriptor; // this is the root descriptor for this root parameter
 	rootParameters[0].ShaderVisibility	= D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
 
-	//rootParameters[1].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
-	//rootParameters[1].Descriptor		= rootCBVDescriptor; // this is the root descriptor for this root parameter
-	//rootParameters[1].ShaderVisibility	= D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
+	rootParameters[1].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
+	rootParameters[1].Descriptor		= rootCBVDescriptor; // this is the root descriptor for this root parameter
+	rootParameters[1].ShaderVisibility	= D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
 
 	// setup the root parameters for textures
 	for (UINT i = 0; i < textureCount; ++i) 

@@ -90,7 +90,7 @@ void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandLis
 		// push needed textures
 		for (size_t i = 0; i < m_Textures.size(); ++i)
 		{
-			m_Textures[i]->PushOnCommandList(i_CommandList);
+			//m_Textures[i]->PushOnCommandList(i_CommandList);
 		}
 
 		// push the mesh on the commandlist (setup vertices)

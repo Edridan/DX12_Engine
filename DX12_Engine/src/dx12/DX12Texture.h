@@ -39,9 +39,9 @@ public:
 	bool					IsLoaded() const;
 
 	// dx12 management
-	const ID3D12DescriptorHeap *	GetDescriptorHeap() const;
-	HRESULT							PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList);
-	
+	const ID3D12DescriptorHeap *		GetDescriptorHeap() const;
+	const D3D12_GPU_DESCRIPTOR_HANDLE	GetDescriptorHandle() const;
+
 protected:
 	// information
 	D3D12_RESOURCE_DESC		m_Desc;

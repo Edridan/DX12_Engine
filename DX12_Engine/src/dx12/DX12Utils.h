@@ -38,6 +38,7 @@ WICPixelFormatGUID GetConvertToWICFormat(WICPixelFormatGUID & i_WicFormat);
 // get the number of bits per pixel for a dxgi format
 int GetDXGIFormatBitsPerPixel(const DXGI_FORMAT & i_DxGIFormat);
 
+
 // color management
 inline DirectX::XMFLOAT3 ColorToVec3(const Color & i_Color)
 {

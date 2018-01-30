@@ -9,6 +9,7 @@
 // class predef
 class DX12Texture;
 
+
 class DX12Material
 {
 public:
@@ -70,5 +71,6 @@ private:
 	float	m_SpecularExponent;
 
 	// management
-	bool	m_HaveChanged;
+	bool		m_HaveChanged;
+	ADDRESS_ID	m_ConstantBuffer;
 };

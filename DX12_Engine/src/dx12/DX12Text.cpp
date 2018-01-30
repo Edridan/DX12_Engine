@@ -200,7 +200,7 @@ void DX12Text::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
 	int frameIndex = DX12RenderEngine::GetInstance().GetFrameIndex();
 	UpdateGPUBuffer(frameIndex);
 
-	i_CommandList->DrawInstanced(4, m_Text.size(), 0, 0);
+	i_CommandList->DrawInstanced(4u, (UINT)m_Text.size(), 0, 0);
 }
 
 void DX12Text::UpdateGPUBuffer(int i_FrameIndex)

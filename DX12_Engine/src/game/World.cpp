@@ -44,7 +44,7 @@ float World::GetFrameTime() const
 
 UINT World::GetActorCount() const
 {
-	return m_Actors.size();
+	return (UINT)m_Actors.size();
 }
 
 
