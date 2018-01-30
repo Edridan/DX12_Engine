@@ -13,6 +13,9 @@
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12Shader.h"
 
+// class predef
+class DX12ConstantBuffer;
+
 // define
 #define DEBUG_DX12_ENABLE		1
 
@@ -26,18 +29,6 @@ enum PiplineStateFlags
 class DX12RenderEngine
 {
 public:
-	// Constant buffer definition
-	struct DefaultConstantBuffer
-	{
-		// 3D space computing
-		DirectX::XMFLOAT4X4		m_Model;
-		DirectX::XMFLOAT4X4		m_View;
-		DirectX::XMFLOAT4X4		m_Projection;
-		// other
-		FLOAT					m_Time;
-		DirectX::XMFLOAT3		m_CameraForward;
-	};
-
 	struct PipelineStateObject
 	{
 		ID3D12PipelineState *	m_PipelineState;
@@ -63,12 +54,6 @@ public:
 	//** DX12 Management **//
 	// fences
 	HRESULT						IncrementFence();
-	// constant buffer allocation
-	ADDRESS_ID					ReserveConstantBufferVirtualAddress();
-	void						ReleaseConstantBufferVirtualAddress(ADDRESS_ID i_Address);
-	void						UpdateConstantBuffer(ADDRESS_ID i_Address, DefaultConstantBuffer & i_ConstantBuffer);
-	UINT8 *						GetConstantBufferGPUAddress(ADDRESS_ID i_Address) const;
-	D3D12_GPU_VIRTUAL_ADDRESS	GetConstantBufferUploadVirtualAddress(ADDRESS_ID i_Address) const;
 	// pipeline state management
 	// this is used for default basic rendering
 	// if you need other pipeline states (skinned objects for example) create a pipeline state objects on your side
@@ -79,6 +64,18 @@ public:
 	// close the render engine
 	HRESULT						Close();
 	HRESULT						ResizeRenderTargets(const IntVec2 & i_NewSize);
+
+	// constant buffer management
+	enum EConstantBufferId
+	{
+		eTransform,		// used for transform matrix 3D space
+		eMaterial,		// used for material specs
+
+		// count
+		eCount,
+	};
+
+	DX12ConstantBuffer *		GetConstantBuffer(EConstantBufferId i_Id);
 	
 	// dx12 helpers
 	// For creation of resources in the GPU
@@ -133,7 +130,6 @@ private:
 	// Desc
 #define FRAME_BUFFER_COUNT		3
 	const int m_FrameBufferCount = FRAME_BUFFER_COUNT; // number of buffers we want, 2 for double buffering, 3 for tripple buffering
-	const static int ConstantBufferPerObjectAlignedSize;
 
 	// DX12 Implementation
 	ID3D12Device*				m_Device; // direct3d device
@@ -158,12 +154,13 @@ private:
 	ID3D12DescriptorHeap*		m_DepthStencilDescriptorHeap; // This is a heap for our depth/stencil buffer descriptor
 
 	// Constant buffer
-	#define  CONSTANT_BUFFER_HEAP_SIZE			32
-	UINT						m_ConstantBufferHeapSize = CONSTANT_BUFFER_HEAP_SIZE;
-	ID3D12DescriptorHeap *		m_MainDescriptorHeap[FRAME_BUFFER_COUNT];	// Warning : unused
-	ID3D12Resource *			m_ConstantBufferUploadHeap[FRAME_BUFFER_COUNT];	// memory where constant buffers for each frame will be placed
-	UINT8 *						m_ConstantBufferGPUAdress[FRAME_BUFFER_COUNT];	// pointer for each of the resource buffer constant heap
-	bool						m_ConstantBufferReservedAddress[CONSTANT_BUFFER_HEAP_SIZE];	// internal constant buffer management
+	DX12ConstantBuffer *		m_ConstantBuffer[EConstantBufferId::eCount];	// constant buffer are created here and used/managed from other space
+	struct ConstantBufferDef
+	{
+		UINT		ElementSize;
+		UINT		ElementCount;
+	};
+	static const ConstantBufferDef			s_ConstantBufferSize[EConstantBufferId::eCount];	// setup this array to manage the size of the constant buffer
 
 	// size
 	IntVec2						m_WindowSize;

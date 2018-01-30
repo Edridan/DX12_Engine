@@ -3,4 +3,5 @@
 
 cbuffer MaterialBuffer : register(b1)	// the material buffer is instanced on the buffer 1
 {
+
 };

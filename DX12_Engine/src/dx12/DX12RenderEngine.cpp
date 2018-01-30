@@ -12,7 +12,14 @@
 
 // Static definition implementation
 DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
-const int DX12RenderEngine::ConstantBufferPerObjectAlignedSize = (sizeof(DefaultConstantBuffer) + 255) & ~255;
+
+// constant buffer size are setupped here
+const DX12RenderEngine::ConstantBufferDef			DX12RenderEngine::s_ConstantBufferSize[] =
+{
+	// {ElementSize, ElementCount}
+	{256, 1024},		// transform
+	{256, 1024},		// materials
+};
 
 const DX12RenderEngine::HeapProperty DX12RenderEngine::s_HeapProperties[] =
 {
@@ -271,40 +278,15 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		return E_FAIL;
 	}
 
-	// -- Create default constant buffer -- //
+	// -- Create constant buffer -- //
 
-	for (int i = 0; i < m_FrameBufferCount; ++i)
+	for (size_t i = 0; i < EConstantBufferId::eCount; ++i)
 	{
-		hr = m_Device->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // this heap will be used to upload the constant buffer data
-			D3D12_HEAP_FLAG_NONE, // no flags
-			&CD3DX12_RESOURCE_DESC::Buffer(m_ConstantBufferHeapSize * 1024 * 64), // size of the resource heap. Must be a multiple of 64KB for single-textures and constant buffers
-			D3D12_RESOURCE_STATE_GENERIC_READ, // will be data that is read from so we keep it in the generic read state
-			nullptr, // we do not have use an optimized clear value for constant buffers
-			IID_PPV_ARGS(&m_ConstantBufferUploadHeap[i]));
-
-		if (FAILED(hr))
-		{
-			ASSERT_ERROR("Error : CreateCommittedResource");
-			return E_FAIL;
-		}
-
-		m_ConstantBufferUploadHeap[i]->SetName(L"Constant Buffer Upload Resource Heap");
-
-		CD3DX12_RANGE readRange(0, 0);    // We do not intend to read from this resource on the CPU. (so end is less than or equal to begin)
-		hr = m_ConstantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_ConstantBufferGPUAdress[i]));
-
-		if (FAILED(hr))
-		{
-			ASSERT_ERROR("Error : Error during Map");
-			return E_FAIL;
-		}
-	}
-
-	// initialize constant buffer reserved table (internal management)
-	for (UINT i = 0; i < m_ConstantBufferHeapSize; i++)
-	{
-		m_ConstantBufferReservedAddress[i] = false;
+		// create constant buffer of 256 slots of 256 bytes
+		m_ConstantBuffer[i] = new DX12ConstantBuffer(
+			s_ConstantBufferSize[i].ElementCount, 
+			s_ConstantBufferSize[i].ElementSize
+		);
 	}
 
 	// -- Create multiple default Pipeline State and Root Signature for predifined -- //
@@ -395,10 +377,6 @@ HRESULT DX12RenderEngine::PrepareForRender()
 	// associated with it, but only one can be recording at any time. Make sure
 	// that any other command lists associated to this command allocator are in
 	// the closed state (not recording).
-	// Here you will pass an initial pipeline state object as the second parameter,
-	// but in this tutorial we are only clearing the rtv, and do not actually need
-	// anything but an initial default pipeline, which is what we get by setting
-	// the second parameter to NULL
 	hr = m_CommandList->Reset(m_CommandAllocator[m_FrameIndex], nullptr);
 	if (FAILED(hr))
 	{
@@ -474,77 +452,6 @@ HRESULT DX12RenderEngine::IncrementFence()
 	return m_CommandQueue->Signal(m_Fences[m_FrameIndex], m_FenceValue[m_FrameIndex]);
 }
 
-ADDRESS_ID DX12RenderEngine::ReserveConstantBufferVirtualAddress()
-{
-	ADDRESS_ID address = 0;
-
-	// retreive the first address available
-	while (address < m_ConstantBufferHeapSize)
-	{
-		if (m_ConstantBufferReservedAddress[address] == false)
-		{
-			m_ConstantBufferReservedAddress[address] = true;
-			break;	// exit the loop, we have found an available address
-		}
-		++address;
-	}
-
-	// we didn't found a available address
-	if (address == m_ConstantBufferHeapSize)
-		return -1;	// error address
-
-	// erase before used data and push null data to the constant buffer
-	DefaultConstantBuffer constantBuffer;
-	ZeroMemory(&constantBuffer, sizeof(constantBuffer));
-
-	for (int i = 0; i < m_FrameBufferCount; ++i)
-	{
-		// constant buffer new data
-		memcpy(m_ConstantBufferGPUAdress[i] + (address * ConstantBufferPerObjectAlignedSize), &constantBuffer, sizeof(constantBuffer));
-	}
-
-	return address;
-}
-
-void DX12RenderEngine::ReleaseConstantBufferVirtualAddress(ADDRESS_ID i_Address)
-{
-	if (i_Address < m_ConstantBufferHeapSize)
-	{
-		// release the constant buffer address
-		// we let the buffer as is, we don't need to clear or release on gpu side (it's done when the engine is killed)
-		m_ConstantBufferReservedAddress[i_Address] = false;
-	}
-}
-
-void DX12RenderEngine::UpdateConstantBuffer(ADDRESS_ID i_Address, DefaultConstantBuffer & i_ConstantBuffer)
-{
-	if (m_ConstantBufferReservedAddress[i_Address] == true)
-	{
-		// copy data to the constant buffer
-		memcpy(m_ConstantBufferGPUAdress[m_FrameIndex] + (i_Address * ConstantBufferPerObjectAlignedSize), &i_ConstantBuffer, sizeof(DefaultConstantBuffer));
-	}
-	else
-	{
-		ASSERT_ERROR("Error trying to update non reserved address");
-	}
-}
-
-UINT8 * DX12RenderEngine::GetConstantBufferGPUAddress(ADDRESS_ID i_Address) const
-{
-	return m_ConstantBufferGPUAdress[m_FrameIndex] + (i_Address * ConstantBufferPerObjectAlignedSize);
-}
-
-D3D12_GPU_VIRTUAL_ADDRESS DX12RenderEngine::GetConstantBufferUploadVirtualAddress(ADDRESS_ID i_Address) const
-{
-	if (m_ConstantBufferReservedAddress[i_Address] == false || (i_Address == UnavailableAdressId))
-	{
-		POPUP_ERROR("Error using a non reserved address for constant buffer");
-		DEBUG_BREAK;
-	}
-
-	return m_ConstantBufferUploadHeap[m_FrameIndex]->GetGPUVirtualAddress() + (i_Address * ConstantBufferPerObjectAlignedSize);
-}
-
 DX12RenderEngine::PipelineStateObject * DX12RenderEngine::GetPipelineStateObject(UINT64 i_Flag)
 {
 	return m_PipelineStateObjects[i_Flag];
@@ -608,6 +515,16 @@ HRESULT DX12RenderEngine::ResizeRenderTargets(const IntVec2 & i_NewSize)
 	m_SwapChain->ResizeBuffers(0, i_NewSize.x, i_NewSize.y, DXGI_FORMAT_UNKNOWN, 0);
 
 	return S_OK;
+}
+
+DX12ConstantBuffer * DX12RenderEngine::GetConstantBuffer(EConstantBufferId i_Id)
+{
+	if (i_Id < EConstantBufferId::eCount)
+	{
+		return m_ConstantBuffer[i_Id];
+	}
+	
+	return nullptr;	// issue
 }
 
 ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_HeapProperty, uint64_t i_Size, D3D12_RESOURCE_FLAGS i_Flags) const
@@ -751,9 +668,6 @@ void DX12RenderEngine::CleanUp()
 		SAFE_RELEASE(m_RenderTargets[i]);
 		SAFE_RELEASE(m_CommandAllocator[i]);
 		SAFE_RELEASE(m_Fences[i]);
-
-		// To do : fix release of the constant buffer
-		SAFE_RELEASE(m_ConstantBufferUploadHeap[i]);
 	};
 
 	SAFE_RELEASE(m_DepthStencilBuffer);
@@ -851,6 +765,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	D3D12_INPUT_LAYOUT_DESC desc;
 	DX12Shader * pixelShader = nullptr, *vertexShader = nullptr;
 	UINT textureCount = 0;
+	static const UINT bufferCount = 1;		// 3D transform, material specs
 
 	// sampler for textures
 	D3D12_STATIC_SAMPLER_DESC	* sampler			= nullptr;
@@ -925,19 +840,23 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 
 	// create the default root parameter and fill it out
 	// this paramater is the model view projection matrix
-	D3D12_ROOT_PARAMETER *  rootParameters = new D3D12_ROOT_PARAMETER[1 + textureCount]; // only one parameter right now
+	D3D12_ROOT_PARAMETER *  rootParameters = new D3D12_ROOT_PARAMETER[bufferCount + textureCount]; // only one parameter right now
 
 	// first parameter is always the CBV
 	rootParameters[0].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
 	rootParameters[0].Descriptor		= rootCBVDescriptor; // this is the root descriptor for this root parameter
 	rootParameters[0].ShaderVisibility	= D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
 
+	//rootParameters[1].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
+	//rootParameters[1].Descriptor		= rootCBVDescriptor; // this is the root descriptor for this root parameter
+	//rootParameters[1].ShaderVisibility	= D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
+
 	// setup the root parameters for textures
 	for (UINT i = 0; i < textureCount; ++i) 
 	{
-		rootParameters[1 + i].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		rootParameters[1 + i].DescriptorTable	= descriptorTable[i];
-		rootParameters[1 + i].ShaderVisibility	= D3D12_SHADER_VISIBILITY_PIXEL;	// for now only the pixel shader will going to use the textures
+		rootParameters[bufferCount + i].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[bufferCount + i].DescriptorTable	= descriptorTable[i];
+		rootParameters[bufferCount + i].ShaderVisibility	= D3D12_SHADER_VISIBILITY_PIXEL;	// for now only the pixel shader will going to use the textures
 	}
 
 	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT

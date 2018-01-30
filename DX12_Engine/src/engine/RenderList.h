@@ -26,6 +26,18 @@ public:
 		ID3D12GraphicsCommandList *		CommandList = nullptr;	// command list to render
 	};
 
+	// Constant buffer definition
+	struct TransformConstantBuffer
+	{
+		// 3D space computing
+		DirectX::XMFLOAT4X4		m_Model;
+		DirectX::XMFLOAT4X4		m_View;
+		DirectX::XMFLOAT4X4		m_Projection;
+		// other
+		FLOAT					m_Time;
+		DirectX::XMFLOAT3		m_CameraForward;
+	};
+
 
 	// render list
 	RenderList();

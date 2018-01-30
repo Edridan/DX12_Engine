@@ -6,6 +6,7 @@
 #include "dx12/DX12Mesh.h"
 #include "dx12/DX12MeshBuffer.h"
 #include "dx12/DX12Texture.h"
+#include "dx12/DX12RenderEngine.h"
 
 RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor)
 	:ActorComponent(i_Actor)
@@ -54,7 +55,8 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 	//}
 
 	// retreive a constant buffer address
-	m_ConstBuffer = render.ReserveConstantBufferVirtualAddress();
+	//m_ConstBuffer = render.ReserveConstantBufferVirtualAddress();
+	m_ConstBuffer = render.GetConstantBuffer(DX12RenderEngine::eTransform)->ReserveVirtualAddress();
 }
 
 RenderComponent::~RenderComponent()
@@ -65,7 +67,7 @@ RenderComponent::~RenderComponent()
 	if (m_Mesh) delete m_Mesh;
 	
 	if (m_ConstBuffer != UnavailableAdressId)
-		render.ReleaseConstantBufferVirtualAddress(m_ConstBuffer);
+		render.GetConstantBuffer(DX12RenderEngine::eTransform)->ReleaseVirtualAddress(m_ConstBuffer);
 }
 
 void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
@@ -82,7 +84,7 @@ void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandLis
 		// push const buffer
 		if (m_ConstBuffer != UnavailableAdressId)
 		{
-			i_CommandList->SetGraphicsRootConstantBufferView(0, render.GetConstantBufferUploadVirtualAddress(m_ConstBuffer));
+			i_CommandList->SetGraphicsRootConstantBufferView(0, render.GetConstantBuffer(DX12RenderEngine::eTransform)->GetUploadVirtualAddress(m_ConstBuffer));
 		}
 
 		// push needed textures

@@ -2,6 +2,7 @@
 
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12RenderEngine.h"
+#include "dx12/DX12ConstantBuffer.h"
 #include "game/RenderComponent.h"
 #include "game/Actor.h"
 
@@ -66,7 +67,7 @@ void RenderList::PushOnCommandList() const
 	// -- Opaque geomtry -- //
 
 	// precompute needed matrices and store them into a constant buffer
-	DX12RenderEngine::DefaultConstantBuffer constantBuffer;	// constant buffer copied into the GPU memory
+	TransformConstantBuffer constantBuffer;	// constant buffer copied into the GPU memory
 	XMStoreFloat4x4(&constantBuffer.m_View, XMMatrixTranspose(m_View));
 	XMStoreFloat4x4(&constantBuffer.m_Projection, XMMatrixTranspose(m_Projection));
 
@@ -98,7 +99,7 @@ void RenderList::PushOnCommandList() const
 		XMStoreFloat4x4(&constantBuffer.m_Model, XMMatrixTranspose(actor->GetWorldTransform()));
 
 		// update the constant buffer on GPU
-		render.UpdateConstantBuffer(cbvAddress, constantBuffer);
+		render.GetConstantBuffer(DX12RenderEngine::eTransform)->UpdateConstantBuffer(cbvAddress, &constantBuffer, sizeof(TransformConstantBuffer));
 		component->PushOnCommandList(m_CommandList);
 	}
 }
