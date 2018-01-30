@@ -13,8 +13,9 @@
 
 // class predef
 class DX12MeshBuffer;
-class DX12Material;
 class DX12Texture;
+class DX12Material;
+
 
 class DX12Mesh
 {
