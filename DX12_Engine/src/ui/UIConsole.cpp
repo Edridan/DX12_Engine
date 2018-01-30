@@ -49,13 +49,17 @@ void UIConsole::DrawWindow()
 {
 	ImGui::BeginGroup();
 	// text
-	ImGui::BeginChild("", ImVec2(0.f, 250.f), true, 0);
+	ImGui::PushItemWidth(ImGui::GetWindowWidth());
+	ImGui::BeginChild("", ImVec2(0.f, ImGui::GetWindowSize().y - 60.f), true, 0);
 	ImGui::Text(m_History.c_str());
 	ImGui::EndChild();
+	ImGui::PopItemWidth();
 
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.8f);
 	ImGui::InputText("", m_CommandBuffer, m_BufferSize, 0);
+	ImGui::PopItemWidth();
 	ImGui::SameLine();
-	if (ImGui::Button("Exec", ImVec2(64.f, 20.f)))
+	if (ImGui::Button("Exec", ImVec2(64.f, 18.f)))
 	{
 		PushCommandOnConsole();
 	}

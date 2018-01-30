@@ -14,6 +14,7 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 	,m_ConstBuffer(UnavailableAdressId)
 	,m_PipelineState(nullptr)
 	,m_RootSignature(nullptr)
+	,m_Material(nullptr)
 	,m_RenderPass(RenderPass::eOpaqueGeometry)
 {
 	// retreive the engine and load the mesh if needed
@@ -34,6 +35,23 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 		DEBUG_BREAK;
 	}
 
+	// material management
+	//if (i_Desc.Material == nullptr)
+	//{
+	//	// retreive the material default from mesh
+	//}
+	//else
+	//{
+	//	if (!m_Mesh->IsCompatible(*i_Desc.Material)) 
+	//	{
+	//		m_Material = new DX12Material(*i_Desc.Material);
+	//	}
+	//	else
+	//	{
+	//		PRINT_DEBUG("Error, the material is not compatible with the mesh");
+	//		return;
+	//	}
+	//}
 
 	// retreive a constant buffer address
 	m_ConstBuffer = render.ReserveConstantBufferVirtualAddress();
@@ -52,7 +70,7 @@ RenderComponent::~RenderComponent()
 
 void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
 {
-	if (m_Mesh != nullptr && m_Actor != nullptr)
+	if (m_Mesh != nullptr && m_Actor != nullptr /*&& m_Material != nullptr*/)
 	{
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 

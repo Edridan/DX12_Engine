@@ -192,7 +192,11 @@ DX12Font::DX12Font(const wchar_t * i_fontDefFileinition)
 		// get amount
 		filestream >> temp;	// amount=##
 		startPos = temp.find(L"=") + 1;
+
+#pragma warning(disable:4244)
 		int t = (float)std::stoi(temp.substr(startPos, temp.size() - startPos));
+#pragma  warning(default:4244)
+
 		ke.Amount = (float)t;
 	}
 

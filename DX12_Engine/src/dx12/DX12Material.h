@@ -17,7 +17,7 @@ public:
 	{
 		Color Ka, Kd, Ks, Ke;
 		float Ns;
-		DX12Texture *	map_Kd, * map_Ks, * map_Ke;
+		DX12Texture *	map_Kd, * map_Ks, * map_Ka;
 
 		// default constructor
 		DX12MaterialDesc()
@@ -28,19 +28,33 @@ public:
 			,Ns(0.f)
 			,map_Kd(nullptr)
 			,map_Ks(nullptr)
-			,map_Ke(nullptr)
+			,map_Ka(nullptr)
 		{}
 	};
 
+	// textures type managed by materials
+	enum ETextureType
+	{
+		eAmbient,
+		eSpecular,
+		eDiffuse,
+
+		eCount,
+	};
 
 	DX12Material(const DX12MaterialDesc & i_Desc);
 	~DX12Material();
 
 	// material management
+	void		SetTexture(DX12Texture * i_Texture, ETextureType i_Type);
+	bool		HaveTexture(ETextureType i_Type) const;
+	void		SetAmbientColor(const Color & i_Color);
+	void		SetDiffuseColor(const Color & i_Color);
+	void		SetEmissiveColor(const Color & i_Color);
+	void		SetSpecularColor(const Color & i_Color);
 
-
-
-
+	// rendering
+	void		PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList);
 
 private:
 	// color of material
@@ -50,10 +64,11 @@ private:
 	Color	m_ColorEmissive;
 
 	// textures of the material (if null means not found or not used)
-	DX12Texture *	m_TextureDiffuse;
-	DX12Texture *	m_TextureSpecular;
-	DX12Texture *	m_TextureAmbient;
+	DX12Texture *	m_Textures[eCount];
 
 	// other
 	float	m_SpecularExponent;
+
+	// management
+	bool	m_HaveChanged;
 };

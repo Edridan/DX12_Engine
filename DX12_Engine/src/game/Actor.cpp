@@ -158,6 +158,10 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 
 			m_RenderComponent = new RenderComponent(componentDesc, this);
 		}
+		else
+		{
+			PRINT_DEBUG("Error, unable to get mesh %s", i_Desc.Mesh.c_str());
+		}
 	}
 }
 

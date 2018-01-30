@@ -24,9 +24,11 @@ enum PopUpIcon
 
 #ifdef _DEBUG
 void OutputDebug(const char * i_Text, ...);
+void OutputDebugVS(const char * i_Text, ...);	// VS output only
 void PopUpWindow(PopUpIcon i_Icon, const char * i_Notif, const char * i_Text, ...);
 
 #define PRINT_DEBUG(i_Text, ...)	OutputDebug(i_Text, __VA_ARGS__)
+#define PRINT_DEBUG_VS(i_Text, ...)	OutputDebugVS(i_Text, __VA_ARGS__)
 
 // Assert 
 #define ASSERT(i_Condition)													\

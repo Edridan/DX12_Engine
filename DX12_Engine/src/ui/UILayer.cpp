@@ -129,6 +129,8 @@ unsigned int UILayer::PushUIWindowOnLayer(UIWindow * i_Window)
 	}
 
 	m_Windows.push_back(i_Window);
+
+	return i_Window->GetId();
 }
 
 void UILayer::PopUIWindowFromLayer(UIWindow * i_Window)

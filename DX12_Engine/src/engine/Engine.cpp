@@ -116,8 +116,12 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 
 #ifdef _DEBUG
-	PRINT_DEBUG("DX12 engine initilization, version 0.1");
+	PRINT_DEBUG("DX12 engine [version 0.1]");
+	PRINT_DEBUG("Initilization... OK");
 #endif
+
+	// load error resources
+	ASSERT(m_ResourcesManager->LoadErrorTexture(L"resources/tex/engine/error.bmp"));
 
 	m_Exit = false;
 }

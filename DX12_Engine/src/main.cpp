@@ -7,6 +7,9 @@
 // WinMain
 #include <Windows.h>
 
+// debug : to delete
+#include "engine/ResourcesManager.h"
+
 int WINAPI WinMain(
 	HINSTANCE hInstance,    //Main windows function
 	HINSTANCE hPrevInstance,
@@ -18,7 +21,7 @@ int WINAPI WinMain(
 	// define the engine setup
 	desc.HInstance				= hInstance;
 	desc.FramePerSecondTargeted = 60;
-	desc.CameraPosition = XMFLOAT4(-5.f, 0.f, 0.f, 0.f);
+	desc.CameraPosition = XMFLOAT4(0.f, 0.f, -5.f, 0.f);
 
 	// create the engine singleton
 	Engine::Create();
@@ -33,10 +36,13 @@ int WINAPI WinMain(
 	// create objects...
 	Actor::ActorDesc cubeActor;
 	cubeActor.Name = L"Box";
-	cubeActor.Mesh = L"resources/obj/cube.obj";
+	//cubeActor.Mesh = L"resources/obj/cube.obj";
+	cubeActor.Mesh = L"Plane";
 	cubeActor.ActorTransform = Transform(XMFLOAT3(0.f, 0.f, 0.f));
 
-	world->SpawnActor(cubeActor);
+	Actor * actor = world->SpawnActor(cubeActor);
+	DX12Texture * tex = engine.GetResourcesManager()->GetTexture(L"resources/tex/brick_messy.jpg");
+	actor->GetRenderComponent()->SetTexture(tex);
 
 	engine.Run();
 }

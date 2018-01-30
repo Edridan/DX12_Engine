@@ -120,6 +120,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\ui\UIConsole.cpp" />
     <ClCompile Include="src\ui\UILayer.cpp" />
+    <ClCompile Include="src\ui\UITexture.cpp" />
     <ClCompile Include="src\ui\UIWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +162,7 @@
     <ClInclude Include="src\ui\UI.h" />
     <ClInclude Include="src\ui\UIConsole.h" />
     <ClInclude Include="src\ui\UILayer.h" />
+    <ClInclude Include="src\ui\UITexture.h" />
     <ClInclude Include="src\ui\UIWindow.h" />
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +184,7 @@
     <None Include="resources\fonts\Arial.fnt" />
     <None Include="resources\shaders\Buffer.hlsli" />
     <None Include="resources\shaders\EffectLib.hlsli" />
+    <None Include="resources\shaders\Material.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX12_Engine.rc" />

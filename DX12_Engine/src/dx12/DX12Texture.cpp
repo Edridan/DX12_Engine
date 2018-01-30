@@ -20,7 +20,7 @@ DX12Texture::DX12Texture(const wchar_t * i_Filename)
 	// load image from file
 	if (imageSize <= 0)
 	{
-		POPUP_ERROR("Unable to load %S\n", m_Name.c_str());
+		PRINT_DEBUG_VS("Unable to load %S", m_Name.c_str());
 		DEBUG_BREAK;
 		return;
 	}

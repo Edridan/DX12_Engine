@@ -91,6 +91,9 @@
     <Filter Include="Header Files\UI\Editor">
       <UniqueIdentifier>{fa9a2385-acf1-4254-9ba7-95d396c01dbf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders\Forward">
+      <UniqueIdentifier>{42fa381b-47f6-452e-8fba-12c6346d2593}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
@@ -191,6 +194,9 @@
     </ClCompile>
     <ClCompile Include="src\engine\Console.cpp">
       <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UITexture.cpp">
+      <Filter>Source Files\UI\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -311,6 +317,9 @@
     <ClInclude Include="src\ui\UIConsole.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="src\ui\UITexture.h">
+      <Filter>Header Files\UI\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\tex\box.bmp">
@@ -341,6 +350,9 @@
     <None Include="resources\shaders\EffectLib.hlsli">
       <Filter>Resource Files\Shaders\Lib</Filter>
     </None>
+    <None Include="resources\shaders\Material.hlsli">
+      <Filter>Resource Files\Shaders\Lib</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX12_Engine.rc">
@@ -354,26 +366,26 @@
     <FxCompile Include="resources\shaders\TextPixel.hlsl">
       <Filter>Resource Files\Shaders\Text</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultPixel.hlsl">
-      <Filter>Resource Files\Shaders\Default</Filter>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\NormalColorVertex.hlsl">
-      <Filter>Resource Files\Shaders\Default</Filter>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\NormalTexPixel.hlsl">
-      <Filter>Resource Files\Shaders\Default</Filter>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\NormalTexVertex.hlsl">
-      <Filter>Resource Files\Shaders\Default</Filter>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\NormalVertex.hlsl">
-      <Filter>Resource Files\Shaders\Default</Filter>
-    </FxCompile>
     <FxCompile Include="resources\shaders\ImGuiVertex.hlsl">
       <Filter>Resource Files\Shaders\ImGui</Filter>
     </FxCompile>
     <FxCompile Include="resources\shaders\ImGuiPixel.hlsl">
       <Filter>Resource Files\Shaders\ImGui</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultPixel.hlsl">
+      <Filter>Resource Files\Shaders\Forward</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\NormalColorVertex.hlsl">
+      <Filter>Resource Files\Shaders\Forward</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\NormalTexPixel.hlsl">
+      <Filter>Resource Files\Shaders\Forward</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\NormalTexVertex.hlsl">
+      <Filter>Resource Files\Shaders\Forward</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\NormalVertex.hlsl">
+      <Filter>Resource Files\Shaders\Forward</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

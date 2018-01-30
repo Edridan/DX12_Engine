@@ -1,7 +1,7 @@
 // default constant buffer in include file
 
 // b0 buffer
-cbuffer ConstantBuffer : register(b0)
+cbuffer TransformBuffer : register(b0)
 {
 	// basics matrix for compute space position
 	matrix	model;

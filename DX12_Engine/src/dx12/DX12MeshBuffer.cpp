@@ -143,6 +143,16 @@ const std::wstring & DX12MeshBuffer::GetName() const
 	return m_Name;
 }
 
+bool DX12MeshBuffer::IsCompatible(const DX12Material::DX12MaterialDesc & i_Desc) const
+{
+	return false;
+}
+
+bool DX12MeshBuffer::IsCompatible(const DX12Material & i_Desc) const
+{
+	return false;
+}
+
 inline HRESULT DX12MeshBuffer::CreateBuffer(ID3D12Resource ** i_Buffer, UINT i_BufferSize, const wchar_t * i_Name)
 {
 	HRESULT hr;

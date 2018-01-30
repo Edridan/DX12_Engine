@@ -62,7 +62,7 @@ Actor * World::SpawnActor(const Actor::ActorDesc & i_Desc, Actor * i_Parent)
 	// debug print
 	{
 		XMFLOAT3 pos = newActor->m_Transform.GetPosition();
-		PRINT_DEBUG("Spawn actor \"%S\"[%i] at location (%.3f, %.3f, %.3f)", 
+		PRINT_DEBUG("Spawn actor \"%S\"[id:%i] at location (%.3f, %.3f, %.3f)", 
 			newActor->GetName().c_str(), newActor->GetId(), 
 			pos.x, pos.y, pos.z);
 	}

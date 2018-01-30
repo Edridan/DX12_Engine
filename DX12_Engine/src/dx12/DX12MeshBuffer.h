@@ -4,6 +4,7 @@
 
 #include <d3d12.h>
 #include <string>
+#include "dx12/DX12Material.h"
 
 class DX12MeshBuffer
 {
@@ -19,6 +20,10 @@ public:
 	HRESULT					PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
 	UINT64					GetElementFlags() const;	// retreive flags to render the mesh buffer
 	const std::wstring &	GetName() const;
+
+	// material/mesh compatibility
+	bool					IsCompatible(const DX12Material::DX12MaterialDesc & i_Desc) const;
+	bool					IsCompatible(const DX12Material & i_Desc) const;
 
 	// friend class
 	friend class DX12Mesh;

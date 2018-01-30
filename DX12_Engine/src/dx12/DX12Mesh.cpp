@@ -5,7 +5,10 @@
 #include "dx12/DX12Material.h"
 
 #include "d3dx12.h"
+
 #include "engine/Clock.h"
+#include "engine/Engine.h"
+#include "engine/ResourcesManager.h"
 
 #include <sstream>
 #include <algorithm>
@@ -43,7 +46,7 @@ FLOAT vTriangle[] = {
 // Plane data
 FLOAT vPlane[] = {
 	-0.5f,  0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	0.0f, 1.0f,
-	0.5f, -0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	1.0f, 1.0f,
+	0.5f, -0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	1.0f, 0.0f,
 	-0.5f, -0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	0.0f, 0.0f,
 	 0.5f,  0.5f, 0.0f,		0.0f, 0.0f, -1.0f,	1.0f, 1.0f
 };
@@ -120,6 +123,8 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 
 DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder, const char * i_TextureFolder)
 {
+	ResourcesManager * resourcesManager = Engine::GetInstance().GetResourcesManager();
+
 	tinyobj::attrib_t					attrib;
 	std::vector<tinyobj::shape_t>		shapes;
 	std::vector<tinyobj::material_t>	material;
@@ -358,30 +363,7 @@ DX12Mesh::DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffe
 
 DX12Mesh::~DX12Mesh()
 {
-	// cleanup resources
-	// clean textures
-	std::map<std::string, DX12Texture*>::iterator tex_itr = m_Textures.begin();
-	while (tex_itr != m_Textures.end())
-	{
-		delete (*tex_itr).second;
-		++tex_itr;
-	}
-
-	// clean materials
-	std::vector<DX12Material *>::iterator mat_itr = m_Materials.begin();
-	while (mat_itr != m_Materials.end())
-	{
-		delete (*mat_itr);
-		++mat_itr;
-	}
-
-	// clean meshes
-	std::vector<MeshBuffer*>::iterator sub_itr = m_SubMeshBuffer.begin();
-	while (sub_itr != m_SubMeshBuffer.end())
-	{
-		delete ((*sub_itr)->Mesh);
-		++sub_itr;
-	}
+	// To do : cleanup resources
 
 	if (m_RootMeshBuffer != nullptr)
 	{

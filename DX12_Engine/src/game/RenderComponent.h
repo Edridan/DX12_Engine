@@ -8,6 +8,7 @@
 #include "ActorComponent.h"
 #include "dx12/d3dx12.h"
 #include "dx12/DX12Utils.h"
+#include "dx12/DX12Material.h"
 #include <vector>
 #include <string>
 
@@ -32,16 +33,13 @@ public:
 		eDepthEnabled		= 1 << 0,
 	};
 
-	enum TextureDef
-	{
-		eAlbedo,
-	};
-
 	// struct definition
 	struct RenderComponentDesc
 	{
 		// mesh
-		const DX12MeshBuffer *		Mesh			= nullptr;				// mesh filepath
+		const DX12MeshBuffer *	Mesh = nullptr;			// mesh pointer
+		const DX12Material::DX12MaterialDesc * Material = nullptr;	// if null, we take the default mesh material desc each render component have is own material instance
+		// To do : delete this (this is contained in the material now)
 		std::vector<DX12Texture *>	Textures;
 	};
 
@@ -61,11 +59,14 @@ public:
 	//void			SetTexture(const DX12Texture * i_Texture, TextureDef i_Def);	// To do : implement
 
 private:
-	// dx12 rendering
+	// rendering
 	const DX12MeshBuffer *		m_Mesh;
+	const DX12Material *		m_Material;
+
+	// dx12
 	ID3D12PipelineState *		m_PipelineState;
 	ID3D12RootSignature *		m_RootSignature;
-	ADDRESS_ID					m_ConstBuffer;	// const buffer
+	ADDRESS_ID					m_ConstBuffer;	// const buffer for 3D matrices
 	std::vector<DX12Texture *>	m_Textures;
 
 	// informations

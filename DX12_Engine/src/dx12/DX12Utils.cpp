@@ -211,4 +211,7 @@ int GetDXGIFormatBitsPerPixel(const DXGI_FORMAT & i_DxGIFormat)
 	else if (i_DxGIFormat == DXGI_FORMAT_R16_UNORM) return 16;
 	else if (i_DxGIFormat == DXGI_FORMAT_R8_UNORM) return 8;
 	else if (i_DxGIFormat == DXGI_FORMAT_A8_UNORM) return 8;
+
+	// default return
+	return 0;
 }

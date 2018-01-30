@@ -9,17 +9,20 @@
 #include <cstdarg>
 #include <stdio.h>
 
+// size of the buffer for print debug
+#define BUFFER_SIZE			2048
+
 // debug functions
 #ifdef _DEBUG
 
 void OutputDebug(const char * i_Text, ...)
 {
-	static char buffer[2048];
+	static char buffer[BUFFER_SIZE];
 	const char * p = buffer;
 
 	va_list args;
 	va_start(args, i_Text);
-	vsnprintf(buffer, 2048, i_Text, args);
+	vsnprintf(buffer, BUFFER_SIZE, i_Text, args);
 	va_end(args);
 
 #if PRINT_DEBUG_ON_CONSOLE
@@ -30,9 +33,22 @@ void OutputDebug(const char * i_Text, ...)
 	OutputDebugStringA(buffer);
 }
 
+void OutputDebugVS(const char * i_Text, ...)
+{
+	static char buffer[BUFFER_SIZE];
+	const char * p = buffer;
+
+	va_list args;
+	va_start(args, i_Text);
+	vsnprintf(buffer, BUFFER_SIZE, i_Text, args);
+	va_end(args);
+
+	OutputDebugStringA(buffer);
+}
+
 void PopUpWindow(PopUpIcon i_Icon, const char * i_Notif, const char * i_Text, ...)
 {
-	static char buffer[2048];
+	static char buffer[BUFFER_SIZE];
 	const char * p = buffer;
 
 	va_list args;
