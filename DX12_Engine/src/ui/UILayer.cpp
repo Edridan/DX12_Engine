@@ -104,6 +104,18 @@ bool UILayer::IsEnable() const
 	return m_Enabled;
 }
 
+bool UILayer::IsOneWindowFocused() const
+{
+	for (size_t i = 0; i < m_Windows.size(); ++i)
+	{
+		if (m_Windows[i]->IsFocused())
+			return true;
+	}
+
+	// no window is focused
+	return false;
+}
+
 unsigned int UILayer::PushUIWindowOnLayer(UIWindow * i_Window)
 {
 	for (size_t i = 0; i < m_Windows.size(); ++i)

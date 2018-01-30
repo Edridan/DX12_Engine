@@ -38,6 +38,7 @@ public:
 
 	// information
 	bool		IsEnable() const;
+	bool		IsOneWindowFocused() const;
 
 	// window management
 	unsigned int	PushUIWindowOnLayer(UIWindow * i_Window);

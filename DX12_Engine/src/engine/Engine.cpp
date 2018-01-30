@@ -142,19 +142,11 @@ void Engine::Run()
 			m_FramePerSecond = (UINT)(1.f / elapsed);
 		}
 
-#ifdef _DEBUG
+#ifdef WITH_EDITOR
 		// camera management depending if the windows are selected or not
 		Camera * const freeCam = m_CurrentWorld->GetCurrentCamera();
-		if (m_UIConsole->IsFocused() 
-			&& freeCam->FreecamIsEnabled())
-		{
-			m_CurrentWorld->GetCurrentCamera()->SetFreecamEnabled(false);
-		}
-		else if (!m_UIConsole->IsFocused() 
-			&& !freeCam->FreecamIsEnabled())
-		{
-			m_CurrentWorld->GetCurrentCamera()->SetFreecamEnabled(true);
-		}
+		// To do : disable input for the engine when a window is selected
+		freeCam->SetFreecamEnabled(!m_UILayer->IsOneWindowFocused());
 #endif
 		/* -- Update -- */
 

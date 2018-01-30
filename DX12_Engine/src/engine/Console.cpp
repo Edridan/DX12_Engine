@@ -180,7 +180,7 @@ int Console::CommandLine::ToInt(const Value & i_Val) const
 float Console::CommandLine::ToFloat(const Value & i_Val) const
 {
 	if (i_Val.m_Type == eFloat)
-		return atof(i_Val.m_Value.c_str());
+		return (float)atof(i_Val.m_Value.c_str());
 	else if (i_Val.m_Type == eInt)
 		return (float)atoi(i_Val.m_Value.c_str());
 

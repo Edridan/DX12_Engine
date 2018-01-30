@@ -113,7 +113,7 @@ private:
 	Console *			m_Console;
 
 	// ui
-	UILayer *			m_UILayer;	// manager
+	UILayer *			m_UILayer;	// To do : add other layer for editor and other
 	// ui windows for debug, editor and other
 	UIConsole *			m_UIConsole;
 
