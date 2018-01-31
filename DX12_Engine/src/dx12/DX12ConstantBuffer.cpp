@@ -3,7 +3,7 @@
 
 
 DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize)
-	:m_ElementSize(i_ElementSize)
+	:m_ElementSize((i_ElementSize + 255) & ~255)	// align element size on 256 bytes
 	,m_BufferSize(i_BufferSize)
 {
 	// retreive device
@@ -126,6 +126,23 @@ void DX12ConstantBuffer::UpdateConstantBuffer(ADDRESS_ID i_Address, void * i_Dat
 	{
 		// copy data to the constant buffer
 		memcpy(m_ConstantBufferGPUAdress[frameIndex] + (i_Address * m_ElementSize), i_Data, i_Size);
+	}
+	else
+	{
+		PRINT_DEBUG("Error, trying to update non reserved constant buffer address");
+		DEBUG_BREAK;
+	}
+}
+
+void DX12ConstantBuffer::UpdateConstantBufferForEachFrame(ADDRESS_ID i_Address, void * i_Data, UINT i_Size)
+{
+	if (m_ConstantBufferReservedAddress[i_Address] == true)
+	{
+		for (UINT i = 0; i < m_FrameCount; ++i)
+		{
+			// copy data to the constant buffer
+			memcpy(m_ConstantBufferGPUAdress[i] + (i_Address * m_ElementSize), i_Data, i_Size);
+		}
 	}
 	else
 	{

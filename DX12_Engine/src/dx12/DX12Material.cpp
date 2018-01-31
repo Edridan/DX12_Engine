@@ -21,7 +21,7 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	m_Textures[eSpecular]	= i_Desc.map_Ks;
 
 	// reserve address for constant buffer
-	m_ConstantBuffer = render.GetConstantBuffer(DX12RenderEngine::eMaterial)->ReserveVirtualAddress(false);
+	m_ConstantBuffer = render.GetConstantBuffer(DX12RenderEngine::eMaterial)->ReserveVirtualAddress();
 	UpdateConstantBufferView();	// update to constant buffer
 }
 
@@ -138,7 +138,7 @@ void DX12Material::UpdateConstantBufferView()
 		mat.Ns = m_SpecularExponent;
 
 		// update the buffer
-		render.GetConstantBuffer(DX12RenderEngine::eMaterial)->UpdateConstantBuffer(m_ConstantBuffer, &mat, sizeof(MaterialStruct));
+		render.GetConstantBuffer(DX12RenderEngine::eMaterial)->UpdateConstantBufferForEachFrame(m_ConstantBuffer, &mat, sizeof(MaterialStruct));
 
 		m_HaveChanged = false;
 	}

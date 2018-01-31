@@ -23,6 +23,7 @@ public:
 
 	// update buffer
 	void						UpdateConstantBuffer(ADDRESS_ID i_Address, void * i_Data, UINT i_Size);
+	void						UpdateConstantBufferForEachFrame(ADDRESS_ID i_Address, void * i_Data, UINT i_Size);
 
 private:
 	// dx12

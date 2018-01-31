@@ -312,6 +312,8 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 
 			// load textures
 			desc.map_Ka = LoadTexture(mat.ambient_texname, textureFolder, resourcesManager);
+			desc.map_Kd = LoadTexture(mat.diffuse_texname, textureFolder, resourcesManager);
+			desc.map_Ks = LoadTexture(mat.specular_texname, textureFolder, resourcesManager);
 			// to do : load other textures
 
 			// retreive other data

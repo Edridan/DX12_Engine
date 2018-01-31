@@ -1,8 +1,11 @@
 // include render light lib
 #include "Material.hlsli"
 
-Texture2D tex			: register(t0);
-SamplerState tex_sample	: register(s0);
+// texture sampler for material
+Texture2D tex_ambient		: register(t0);
+//Texture2D tex_specular		: register(t1);
+//Texture2D tex_diffuse		: register(t2);
+SamplerState tex_sample		: register(s0);
 
 struct VS_OUTPUT
 {
@@ -17,11 +20,11 @@ float4 main(VS_OUTPUT input) : SV_TARGET
 
 	if (map_a)
 	{
-		color = float3(0.f, 1.f, 0.f);
+		color = kd;
 	}
 	else
 	{
-		color = float3(0.f, 0.f, 1.f);
+		color = kd;
 	}
 	// compute color of a pixel
 	//tex.Sample(tex_sample, input.uv).xyz;
