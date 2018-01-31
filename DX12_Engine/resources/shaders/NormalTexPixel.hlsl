@@ -1,6 +1,5 @@
 // include render light lib
-#include "EffectLib.hlsli"
-#include "Buffer.hlsli"
+#include "Material.hlsli"
 
 Texture2D tex			: register(t0);
 SamplerState tex_sample	: register(s0);
@@ -14,11 +13,18 @@ struct VS_OUTPUT
 
 float4 main(VS_OUTPUT input) : SV_TARGET
 {
-	matrix MyMat = model;
+	float3 color;
 
+	if (map_a)
+	{
+		color = float3(0.f, 1.f, 0.f);
+	}
+	else
+	{
+		color = float3(0.f, 0.f, 1.f);
+	}
 	// compute color of a pixel
-	float3 color = tex.Sample(tex_sample, input.uv).xyz;
-	float3 lightDir = LightDir.xyz;
-
-	return ComputeDirectionalLight(lightDir, color, input.normal);
+	//tex.Sample(tex_sample, input.uv).xyz;
+	
+	return float4(color, 1.f);
 }

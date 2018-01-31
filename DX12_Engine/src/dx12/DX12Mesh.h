@@ -10,11 +10,11 @@
 
 #include "dx12/DX12Shader.h"
 #include "dx12/DX12ConstantBuffer.h"
+#include "dx12/DX12Material.h"
 
 // class predef
 class DX12MeshBuffer;
 class DX12Texture;
-class DX12Material;
 
 
 class DX12Mesh
@@ -30,14 +30,13 @@ public:
 		eCube,
 	};
 
-	// To do : impl textures and different PSO management
 	// element input defines the element desc in flags
 	enum EElementFlags
 	{
-		eNone = 0,
-		eHaveNormal = 1 << 0,
-		eHaveTexcoord = 1 << 1,
-		eHaveColor = 1 << 2,
+		eNone			= 0,
+		eHaveNormal		= 1 << 0,
+		eHaveTexcoord	= 1 << 1,
+		eHaveColor		= 1 << 2,
 	};
 
 	// Factory
@@ -53,13 +52,10 @@ public:
 	bool	HaveSubMeshes() const;
 	UINT	SubMeshesCount() const;
 
-	// get the textures for the meshes (future : will be stocked directly into the materials)
-	int		GetTextures(std::vector<DX12Texture*>& o_Textures, size_t i_SubMeshId);	// specific for the submeshes
-	int		GetTextures(std::vector<DX12Texture*>& o_Textures);	// root mesh
 	// get material for the meshes
 	// to do : implement
-	int		GetMaterial(std::vector<DX12Material*>& o_Mat, size_t i_SubMeshId);	// specific for the submeshes
-	int		GetMaterial(std::vector<DX12Material*>& o_Mat);	// root mesh
+	DX12Material::DX12MaterialDesc		GetMaterial(size_t i_SubMeshId);	// specific for the submeshes (one material per mesh
+	DX12Material::DX12MaterialDesc		GetMaterial();	// root mesh
 
 	const DX12MeshBuffer *		GetRootMesh() const;
 	const DX12MeshBuffer*		GetSubMeshes(size_t i_Index) const;
@@ -74,23 +70,10 @@ public:
 	static void		CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_InputLayout, UINT64 i_Flags);
 
 private:
-	struct MeshBuffer
-	{
-		std::vector<DX12Texture*>	Textures;
-		std::vector<DX12Material*>	Materials;
-		DX12MeshBuffer *			Mesh;
-	};
-
 	// private constructor created by LoadMesh static function
 	DX12Mesh();
 
 	// mesh buffer (GPU)
-	MeshBuffer	*					m_RootMeshBuffer;
-	std::vector<MeshBuffer*>		m_SubMeshBuffer;	// if there is multiple shapes per mesh, there are here (sometime there is only submeshes so the root mesh is null)
-
-	// material
-	std::vector<DX12Material*>		m_Materials;
-
-	// textures
-	std::map<std::string, DX12Texture *>	m_Textures;
+	DX12MeshBuffer	*				m_RootMeshBuffer;
+	std::vector<DX12MeshBuffer*>	m_SubMeshBuffer;	// if there is multiple shapes per mesh, there are here (sometime there is only submeshes so the root mesh is null)
 };

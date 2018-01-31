@@ -16,16 +16,19 @@ public:
 	// struct
 	struct DX12MaterialDesc
 	{
+		std::string Name;
 		Color Ka, Kd, Ks, Ke;
 		float Ns;
 		DX12Texture *	map_Kd, * map_Ks, * map_Ka;
 
 		// default constructor
 		DX12MaterialDesc()
-			:Ka(color::Black)
-			,Kd(color::Black)
-			,Ks(color::Black)
-			,Ke(color::Black)
+			:Name("Default")
+			// set default color to pink (error color)
+			,Ka(color::Blue)
+			,Kd(color::Blue)
+			,Ks(color::Blue)
+			,Ke(color::Blue)
 			,Ns(0.f)
 			,map_Kd(nullptr)
 			,map_Ks(nullptr)
@@ -53,9 +56,12 @@ public:
 	void		SetDiffuseColor(const Color & i_Color);
 	void		SetEmissiveColor(const Color & i_Color);
 	void		SetSpecularColor(const Color & i_Color);
+	void		Set(const DX12MaterialDesc & i_Desc);
 
-	// rendering
-	void		PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList);
+	// dx12
+	bool		NeedUpdate() const;
+	void		UpdateConstantBufferView();
+	void		PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
 
 private:
 	// color of material
@@ -63,6 +69,9 @@ private:
 	Color	m_ColorDiffuse;
 	Color	m_ColorSpecular;
 	Color	m_ColorEmissive;
+
+	// name
+	std::string	m_Name;
 
 	// textures of the material (if null means not found or not used)
 	DX12Texture *	m_Textures[eCount];

@@ -88,6 +88,17 @@ Actor * World::SpawnActor(const Actor::ActorDesc & i_Desc, Actor * i_Parent)
 	return newActor;
 }
 
+Actor * World::SpawnActor(const Actor::ActorDesc & i_Desc, const Transform & i_Transform, Actor * i_Parent)
+{
+	Actor * newActor = SpawnActor(i_Desc, i_Parent);
+	if (newActor != nullptr)
+	{
+		// setup the transform of the actor
+		newActor->m_Transform = i_Transform;
+	}
+	return newActor;
+}
+
 bool World::DeleteActor(Actor * i_ActorToRemove, bool i_RemoveChildren)
 {
 	auto itr = std::find(m_Actors.begin(), m_Actors.end(), i_ActorToRemove);

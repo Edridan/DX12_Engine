@@ -99,7 +99,6 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 {
 	// initialize the object from the desc
 	m_NeedTick		= i_Desc.NeedTick;
-	m_Transform		= i_Desc.ActorTransform;
 	m_Name			= i_Desc.Name;
 
 	if (i_Desc.Id == (UINT64)-1)
@@ -130,7 +129,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 			if (i_Desc.SubMeshId == (UINT)-1)
 			{
 				componentDesc.Mesh = mesh->GetRootMesh();
-				mesh->GetTextures(componentDesc.Textures);
+				//mesh->GetTextures(componentDesc.Textures);
 
 				// if the current mesh have some submesh
 				if (mesh->HaveSubMeshes())
@@ -138,7 +137,6 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 					// load them into other game objects
 					ActorDesc childDesc;
 
-					childDesc.ActorTransform = m_Transform;
 					childDesc.Mesh = i_Desc.Mesh;
 					childDesc.Name = m_Name.append(L"_SubObject");
 					
@@ -153,7 +151,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 			else
 			{
 				componentDesc.Mesh = mesh->GetSubMeshes(i_Desc.SubMeshId);
-				mesh->GetTextures(componentDesc.Textures, i_Desc.SubMeshId);
+				//mesh->GetTextures(componentDesc.Textures, i_Desc.SubMeshId);
 			}
 
 			m_RenderComponent = new RenderComponent(componentDesc, this);

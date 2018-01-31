@@ -32,17 +32,6 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	CreateBuffer(&m_VertexBuffer, vBufferSize, i_Name.c_str());
 	UpdateData(commandList, m_VertexBuffer, vBufferSize, (i_VerticesBuffer));
 
-	/*if (FAILED(commandList->Close()))
-	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error during Close the command list (Mesh Initialization)");
-	}
-
-	ID3D12CommandList* ppCommandLists[] = { commandList };
-	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
-
-	if (FAILED(DX12RenderEngine::GetInstance().IncrementFence()))
-		DX12RenderEngine::GetInstance().PopUpError(L"Error during fence incrementation (Mesh Initialization)");*/
-
 	// create a vertex buffer view for the triangle. We get the GPU memory address to the pointer using the GetGPUVirtualAddress() method
 	m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
 	m_VertexBufferView.StrideInBytes = stride;
@@ -74,18 +63,6 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 
 	CreateBuffer(&m_IndexBuffer, iBufferSize, i_Name.c_str());
 	UpdateData(commandList, m_IndexBuffer, iBufferSize, reinterpret_cast<BYTE*>(i_IndexBuffer));
-
-	/*if (FAILED(commandList->Close()))
-	{
-		DX12RenderEngine::GetInstance().PopUpError(L"Error during Close the command list (Mesh Initialization)");
-	}
-
-	// change data type : D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER
-	ID3D12CommandList* ppCommandLists[] = { commandList };
-	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
-
-	if (FAILED(DX12RenderEngine::GetInstance().IncrementFence()))
-		DX12RenderEngine::GetInstance().PopUpError(L"Error during fence incrementation (Mesh Initialization)");*/
 
 	// create a vertex buffer view for the triangle. We get the GPU memory address to the pointer using the GetGPUVirtualAddress() method
 	m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
@@ -141,6 +118,17 @@ UINT64 DX12MeshBuffer::GetElementFlags() const
 const std::wstring & DX12MeshBuffer::GetName() const
 {
 	return m_Name;
+}
+
+DX12Material::DX12MaterialDesc DX12MeshBuffer::GetDefaultMaterialDesc() const
+{
+	return m_DefaultMaterial;
+}
+
+void DX12MeshBuffer::SetDefaultMaterial(const DX12Material::DX12MaterialDesc & i_Desc)
+{
+	// update default material
+	m_DefaultMaterial = i_Desc;
 }
 
 bool DX12MeshBuffer::IsCompatible(const DX12Material::DX12MaterialDesc & i_Desc) const

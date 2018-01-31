@@ -11,7 +11,6 @@
 RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor)
 	:ActorComponent(i_Actor)
 	,m_Mesh(i_Desc.Mesh)
-	,m_Textures(i_Desc.Textures)
 	,m_ConstBuffer(UnavailableAdressId)
 	,m_PipelineState(nullptr)
 	,m_RootSignature(nullptr)
@@ -37,26 +36,35 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 	}
 
 	// material management
-	//if (i_Desc.Material == nullptr)
-	//{
-	//	// retreive the material default from mesh
-	//}
-	//else
-	//{
-	//	if (!m_Mesh->IsCompatible(*i_Desc.Material)) 
-	//	{
-	//		m_Material = new DX12Material(*i_Desc.Material);
-	//	}
-	//	else
-	//	{
-	//		PRINT_DEBUG("Error, the material is not compatible with the mesh");
-	//		return;
-	//	}
-	//}
+	if (i_Desc.Material == nullptr)
+	{
+		// retreive the material default from mesh
+		m_Material = new DX12Material(m_Mesh->GetDefaultMaterialDesc());
+	}
+	else
+	{
+		if (!m_Mesh->IsCompatible(*i_Desc.Material)) 
+		{
+			m_Material = new DX12Material(*i_Desc.Material);
+		}
+		else
+		{
+			PRINT_DEBUG("Error, the material is not compatible with the mesh");
+			return;
+		}
+	}
+
+	// assert for debug
+	ASSERT(m_Material != nullptr);
+	ASSERT(m_Mesh != nullptr);
+	ASSERT(m_RootSignature != nullptr);
+	ASSERT(m_PipelineState != nullptr);
 
 	// retreive a constant buffer address
 	//m_ConstBuffer = render.ReserveConstantBufferVirtualAddress();
 	m_ConstBuffer = render.GetConstantBuffer(DX12RenderEngine::eTransform)->ReserveVirtualAddress();
+
+	m_Material->UpdateConstantBufferView();
 }
 
 RenderComponent::~RenderComponent()
@@ -87,11 +95,7 @@ void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandLis
 			i_CommandList->SetGraphicsRootConstantBufferView(0, render.GetConstantBuffer(DX12RenderEngine::eTransform)->GetUploadVirtualAddress(m_ConstBuffer));
 		}
 
-		// push needed textures
-		for (size_t i = 0; i < m_Textures.size(); ++i)
-		{
-			//m_Textures[i]->PushOnCommandList(i_CommandList);
-		}
+		m_Material->PushOnCommandList(i_CommandList);
 
 		// push the mesh on the commandlist (setup vertices)
 		m_Mesh->PushOnCommandList(i_CommandList);
@@ -113,8 +117,20 @@ ADDRESS_ID RenderComponent::GetConstBufferAddress() const
 	return m_ConstBuffer;
 }
 
-void RenderComponent::SetTexture(DX12Texture * i_Texture)
+void RenderComponent::SetMaterial(const DX12Material::DX12MaterialDesc & i_Desc)
 {
-	m_Textures.clear();
-	m_Textures.push_back(i_Texture);
+	if (m_Mesh->IsCompatible(i_Desc))
+	{
+		m_Material->Set(i_Desc);
+		m_Material->UpdateConstantBufferView();
+	}
+	else
+	{
+		PRINT_DEBUG("[Warning] setting a non compatible material to mesh %s", m_Mesh->GetName().c_str());
+	}
+}
+
+DX12Material * RenderComponent::GetMaterial()
+{
+	return m_Material;
 }

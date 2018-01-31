@@ -37,10 +37,8 @@ public:
 	struct RenderComponentDesc
 	{
 		// mesh
-		const DX12MeshBuffer *	Mesh = nullptr;			// mesh pointer
-		const DX12Material::DX12MaterialDesc * Material = nullptr;	// if null, we take the default mesh material desc each render component have is own material instance
-		// To do : delete this (this is contained in the material now)
-		std::vector<DX12Texture *>	Textures;
+		const DX12MeshBuffer *					Mesh = nullptr;			// mesh pointer
+		const DX12Material::DX12MaterialDesc *	Material = nullptr;		// if null, we take the default mesh material
 	};
 
 	RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor);
@@ -55,21 +53,20 @@ public:
 	ADDRESS_ID		GetConstBufferAddress() const;
 
 	// manage render stuff
-	void			SetTexture(DX12Texture * i_Texture);
-	//void			SetTexture(const DX12Texture * i_Texture, TextureDef i_Def);	// To do : implement
+	void			SetMaterial(const DX12Material::DX12MaterialDesc & i_Desc);
+	DX12Material *	GetMaterial();
 
 private:
 	// rendering
 	const DX12MeshBuffer *		m_Mesh;
-	const DX12Material *		m_Material;
+	DX12Material *				m_Material;	// material instance that manage the rendering pass
 
 	// dx12
 	ID3D12PipelineState *		m_PipelineState;
 	ID3D12RootSignature *		m_RootSignature;
 	ADDRESS_ID					m_ConstBuffer;	// const buffer for 3D matrices
-	std::vector<DX12Texture *>	m_Textures;
 
 	// informations
-	RenderPass		m_RenderPass;
-	RenderFlags		m_RenderFlags;
+	RenderPass			m_RenderPass;
+	RenderFlags			m_RenderFlags;
 };

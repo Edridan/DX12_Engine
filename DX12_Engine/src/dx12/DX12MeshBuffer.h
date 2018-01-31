@@ -20,6 +20,9 @@ public:
 	HRESULT					PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
 	UINT64					GetElementFlags() const;	// retreive flags to render the mesh buffer
 	const std::wstring &	GetName() const;
+	// material management
+	DX12Material::DX12MaterialDesc		GetDefaultMaterialDesc() const;
+	void								SetDefaultMaterial(const DX12Material::DX12MaterialDesc & i_Desc);
 
 	// material/mesh compatibility
 	bool					IsCompatible(const DX12Material::DX12MaterialDesc & i_Desc) const;
@@ -40,6 +43,8 @@ private:
 	// Buffer view
 	D3D12_VERTEX_BUFFER_VIEW			m_VertexBufferView;
 	D3D12_INDEX_BUFFER_VIEW				m_IndexBufferView;
+	// Material
+	DX12Material::DX12MaterialDesc		m_DefaultMaterial;	// material default (unset if not managed)
 	// Other
 	const std::wstring 					m_Name;
 	// element flags

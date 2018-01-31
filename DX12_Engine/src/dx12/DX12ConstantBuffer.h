@@ -19,7 +19,7 @@ public:
 	D3D12_GPU_VIRTUAL_ADDRESS	GetUploadVirtualAddress(ADDRESS_ID i_Address) const;
 
 	// information
-	UINT64		GetConstantElementSize() const;
+	UINT64						GetConstantElementSize() const;
 
 	// update buffer
 	void						UpdateConstantBuffer(ADDRESS_ID i_Address, void * i_Data, UINT i_Size);

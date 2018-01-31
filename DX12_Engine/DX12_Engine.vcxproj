@@ -183,7 +183,6 @@
   <ItemGroup>
     <None Include="resources\fonts\Arial.fnt" />
     <None Include="resources\shaders\Buffer.hlsli" />
-    <None Include="resources\shaders\EffectLib.hlsli" />
     <None Include="resources\shaders\Material.hlsli" />
   </ItemGroup>
   <ItemGroup>

@@ -8,8 +8,10 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	,m_ColorDiffuse(i_Desc.Kd)
 	,m_ColorSpecular(i_Desc.Ks)
 	,m_ColorEmissive(i_Desc.Ke)
+	,m_SpecularExponent(i_Desc.Ns)
 	,m_HaveChanged(true)
 	,m_ConstantBuffer(UnavailableAdressId)
+	,m_Name(i_Desc.Name)
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
@@ -19,11 +21,18 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	m_Textures[eSpecular]	= i_Desc.map_Ks;
 
 	// reserve address for constant buffer
-	m_ConstantBuffer = render.GetConstantBuffer(DX12RenderEngine::eMaterial)->ReserveVirtualAddress();
+	m_ConstantBuffer = render.GetConstantBuffer(DX12RenderEngine::eMaterial)->ReserveVirtualAddress(false);
+	UpdateConstantBufferView();	// update to constant buffer
 }
 
 DX12Material::~DX12Material()
 {
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
+	if (m_ConstantBuffer != UnavailableAdressId)
+	{
+		render.GetConstantBuffer(DX12RenderEngine::eMaterial)->ReleaseVirtualAddress(m_ConstantBuffer);
+	}
 }
 
 void DX12Material::SetTexture(DX12Texture * i_Texture, ETextureType i_Type)
@@ -34,7 +43,7 @@ void DX12Material::SetTexture(DX12Texture * i_Texture, ETextureType i_Type)
 	}
 }
 
-bool DX12Material::HaveTexture(ETextureType i_Type) const
+inline bool DX12Material::HaveTexture(ETextureType i_Type) const
 {
 	if (i_Type < eCount)
 	{
@@ -67,9 +76,40 @@ void DX12Material::SetSpecularColor(const Color & i_Color)
 
 }
 
-void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
+void DX12Material::Set(const DX12MaterialDesc & i_Desc)
 {
-	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+	m_ColorAmbient = i_Desc.Ka;
+	m_ColorDiffuse = i_Desc.Kd;
+	m_ColorSpecular = i_Desc.Ks;
+	m_ColorEmissive = i_Desc.Ke;
+
+	m_HaveChanged = true;
+
+	m_ConstantBuffer = UnavailableAdressId;
+
+	m_Name = i_Desc.Name;
+
+	// manage if the material have texture or not
+	m_Textures[eDiffuse] = i_Desc.map_Kd;
+	m_Textures[eAmbient] = i_Desc.map_Ka;
+	m_Textures[eSpecular] = i_Desc.map_Ks;
+
+	m_HaveChanged = true;
+}
+
+bool DX12Material::NeedUpdate() const
+{
+	return false;
+}
+
+void DX12Material::UpdateConstantBufferView()
+{
+	struct MaterialStruct
+	{
+		DirectX::XMFLOAT3		Ka, Kd, Ks, Ke;
+		BOOL					Map_A, Map_D, Map_S;
+		float					Ns;
+	};
 
 	// error management
 	if (m_ConstantBuffer == UnavailableAdressId)
@@ -79,15 +119,10 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
 		return;
 	}
 
-	struct MaterialStruct
-	{
-		DirectX::XMFLOAT3		Ka, Kd, Ks, Ke;
-		BOOL					Map_A, Map_D, Map_S;
-		float					Ns;
-	};
-
 	if (m_HaveChanged)
 	{
+		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
 		// push constant buffer to the gpu
 		MaterialStruct mat;
 
@@ -104,10 +139,32 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
 
 		// update the buffer
 		render.GetConstantBuffer(DX12RenderEngine::eMaterial)->UpdateConstantBuffer(m_ConstantBuffer, &mat, sizeof(MaterialStruct));
+
+		m_HaveChanged = false;
+	}
+}
+
+void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
+{
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
+	// error management
+	if (m_ConstantBuffer == UnavailableAdressId)
+	{
+		PRINT_DEBUG("Error, the constant buffer address is not set");
+		DEBUG_BREAK;
+		return;
 	}
 
-
+	// bind textures
+	for (UINT i = 0; i < ETextureType::eCount; ++i)
+	{
+		if (HaveTexture((ETextureType)i))
+		{
+			
+		}
+	}
 
 	// bind the constant buffer and texture to the commandlist
-	i_CommandList->SetGraphicsRootConstantBufferView(0, render.GetConstantBuffer(DX12RenderEngine::eTransform)->GetUploadVirtualAddress(m_ConstantBuffer));
+	i_CommandList->SetGraphicsRootConstantBufferView(1, render.GetConstantBuffer(DX12RenderEngine::eMaterial)->GetUploadVirtualAddress(m_ConstantBuffer));
 }

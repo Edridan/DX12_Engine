@@ -36,20 +36,8 @@ int WINAPI WinMain(
 	// create objects...
 	Actor::ActorDesc cubeActor;
 	cubeActor.Name = L"Box";
-	//cubeActor.Mesh = L"resources/obj/cube.obj";
-	cubeActor.Mesh = L"Plane";
-	cubeActor.ActorTransform = Transform(XMFLOAT3(0.f, 0.f, 0.f));
-
-	Actor * actor = world->SpawnActor(cubeActor);
-	DX12Texture * tex = engine.GetResourcesManager()->GetTexture(L"resources/tex/brick_messy.jpg");
-	actor->GetRenderComponent()->SetTexture(tex);
-
-	cubeActor.ActorTransform = Transform(XMFLOAT3(2.f, 0.f, 0.f));
-
-	actor = world->SpawnActor(cubeActor);
-
-	tex = engine.GetResourcesManager()->GetTexture(L"resources/tex/brick_grouthless.jpg");
-	actor->GetRenderComponent()->SetTexture(tex);
+	cubeActor.Mesh = L"resources/obj/cube.obj";
+	world->SpawnActor(cubeActor);
 
 	engine.Run();
 }

@@ -23,7 +23,6 @@ public:
 		// actor definition
 		std::wstring Name			= L"Unnamed Actor";
 		UINT64 Id					= (UINT64)-1;
-		Transform ActorTransform	= Transform();
 		// actor logic
 		bool NeedTick				= false;
 		// actor rendering

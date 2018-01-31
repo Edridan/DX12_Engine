@@ -832,26 +832,40 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 
 	// -- Create root signature -- //
 
+#define CBV_COUNT	2
+
 	// create the root descriptor : where to find the data for this root parameter
-	D3D12_ROOT_DESCRIPTOR rootCBVDescriptor;
-	rootCBVDescriptor.RegisterSpace = 0;
-	rootCBVDescriptor.ShaderRegister = 0;
+	D3D12_ROOT_DESCRIPTOR * rootCBVDescriptor = new D3D12_ROOT_DESCRIPTOR[CBV_COUNT];
+	rootCBVDescriptor[0].RegisterSpace = 0;
+	rootCBVDescriptor[0].ShaderRegister = 0;
+
+	rootCBVDescriptor[1].RegisterSpace = 0;
+	rootCBVDescriptor[1].ShaderRegister = 1;
 
 	// create the default root parameter and fill it out
 	// this paramater is the model view projection matrix
-	D3D12_ROOT_PARAMETER *  rootParameters = new D3D12_ROOT_PARAMETER[1 + textureCount]; // only one parameter right now
+	D3D12_ROOT_PARAMETER *  rootParameters = new D3D12_ROOT_PARAMETER[CBV_COUNT + textureCount]; // only one parameter right now
 
-	// first parameter is always the CBV
-	rootParameters[0].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
-	rootParameters[0].Descriptor		= rootCBVDescriptor; // this is the root descriptor for this root parameter
-	rootParameters[0].ShaderVisibility	= D3D12_SHADER_VISIBILITY_VERTEX; // our vertex shader will be the only shader accessing this parameter for now
+	static const D3D12_SHADER_VISIBILITY shaderVisibility[CBV_COUNT] =
+	{
+		D3D12_SHADER_VISIBILITY_VERTEX,
+		D3D12_SHADER_VISIBILITY_PIXEL,
+	};
+
+	for (UINT i = 0; i < CBV_COUNT; ++i)
+	{
+		// first parameter is always the CBV
+		rootParameters[i].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
+		rootParameters[i].Descriptor = rootCBVDescriptor[i]; // this is the root descriptor for this root parameter
+		rootParameters[i].ShaderVisibility = shaderVisibility[i]; // our vertex shader will be the only shader accessing this parameter for now
+	}
 
 	// setup the root parameters for textures
 	for (UINT i = 0; i < textureCount; ++i) 
 	{
-		rootParameters[1 + i].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		rootParameters[1 + i].DescriptorTable	= descriptorTable[i];
-		rootParameters[1 + i].ShaderVisibility	= D3D12_SHADER_VISIBILITY_PIXEL;	// for now only the pixel shader will going to use the textures
+		rootParameters[CBV_COUNT + i].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[CBV_COUNT + i].DescriptorTable	= descriptorTable[i];
+		rootParameters[CBV_COUNT + i].ShaderVisibility	= D3D12_SHADER_VISIBILITY_PIXEL;	// for now only the pixel shader will going to use the textures
 	}
 
 	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT

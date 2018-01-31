@@ -93,6 +93,7 @@ DWORD iCube[] = {
 		20, 21, 22, 20, 23, 21, 
 	};
 
+
 /// GENERATE PRIMITIVE MESH HERE :
 DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 {
@@ -119,6 +120,27 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	}
 
 	return returnMesh;
+}
+
+// helpers
+inline DX12Texture * LoadTexture(const std::string & i_TexName, const std::string & i_Folder, ResourcesManager * i_Manager)
+{
+	if (i_TexName == "")
+		return nullptr;
+
+	const std::string filepath = i_Folder + i_TexName;
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> stringConverter;
+	const std::wstring wFilepath = stringConverter.from_bytes(filepath.c_str());
+
+	DX12Texture * texture = i_Manager->GetTexture(wFilepath.c_str());
+	if (texture != nullptr && texture->IsLoaded())
+	{
+		return texture;
+	}
+
+	PRINT_DEBUG("Error when loading %s", i_TexName.c_str());
+	DEBUG_BREAK;
+	return nullptr;
 }
 
 DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder, const char * i_TextureFolder)
@@ -180,48 +202,20 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 	
 	std::string message(stream.str());
 	PRINT_DEBUG(message.c_str());
+#endif
 
-#else
 	if (!ret)
 	{
-		// display error message
-		std::replace(error.begin(), error.end(), '\n', ' ');
-		DX12RenderEngine::GetInstance().PrintMessage(error.c_str());
+		DEBUG_BREAK;
 		return nullptr;
 	}
-#endif
 
 	// load mesh information and create the stream
 	DX12Mesh * mesh = new DX12Mesh;
 
-	// load textures
-	for (size_t i = 0; i < material.size(); ++i)
-	{
-		//std::string texFilename = 
-		const char * texName = material[i].ambient_texname.c_str();
-
-		if (std::strcmp(texName, "") != 0 && mesh->m_Textures[texName] == nullptr)
-		{
-			std::string texFilepath(textureFolder);
-			texFilepath.append(texName);
-
-			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> stringConverter;
-			std::wstring wTexName = stringConverter.from_bytes(texFilepath.c_str());
-
-			DX12Texture * tex = new DX12Texture(wTexName.c_str());
-
-			// add to textures loaded
-			if (tex->IsLoaded())
-			{
-				mesh->m_Textures[texName] = tex;
-			}
-		}
-	}
-
 	for (size_t sh = 0; sh < shapes.size(); ++sh)
 	{
 		// create buffer and initialize data
-		MeshBuffer * meshBuffer		= new MeshBuffer;	// mesh buffer
 		UINT stride					= 3;	// default stride in float (3 float for positions)
 		tinyobj::shape_t * shape	= &shapes[sh];
 		const size_t verticeCount	= shape->mesh.indices.size();
@@ -250,27 +244,6 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 
 		FLOAT * const verticeBuffer = new FLOAT[verticeCount * stride];
 		FLOAT * bufferItr = verticeBuffer;
-
-		if (flags & DX12Mesh::EElementFlags::eHaveTexcoord)
-		{
-			// retreive textures
-			std::vector<int> meshMaterials(shape->mesh.material_ids);
-			meshMaterials.erase(std::unique(meshMaterials.begin(), meshMaterials.end()), meshMaterials.end());
-
-			for (size_t i = 0; i < material.size(); ++i)
-			{
-				const char * texName = material[i].ambient_texname.c_str();
-
-				if (std::strcmp(texName, "") != 0)
-				{
-					DX12Texture * tex = mesh->m_Textures[texName];
-					if (tex != nullptr)
-					{
-						meshBuffer->Textures.push_back(tex);
-					}
-				}
-			}
-		}
 
 		for (size_t id = 0; id < shape->mesh.indices.size(); ++id)
 		{
@@ -312,11 +285,43 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		D3D12_INPUT_LAYOUT_DESC layout;
 		CreateInputLayoutFromFlags(layout, flags);
 
-		meshBuffer->Mesh = new DX12MeshBuffer(
+		DX12MeshBuffer * meshBuffer = new DX12MeshBuffer(
 			layout,	// the generated layout depending on the flags
 			reinterpret_cast<BYTE*>(verticeBuffer),
 			(UINT)verticeCount,
 			wname.c_str());
+
+		// retreive materials of the mesh
+		std::vector<int> meshMaterials(shape->mesh.material_ids);
+		meshMaterials.erase(std::unique(meshMaterials.begin(), meshMaterials.end()), meshMaterials.end());
+
+		if (meshMaterials.size() > 1)
+		{
+			// To do : create other mesh with multiple material
+		}
+
+		// load materials
+		for (size_t i = 0; i < meshMaterials.size(); ++i)
+		{
+			tinyobj::material_t mat = material[meshMaterials[i]];
+
+			DX12Material::DX12MaterialDesc desc;
+
+			// setup the name of the material
+			desc.Name = mat.name;
+
+			// load textures
+			desc.map_Ka = LoadTexture(mat.ambient_texname, textureFolder, resourcesManager);
+			// to do : load other textures
+
+			// retreive other data
+			desc.Ka = mat.ambient;
+			desc.Kd = mat.diffuse;
+			desc.Ke = mat.emission;
+			desc.Ks = mat.specular;
+
+			meshBuffer->SetDefaultMaterial(desc);
+		}
 
 		// create mesh and initialize it
 		mesh->m_SubMeshBuffer.push_back(meshBuffer);
@@ -336,7 +341,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 }
 
 DX12Mesh::DX12Mesh()
-	:m_RootMeshBuffer(new MeshBuffer)
+	:m_RootMeshBuffer(nullptr)
 {
 }
 
@@ -346,30 +351,28 @@ DX12Mesh::DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffe
 	:m_RootMeshBuffer(nullptr)
 {
 	// create default material
-	MeshBuffer * meshBuffer = new MeshBuffer;
-	meshBuffer->Mesh = new DX12MeshBuffer(i_InputLayout, i_VerticesBuffer, i_VerticesCount);
 
-	m_RootMeshBuffer = meshBuffer;
+	m_RootMeshBuffer = new DX12MeshBuffer(i_InputLayout, i_VerticesBuffer, i_VerticesCount);
 }
 
 DX12Mesh::DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount)
 	:m_RootMeshBuffer(nullptr)
 {
-	MeshBuffer * meshBuffer = new MeshBuffer;
-	meshBuffer->Mesh = new DX12MeshBuffer(i_InputLayout, i_VerticesBuffer, i_VerticesCount, i_IndexBuffer, i_IndexCount);
-
-	m_RootMeshBuffer = meshBuffer;
+	m_RootMeshBuffer = new DX12MeshBuffer(i_InputLayout, i_VerticesBuffer, i_VerticesCount, i_IndexBuffer, i_IndexCount);
 }
 
 DX12Mesh::~DX12Mesh()
 {
-	// To do : cleanup resources
-
 	if (m_RootMeshBuffer != nullptr)
 	{
-		delete m_RootMeshBuffer->Mesh;
+		delete m_RootMeshBuffer;
 	}
-
+	
+	// delete submeshes
+	for (size_t i = 0; i < m_SubMeshBuffer.size(); ++i)
+	{
+		delete m_SubMeshBuffer[i];
+	}
 }
 
 bool DX12Mesh::HaveSubMeshes() const
@@ -382,43 +385,33 @@ UINT DX12Mesh::SubMeshesCount() const
 	return (UINT)(m_SubMeshBuffer.size());
 }
 
-int DX12Mesh::GetTextures(std::vector<DX12Texture*>& o_Textures, size_t i_SubMeshId)
+DX12Material::DX12MaterialDesc DX12Mesh::GetMaterial(size_t i_SubMeshId)
 {
 	if (i_SubMeshId < m_SubMeshBuffer.size())
 	{
-		return 0;
+		return m_SubMeshBuffer[i_SubMeshId]->GetDefaultMaterialDesc();
 	}
 
-	o_Textures = m_SubMeshBuffer[i_SubMeshId]->Textures;
-	return (int)o_Textures.size();
+	// return default desc for material (pink one)
+	DX12Material::DX12MaterialDesc desc;
+	return desc;
 }
 
-int DX12Mesh::GetTextures(std::vector<DX12Texture*>& o_Textures)
+DX12Material::DX12MaterialDesc DX12Mesh::GetMaterial()
 {
-	o_Textures = m_RootMeshBuffer->Textures;
-	return (int)o_Textures.size();
-}
-
-int DX12Mesh::GetMaterial(std::vector<DX12Material*>& o_Mat, size_t i_SubMeshId)
-{
-	return 0;
-}
-
-int DX12Mesh::GetMaterial(std::vector<DX12Material*>& o_Mat)
-{
-	return 0;
+	return m_RootMeshBuffer->GetDefaultMaterialDesc();
 }
 
 const DX12MeshBuffer * DX12Mesh::GetRootMesh() const
 {
-	return m_RootMeshBuffer->Mesh;
+	return m_RootMeshBuffer;
 }
 
 const DX12MeshBuffer* DX12Mesh::GetSubMeshes(size_t i_Index) const
 {
 	if (i_Index < m_SubMeshBuffer.size())
 	{
-		return m_SubMeshBuffer[i_Index]->Mesh;
+		return m_SubMeshBuffer[i_Index];
 	}
 	
 	return nullptr;

@@ -347,9 +347,6 @@
     <None Include="resources\shaders\Buffer.hlsli">
       <Filter>Resource Files\Shaders\Lib</Filter>
     </None>
-    <None Include="resources\shaders\EffectLib.hlsli">
-      <Filter>Resource Files\Shaders\Lib</Filter>
-    </None>
     <None Include="resources\shaders\Material.hlsli">
       <Filter>Resource Files\Shaders\Lib</Filter>
     </None>

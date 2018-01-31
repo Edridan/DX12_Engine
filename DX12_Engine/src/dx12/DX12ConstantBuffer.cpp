@@ -3,8 +3,8 @@
 
 
 DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize)
-	:m_BufferSize(i_ElementSize)
-	,m_ElementSize(i_BufferSize)
+	:m_ElementSize(i_ElementSize)
+	,m_BufferSize(i_BufferSize)
 {
 	// retreive device
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();

@@ -154,13 +154,13 @@ private:
 	ID3D12DescriptorHeap*		m_DepthStencilDescriptorHeap; // This is a heap for our depth/stencil buffer descriptor
 
 	// Constant buffer
-	DX12ConstantBuffer *		m_ConstantBuffer[EConstantBufferId::eCount];	// constant buffer are created here and used/managed from other space
 	struct ConstantBufferDef
 	{
 		UINT		ElementSize;
 		UINT		ElementCount;
 	};
-	static const ConstantBufferDef			s_ConstantBufferSize[EConstantBufferId::eCount];	// setup this array to manage the size of the constant buffer
+	static const ConstantBufferDef	s_ConstantBufferSize[EConstantBufferId::eCount];	// setup this array to manage the size of the constant buffer
+	DX12ConstantBuffer *			m_ConstantBuffer[EConstantBufferId::eCount];	// constant buffer are created here and used/managed from other space
 
 	// size
 	IntVec2						m_WindowSize;

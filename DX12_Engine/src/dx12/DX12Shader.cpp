@@ -1,11 +1,14 @@
 #include "dx12/DX12Shader.h"
 
 #include <d3dcompiler.h>
+#include <string.h> 
 
 DX12Shader::DX12Shader(EShaderType i_Type, const wchar_t * i_Filename)
 	:m_ShaderType(i_Type)
 	,m_IsLoaded(false)
 {
+	wcscpy_s(m_Name, 128, i_Filename);
+
 	// Load and generate the shader
 	ID3DBlob* shader; // d3d blob for holding vertex shader bytecode
 	ID3DBlob* errorBuff; // a buffer holding the error data if any

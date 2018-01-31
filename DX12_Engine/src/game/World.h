@@ -40,6 +40,7 @@ public:
 
 	// spawn default actor
 	Actor *	SpawnActor(const Actor::ActorDesc & i_Desc, Actor * i_Parent = nullptr);
+	Actor *	SpawnActor(const Actor::ActorDesc & i_Desc, const Transform & i_Transform, Actor * i_Parent = nullptr);	// Warning : the transform is relative to the parent
 	bool	DeleteActor(Actor * i_ActorToRemove, bool i_RemoveChildren = true);
 
 	bool	AttachActor(Actor * i_Parent, Actor * i_Child);

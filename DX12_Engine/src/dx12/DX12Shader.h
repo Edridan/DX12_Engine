@@ -24,7 +24,8 @@ private:
 	// Information
 	const EShaderType	m_ShaderType;
 	bool				m_IsLoaded;	// if true : is loaded and compiled = no error
-	
+	wchar_t 			m_Name[128];
+
 	// DX12
 	D3D12_SHADER_BYTECODE		m_ShaderByteCode;
 };
