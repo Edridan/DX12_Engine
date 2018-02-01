@@ -93,6 +93,8 @@ ADDRESS_ID DX12ConstantBuffer::ReserveVirtualAddress(bool i_Initialize /* = fals
 
 void DX12ConstantBuffer::ReleaseVirtualAddress(ADDRESS_ID i_Address)
 {
+	ASSERT(i_Address < m_BufferSize);
+
 	if (i_Address < m_BufferSize)
 	{
 		// release the constant buffer address
@@ -103,6 +105,8 @@ void DX12ConstantBuffer::ReleaseVirtualAddress(ADDRESS_ID i_Address)
 
 UINT8 * DX12ConstantBuffer::GetGPUAddress(ADDRESS_ID i_Address) const
 {
+	ASSERT(i_Address < m_BufferSize);
+
 	const int frameIndex = GetFrameIndex();
 	return m_ConstantBufferGPUAdress[frameIndex] + (i_Address * m_ElementSize);
 }
@@ -110,6 +114,8 @@ UINT8 * DX12ConstantBuffer::GetGPUAddress(ADDRESS_ID i_Address) const
 D3D12_GPU_VIRTUAL_ADDRESS DX12ConstantBuffer::GetUploadVirtualAddress(ADDRESS_ID i_Address) const
 {
 	const int frameIndex = GetFrameIndex();
+
+	ASSERT(i_Address < m_BufferSize);
 
 	if (m_ConstantBufferReservedAddress[i_Address] == false)
 	{
@@ -129,6 +135,8 @@ void DX12ConstantBuffer::UpdateConstantBuffer(ADDRESS_ID i_Address, void * i_Dat
 {
 	const int frameIndex = GetFrameIndex();
 
+	ASSERT(i_Address < m_BufferSize);
+
 	if (m_ConstantBufferReservedAddress[i_Address] == true)
 	{
 		// copy data to the constant buffer
@@ -143,6 +151,8 @@ void DX12ConstantBuffer::UpdateConstantBuffer(ADDRESS_ID i_Address, void * i_Dat
 
 void DX12ConstantBuffer::UpdateConstantBufferForEachFrame(ADDRESS_ID i_Address, void * i_Data, UINT i_Size)
 {
+	ASSERT(i_Address < m_BufferSize);
+
 	if (m_ConstantBufferReservedAddress[i_Address] == true)
 	{
 		for (UINT i = 0; i < m_FrameCount; ++i)
