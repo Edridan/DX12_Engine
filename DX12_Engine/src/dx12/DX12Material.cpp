@@ -181,7 +181,7 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) 
 	for (UINT i = 0; i < ETextureType::eCount; ++i)
 	{
 		ID3D12DescriptorHeap ** descriptors = (ID3D12DescriptorHeap **)(&m_Descriptors[i]);
-		if (HaveTexture((ETextureType)i) && i < 2)
+		if (HaveTexture((ETextureType)i))
 		{
 			// update the descriptor for the resources
 			i_CommandList->SetDescriptorHeaps(1, descriptors);

@@ -655,7 +655,7 @@ void DX12RenderEngine::CleanUp()
 	if (m_SwapChain->GetFullscreenState(&fs, NULL))
 		m_SwapChain->SetFullscreenState(false, NULL);
 
-	// To do : release properly data : might have some crash here
+	// To do : release properly data : might have some random crash here
 
 	SAFE_RELEASE(m_Device);
 	SAFE_RELEASE(m_SwapChain);
@@ -799,7 +799,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	if (i_Flags & DX12Mesh::EElementFlags::eHaveTexcoord)
 	{
 		// at least one texture
-		textureCount = 2;	// for now only ambient texture is managed
+		textureCount = 3;	// for now only ambient texture is managed
 		samplerCount = 1;	// only one sample to manage all texture right now
 		bufferCount += textureCount;		// add a descriptor table for each textures
 

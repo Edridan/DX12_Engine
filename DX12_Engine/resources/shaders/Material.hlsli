@@ -7,6 +7,12 @@ BOOL					Map_A, Map_D, Map_S;
 float					Ns;
 */
 
+// texture sampler for material
+Texture2D tex_ambient		: register(t0);
+Texture2D tex_specular		: register(t1);
+Texture2D tex_diffuse		: register(t2);
+SamplerState tex_sample		: register(s0);
+
 cbuffer MaterialBuffer : register(b1)	// the material buffer is instanced on the buffer 1
 {
 	// default material implementation
