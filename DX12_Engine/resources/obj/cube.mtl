@@ -11,3 +11,4 @@ newmtl cube
   Ke 0.2500 0.7500 1.0000
   map_Kd box.jpg
   map_Ks box_specular.jpg
+  map_Ke box_specular.jpg
