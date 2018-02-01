@@ -801,10 +801,11 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 		// at least one texture
 		textureCount = 2;	// for now only ambient texture is managed
 		samplerCount = 1;	// only one sample to manage all texture right now
-		++bufferCount;		// add a descriptor table for textures
+		bufferCount += textureCount;		// add a descriptor table for each textures
 
 		// create descriptor table ranges
 		D3D12_DESCRIPTOR_RANGE *  descriptorTableRanges = new D3D12_DESCRIPTOR_RANGE[textureCount];
+		descriptorTable = new D3D12_ROOT_DESCRIPTOR_TABLE[textureCount];	// create a descriptor table
 
 		for (UINT i = 0; i < textureCount; ++i)
 		{
@@ -812,13 +813,11 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 			descriptorTableRanges[i].NumDescriptors		= 1; // we only have one texture right now, so the range is only 1
 			descriptorTableRanges[i].BaseShaderRegister = i; // start index of the shader registers in the range
 			descriptorTableRanges[i].RegisterSpace		= 0; // space 0. can usually be zero
-
 			descriptorTableRanges[i].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
+			// descriptor table
+			descriptorTable[i].NumDescriptorRanges	= 1;	// texture count
+			descriptorTable[i].pDescriptorRanges	= &descriptorTableRanges[i]; // the pointer to the beginning of our ranges array
 		}
-
-		descriptorTable = new D3D12_ROOT_DESCRIPTOR_TABLE[1];	// create a descriptor table
-		descriptorTable[0].NumDescriptorRanges	= textureCount;	// texture count
-		descriptorTable[0].pDescriptorRanges	= descriptorTableRanges; // the pointer to the beginning of our ranges array
 
 		sampler = new D3D12_STATIC_SAMPLER_DESC[samplerCount]; // create a descriptor table
 
@@ -843,8 +842,6 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	// -- Create root signature -- //
 
 	// Constant buffer for materials and transform
-
-
 	// create the root descriptor : where to find the data for this root parameter
 	D3D12_ROOT_DESCRIPTOR * rootCBVDescriptor = new D3D12_ROOT_DESCRIPTOR[CBV_COUNT];
 	// transform constant buffer (matrix)
@@ -881,7 +878,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	for (UINT i = 0; i < (bufferCount - CBV_COUNT); ++i)
 	{
 		rootParameters[CBV_COUNT + i].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-		rootParameters[CBV_COUNT + i].DescriptorTable	= descriptorTable[0];
+		rootParameters[CBV_COUNT + i].DescriptorTable	= descriptorTable[i];
 		rootParameters[CBV_COUNT + i].ShaderVisibility	= textureShaderVisibility[i];
 	}
 

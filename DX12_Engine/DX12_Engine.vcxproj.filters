@@ -322,14 +322,20 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\tex\box.bmp">
-      <Filter>Resource Files\Textures</Filter>
-    </Image>
     <Image Include="resources\fonts\Arial-font.png">
       <Filter>Resource Files\Fonts</Filter>
     </Image>
     <Image Include="resources\icon\icon.ico">
       <Filter>Resource Files\Icon</Filter>
+    </Image>
+    <Image Include="resources\tex\box.jpg">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="resources\tex\brick_grouthless.jpg">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="resources\tex\brick_messy.jpg">
+      <Filter>Resource Files\Textures</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

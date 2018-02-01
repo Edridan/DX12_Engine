@@ -39,10 +39,10 @@ DX12Texture::DX12Texture(const wchar_t * i_Filename)
 	CreateTextureBufferUploadHeap(device, uploadBufferName);
 
 	// store vertex buffer in upload heap
-	D3D12_SUBRESOURCE_DATA textureData = {};
-	textureData.pData = &data[0]; // pointer to our image data
-	textureData.RowPitch = imageDesc.BytesPerRow; // size of all our triangle vertex data
-	textureData.SlicePitch = imageDesc.BytesPerRow * m_Desc.Height; // also the size of our triangle vertex data
+	D3D12_SUBRESOURCE_DATA textureData	= {};
+	textureData.pData		= &data[0]; // pointer to our image data
+	textureData.RowPitch	= imageDesc.BytesPerRow; // size of all our triangle vertex data
+	textureData.SlicePitch	= imageDesc.BytesPerRow * m_Desc.Height; // also the size of our triangle vertex data
 
 	// Now we copy the upload buffer contents to the default heap
 	UpdateSubresources(commandList, m_TextureBuffer, m_TextureBufferUploadHeap, 0, 0, 1, &textureData);
@@ -58,6 +58,10 @@ DX12Texture::DX12Texture(const wchar_t * i_Filename)
 	srvDesc.Texture2D.MipLevels			= 1;
 
 	device->CreateShaderResourceView(m_TextureBuffer, &srvDesc, m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	std::wstring descriptorName(i_Filename);
+	descriptorName.append(L" Buffer Resource Heap");
+	m_DescriptorHeap->SetName(descriptorName.c_str());
 
 	// delete unused data
 	delete data;
@@ -162,20 +166,6 @@ const D3D12_GPU_DESCRIPTOR_HANDLE DX12Texture::GetDescriptorHandle() const
 {
 	return m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 }
-/*
-const D3D12_GPU_DESCRIPTOR_HANDLE DX12Texture::GetDescriptorHandle() const
-{
-// set the descriptor heap
-ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap };
-i_CommandList->SetDescriptorHeaps(1, descriptorHeaps);
-
-i_CommandList->SetGraphicsRootDescriptorTable(1, m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-
-return S_OK;
-return m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-}
-*/
-
 
 DX12Texture::DX12Texture()
 	:m_Name(L"")

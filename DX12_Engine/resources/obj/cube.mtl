@@ -9,5 +9,6 @@ newmtl cube
   Kd 0.5880 0.5880 0.5880
   Ks 0.2500 0.7500 1.0000
   Ke 0.2500 0.7500 1.0000
-  map_Ka box.png
-  map_Kd box.png
+  map_Ka box.jpg
+  map_Kd brick_grouthless.jpg
+  map_Ks brick_grouthless.jpg

@@ -42,6 +42,7 @@ inline void DX12Material::SetTexture(DX12Texture * i_Texture, ETextureType i_Typ
 	if (i_Type < eCount)
 	{
 		m_Textures[i_Type] = i_Texture;
+
 		if (i_Texture)
 		{
 			m_Descriptors[i_Type] = i_Texture->GetDescriptorHeap();
@@ -159,25 +160,9 @@ inline void DX12Material::UpdateConstantBufferView()
 	}
 }
 
-/*
-HRESULT DX12Texture::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
-{
-	// set the descriptor heap
-	ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap };
-	i_CommandList->SetDescriptorHeaps(1, descriptorHeaps);
-	return m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-}
-
-const D3D12_GPU_DESCRIPTOR_HANDLE DX12Texture::GetDescriptorHandle() const
-{
-// set the descriptor heap
-ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap };
-i_CommandList->SetDescriptorHeaps(1, descriptorHeaps);*/
-
 void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
-	ID3D12DescriptorHeap ** descriptors = (ID3D12DescriptorHeap **)m_Descriptors;
 
 	// error management
 	if (m_ConstantBuffer == UnavailableAdressId)
@@ -187,7 +172,7 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) 
 		return;
 	}
 
-	i_CommandList->SetDescriptorHeaps(1, descriptors);
+	// set descriptors
 
 	// parameter 0 is already used by the CBV for transform so we start to the 
 	i_CommandList->SetGraphicsRootConstantBufferView(1, render.GetConstantBuffer(DX12RenderEngine::eMaterial)->GetUploadVirtualAddress(m_ConstantBuffer));
@@ -195,12 +180,13 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) 
 	// bind textures
 	for (UINT i = 0; i < ETextureType::eCount; ++i)
 	{
+		ID3D12DescriptorHeap ** descriptors = (ID3D12DescriptorHeap **)(&m_Descriptors[i]);
 		if (HaveTexture((ETextureType)i) && i < 2)
 		{
-			i_CommandList->SetGraphicsRootDescriptorTable(2 + i, m_Textures[eDiffuse]->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
-
+			// update the descriptor for the resources
+			i_CommandList->SetDescriptorHeaps(1, descriptors);
+			i_CommandList->SetGraphicsRootDescriptorTable(2 + i, m_Textures[i]->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 		}
 	}
 
-	// bind the constant buffer and texture to the commandlist
 }

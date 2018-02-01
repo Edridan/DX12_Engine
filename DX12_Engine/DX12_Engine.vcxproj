@@ -168,7 +168,9 @@
   <ItemGroup>
     <Image Include="resources\fonts\Arial-font.png" />
     <Image Include="resources\icon\icon.ico" />
-    <Image Include="resources\tex\box.bmp" />
+    <Image Include="resources\tex\box.jpg" />
+    <Image Include="resources\tex\brick_grouthless.jpg" />
+    <Image Include="resources\tex\brick_messy.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="resources\obj\cube.obj">
