@@ -7,8 +7,6 @@ cbuffer TransformBuffer : register(b0)
 	matrix	model;
 	matrix	view;
 	matrix	projection;
-	// other useful matrix for effects
-	float	time;	// move this variable to the global buffer
 };
 
 // to do : create another buffer especially for the pixel shaders

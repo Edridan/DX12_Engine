@@ -184,7 +184,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\fonts\Arial.fnt" />
-    <None Include="resources\shaders\Buffer.hlsli" />
+    <None Include="resources\shaders\GlobalBuffer.hlsli" />
+    <None Include="resources\shaders\TransformBuffer.hlsli" />
     <None Include="resources\shaders\Material.hlsli" />
   </ItemGroup>
   <ItemGroup>

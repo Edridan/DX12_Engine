@@ -350,10 +350,13 @@
     <None Include="resources\fonts\Arial.fnt">
       <Filter>Resource Files\Fonts</Filter>
     </None>
-    <None Include="resources\shaders\Buffer.hlsli">
+    <None Include="resources\shaders\Material.hlsli">
       <Filter>Resource Files\Shaders\Lib</Filter>
     </None>
-    <None Include="resources\shaders\Material.hlsli">
+    <None Include="resources\shaders\TransformBuffer.hlsli">
+      <Filter>Resource Files\Shaders\Lib</Filter>
+    </None>
+    <None Include="resources\shaders\GlobalBuffer.hlsli">
       <Filter>Resource Files\Shaders\Lib</Filter>
     </None>
   </ItemGroup>

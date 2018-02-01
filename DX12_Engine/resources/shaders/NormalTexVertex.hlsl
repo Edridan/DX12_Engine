@@ -1,4 +1,4 @@
-#include "Buffer.hlsli"
+#include "TransformBuffer.hlsli"
 
 struct VS_INPUT
 {
@@ -28,8 +28,7 @@ VS_OUTPUT main(VS_INPUT input)
 	// Return 
 	output.pos = pos;
 	output.uv = input.uv;
-	// To do : transform the normal
-	output.normal = float3(norm.xyz);
+	output.normal = float3(normalize(norm.xyz));
 
 	return output;
 }

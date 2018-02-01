@@ -1,7 +1,6 @@
 // include render light lib
 #include "Material.hlsli"
 
-
 struct VS_OUTPUT
 {
 	float4 pos		: SV_POSITION;
