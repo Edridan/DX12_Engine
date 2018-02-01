@@ -153,7 +153,7 @@ bool DX12Texture::IsLoaded() const
 	return m_IsLoaded;
 }
 
-const ID3D12DescriptorHeap * DX12Texture::GetDescriptorHeap() const
+ID3D12DescriptorHeap * DX12Texture::GetDescriptorHeap() const
 {
 	return m_DescriptorHeap;
 }

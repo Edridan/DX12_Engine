@@ -22,7 +22,7 @@ public:
 	{
 		// actor definition
 		std::wstring Name			= L"Unnamed Actor";
-		UINT64 Id					= (UINT64)-1;
+		UINT64 Id					= (UINT64)-1;		// if (-1) no predefined id
 		// actor logic
 		bool NeedTick				= false;
 		// actor rendering
@@ -90,7 +90,4 @@ private:
 
 	// world of the actor
 	World * const			m_World;
-
-	// id creator
-	static UINT64			s_ActorInstanced;
 };

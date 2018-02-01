@@ -11,9 +11,6 @@
 #include "dx12/DX12RenderEngine.h"
 #include "dx12/DX12Mesh.h"
 
-// static definition
-UINT64 Actor::s_ActorInstanced = 0;
-
 XMMATRIX Actor::GetWorldTransform()
 {
 	XMMATRIX thisMat = XMLoadFloat4x4(&m_Transform.GetMatrix());
@@ -104,7 +101,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 	if (i_Desc.Id == (UINT64)-1)
 	{
 		// create an id here
-		m_Id = s_ActorInstanced++;
+		m_Id = (UINT64)this;
 	}
 	else
 	{

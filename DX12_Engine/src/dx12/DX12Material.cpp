@@ -2,6 +2,7 @@
 
 #include "dx12/DX12RenderEngine.h"
 #include "dx12/DX12ConstantBuffer.h"
+#include "dx12/DX12Texture.h"
 
 DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	:m_ColorAmbient(i_Desc.Ka)
@@ -12,13 +13,14 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	,m_HaveChanged(true)
 	,m_ConstantBuffer(UnavailableAdressId)
 	,m_Name(i_Desc.Name)
+	,m_Id((UINT64)this)
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
 	// manage if the material have texture or not
-	m_Textures[eDiffuse]	= i_Desc.map_Kd;
-	m_Textures[eAmbient]	= i_Desc.map_Ka;
-	m_Textures[eSpecular]	= i_Desc.map_Ks;
+	SetTexture(i_Desc.map_Kd, eDiffuse);
+	SetTexture(i_Desc.map_Ks, eSpecular);
+	SetTexture(i_Desc.map_Ka, eAmbient);
 
 	// reserve address for constant buffer
 	m_ConstantBuffer = render.GetConstantBuffer(DX12RenderEngine::eMaterial)->ReserveVirtualAddress();
@@ -35,11 +37,19 @@ DX12Material::~DX12Material()
 	}
 }
 
-void DX12Material::SetTexture(DX12Texture * i_Texture, ETextureType i_Type)
+inline void DX12Material::SetTexture(DX12Texture * i_Texture, ETextureType i_Type)
 {
 	if (i_Type < eCount)
 	{
 		m_Textures[i_Type] = i_Texture;
+		if (i_Texture)
+		{
+			m_Descriptors[i_Type] = i_Texture->GetDescriptorHeap();
+		}
+		else
+		{
+			m_Descriptors[i_Type] = nullptr;
+		}
 	}
 }
 
@@ -90,11 +100,16 @@ void DX12Material::Set(const DX12MaterialDesc & i_Desc)
 	m_Name = i_Desc.Name;
 
 	// manage if the material have texture or not
-	m_Textures[eDiffuse] = i_Desc.map_Kd;
-	m_Textures[eAmbient] = i_Desc.map_Ka;
-	m_Textures[eSpecular] = i_Desc.map_Ks;
+	SetTexture(i_Desc.map_Kd, eDiffuse);
+	SetTexture(i_Desc.map_Ks, eSpecular);
+	SetTexture(i_Desc.map_Ka, eAmbient);
 
 	m_HaveChanged = true;
+}
+
+UINT64 DX12Material::GetId() const
+{
+	return m_Id;
 }
 
 bool DX12Material::NeedUpdate() const
@@ -144,9 +159,25 @@ inline void DX12Material::UpdateConstantBufferView()
 	}
 }
 
+/*
+HRESULT DX12Texture::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
+{
+	// set the descriptor heap
+	ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap };
+	i_CommandList->SetDescriptorHeaps(1, descriptorHeaps);
+	return m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+}
+
+const D3D12_GPU_DESCRIPTOR_HANDLE DX12Texture::GetDescriptorHandle() const
+{
+// set the descriptor heap
+ID3D12DescriptorHeap* descriptorHeaps[] = { m_DescriptorHeap };
+i_CommandList->SetDescriptorHeaps(1, descriptorHeaps);*/
+
 void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+	ID3D12DescriptorHeap ** descriptors = (ID3D12DescriptorHeap **)m_Descriptors;
 
 	// error management
 	if (m_ConstantBuffer == UnavailableAdressId)
@@ -156,15 +187,20 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) 
 		return;
 	}
 
+	i_CommandList->SetDescriptorHeaps(1, descriptors);
+
+	// parameter 0 is already used by the CBV for transform so we start to the 
+	i_CommandList->SetGraphicsRootConstantBufferView(1, render.GetConstantBuffer(DX12RenderEngine::eMaterial)->GetUploadVirtualAddress(m_ConstantBuffer));
+
 	// bind textures
 	for (UINT i = 0; i < ETextureType::eCount; ++i)
 	{
-		if (HaveTexture((ETextureType)i))
+		if (HaveTexture((ETextureType)i) && i < 2)
 		{
-			
+			i_CommandList->SetGraphicsRootDescriptorTable(2 + i, m_Textures[eDiffuse]->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+
 		}
 	}
 
 	// bind the constant buffer and texture to the commandlist
-	i_CommandList->SetGraphicsRootConstantBufferView(1, render.GetConstantBuffer(DX12RenderEngine::eMaterial)->GetUploadVirtualAddress(m_ConstantBuffer));
 }

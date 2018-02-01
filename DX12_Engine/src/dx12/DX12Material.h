@@ -56,7 +56,11 @@ public:
 	void		SetDiffuseColor(const Color & i_Color);
 	void		SetEmissiveColor(const Color & i_Color);
 	void		SetSpecularColor(const Color & i_Color);
+	// reset the material
 	void		Set(const DX12MaterialDesc & i_Desc);
+
+	// id
+	UINT64		GetId() const;
 
 	// dx12
 	bool		NeedUpdate() const;
@@ -74,7 +78,10 @@ private:
 	std::string	m_Name;
 
 	// textures of the material (if null means not found or not used)
-	DX12Texture *	m_Textures[eCount];
+	DX12Texture *			m_Textures[eCount];
+	ID3D12DescriptorHeap *	m_Descriptors[eCount];	// descriptor count
+	// id for the material
+	UINT64					m_Id;
 
 	// other
 	float	m_SpecularExponent;
