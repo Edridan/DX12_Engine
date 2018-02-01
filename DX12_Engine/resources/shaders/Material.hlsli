@@ -10,10 +10,10 @@ float					Ns;
 cbuffer MaterialBuffer : register(b1)	// the material buffer is instanced on the buffer 1
 {
 	// default material implementation
-	float3	ka;
-	float3	kd;
-	float3	ks;
-	float3	ke;
+	float4	ka;
+	float4	kd;
+	float4	ks;
+	float4	ke;
 	bool	map_a;
 	bool	map_d;
 	bool	map_s;

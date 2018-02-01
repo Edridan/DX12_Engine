@@ -8,7 +8,7 @@
 class DX12ConstantBuffer
 {
 public:
-	DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize);
+	DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize, bool i_IsDucpliacted = true /* if true : create a constant buffer for each frame index */);
 	~DX12ConstantBuffer();
 
 	// buffer map
@@ -26,6 +26,9 @@ public:
 	void						UpdateConstantBufferForEachFrame(ADDRESS_ID i_Address, void * i_Data, UINT i_Size);
 
 private:
+	// internal management
+	int							GetFrameIndex() const;
+
 	// dx12
 	ID3D12DescriptorHeap **		m_MainDescriptorHeap;
 	ID3D12Resource **			m_ConstantBufferUploadHeap;	// memory where constant buffers for each frame will be placed
@@ -34,6 +37,7 @@ private:
 	UINT						m_ConstantBufferHeapSize = 32;
 	// internal management
 	UINT					m_FrameCount;
+	const bool				m_IsDuplicated;
 
 	// Constant buffer management
 	const UINT64		m_ElementSize;	// size of one constant buffer per object

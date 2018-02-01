@@ -832,7 +832,8 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 
 	// -- Create root signature -- //
 
-#define CBV_COUNT	2
+	// Constant buffer for materials and transform
+#define CBV_COUNT	2	
 
 	// create the root descriptor : where to find the data for this root parameter
 	D3D12_ROOT_DESCRIPTOR * rootCBVDescriptor = new D3D12_ROOT_DESCRIPTOR[CBV_COUNT];

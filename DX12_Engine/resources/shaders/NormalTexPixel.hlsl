@@ -16,16 +16,7 @@ struct VS_OUTPUT
 
 float4 main(VS_OUTPUT input) : SV_TARGET
 {
-	float3 color;
-
-	if (map_a)
-	{
-		color = kd;
-	}
-	else
-	{
-		color = kd;
-	}
+	float3 color = float3(map_a, map_d, map_s);
 	// compute color of a pixel
 	//tex.Sample(tex_sample, input.uv).xyz;
 	

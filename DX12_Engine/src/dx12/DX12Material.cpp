@@ -102,11 +102,11 @@ bool DX12Material::NeedUpdate() const
 	return false;
 }
 
-void DX12Material::UpdateConstantBufferView()
+inline void DX12Material::UpdateConstantBufferView()
 {
 	struct MaterialStruct
 	{
-		DirectX::XMFLOAT3		Ka, Kd, Ks, Ke;
+		DirectX::XMFLOAT4		Ka, Kd, Ks, Ke;
 		BOOL					Map_A, Map_D, Map_S;
 		float					Ns;
 	};
@@ -126,10 +126,10 @@ void DX12Material::UpdateConstantBufferView()
 		// push constant buffer to the gpu
 		MaterialStruct mat;
 
-		mat.Ka = ColorToVec3(m_ColorAmbient);
-		mat.Kd = ColorToVec3(m_ColorDiffuse);
-		mat.Ks = ColorToVec3(m_ColorSpecular);
-		mat.Ke = ColorToVec3(m_ColorEmissive);
+		mat.Ka = ColorToVec4(m_ColorAmbient);
+		mat.Kd = ColorToVec4(m_ColorDiffuse);
+		mat.Ks = ColorToVec4(m_ColorSpecular);
+		mat.Ke = ColorToVec4(m_ColorEmissive);
 
 		mat.Map_A = HaveTexture(eAmbient);
 		mat.Map_D = HaveTexture(eDiffuse);

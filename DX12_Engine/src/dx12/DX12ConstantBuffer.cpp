@@ -2,14 +2,20 @@
 #include "dx12/DX12RenderEngine.h"
 
 
-DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize)
+DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize, bool i_IsDucpliacted /* = true */)
 	:m_ElementSize((i_ElementSize + 255) & ~255)	// align element size on 256 bytes
 	,m_BufferSize(i_BufferSize)
+	,m_IsDuplicated(i_IsDucpliacted)
 {
 	// retreive device
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 	ID3D12Device * device = render.GetDevice();
-	m_FrameCount = render.GetFrameBufferCount();
+
+	// retreive the frame count (one buffer is going to be created for each frame index)
+	if (m_IsDuplicated)
+		m_FrameCount = render.GetFrameBufferCount();
+	else
+		m_FrameCount = 1;	// only one buffer
 
 	// initialize arrays
 	m_MainDescriptorHeap		= new ID3D12DescriptorHeap *[m_FrameCount];
@@ -41,6 +47,7 @@ DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize
 	}
 }
 
+
 DX12ConstantBuffer::~DX12ConstantBuffer()
 {
 	for (int i = 0; i < DX12RenderEngine::GetInstance().GetFrameBufferCount(); ++i)
@@ -55,8 +62,7 @@ DX12ConstantBuffer::~DX12ConstantBuffer()
 ADDRESS_ID DX12ConstantBuffer::ReserveVirtualAddress(bool i_Initialize /* = false */)
 {
 	ADDRESS_ID address = 0;
-	const int frameBufferCount = DX12RenderEngine::GetInstance().GetFrameBufferCount();
-	
+
 	// retreive the first address available
 	while (address < m_BufferSize)
 	{
@@ -97,13 +103,13 @@ void DX12ConstantBuffer::ReleaseVirtualAddress(ADDRESS_ID i_Address)
 
 UINT8 * DX12ConstantBuffer::GetGPUAddress(ADDRESS_ID i_Address) const
 {
-	const int frameIndex = DX12RenderEngine::GetInstance().GetFrameIndex();
+	const int frameIndex = GetFrameIndex();
 	return m_ConstantBufferGPUAdress[frameIndex] + (i_Address * m_ElementSize);
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS DX12ConstantBuffer::GetUploadVirtualAddress(ADDRESS_ID i_Address) const
 {
-	const int frameIndex = DX12RenderEngine::GetInstance().GetFrameIndex();
+	const int frameIndex = GetFrameIndex();
 
 	if (m_ConstantBufferReservedAddress[i_Address] == false)
 	{
@@ -121,7 +127,8 @@ UINT64 DX12ConstantBuffer::GetConstantElementSize() const
 
 void DX12ConstantBuffer::UpdateConstantBuffer(ADDRESS_ID i_Address, void * i_Data, UINT i_Size)
 {
-	int frameIndex = DX12RenderEngine::GetInstance().GetFrameIndex();
+	const int frameIndex = GetFrameIndex();
+
 	if (m_ConstantBufferReservedAddress[i_Address] == true)
 	{
 		// copy data to the constant buffer
@@ -149,4 +156,14 @@ void DX12ConstantBuffer::UpdateConstantBufferForEachFrame(ADDRESS_ID i_Address, 
 		PRINT_DEBUG("Error, trying to update non reserved constant buffer address");
 		DEBUG_BREAK;
 	}
+}
+
+inline int DX12ConstantBuffer::GetFrameIndex() const
+{
+	if (m_IsDuplicated)
+	{
+		return DX12RenderEngine::GetInstance().GetFrameIndex();
+	}
+	// if the constant buffer is not duplicated, we only have one buffer
+	return 1;
 }
