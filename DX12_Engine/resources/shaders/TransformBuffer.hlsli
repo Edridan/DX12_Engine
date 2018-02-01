@@ -8,6 +8,3 @@ cbuffer TransformBuffer : register(b0)
 	matrix	view;
 	matrix	projection;
 };
-
-// to do : create another buffer especially for the pixel shaders
-// some buffers need to be a single place and are updated once

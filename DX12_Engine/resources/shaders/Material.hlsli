@@ -60,7 +60,7 @@ float4 GetSpecular(float uv)
 // (float4) : position of the pixel to compute
 // (float3)	: normal of the pixel (Warning : we assumed that the normal is already normalized)
 // (float2) : uv of the object
-float4 ComputeColor(float4 pos, float3 normal, float2 uv)
+float4 ComputeColor(float4 pos, float3 normal, float3 cam_pos, float2 uv)
 {
 	// ambient color
 	float4 ambient = GetAmbient(uv);
@@ -83,7 +83,7 @@ float4 ComputeColor(float4 pos, float3 normal, float2 uv)
 // (float4) : position of the pixel to compute
 // (float3)	: normal of the pixel (Warning : we assumed that the normal is already normalized)
 // (float4) : color of the pixel
-float4 ComputeColor(float4 pos, float3 normal, float4 color)
+float4 ComputeColor(float4 pos, float3 normal, float3 cam_pos, float4 color)
 {
 	return color;
 }
