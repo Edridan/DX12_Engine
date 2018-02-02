@@ -19,12 +19,6 @@ class DX12ConstantBuffer;
 // define
 #define DEBUG_DX12_ENABLE		1
 
-enum PiplineStateFlags
-{
-	eDefault			= 0 << 0,
-	eTextured			= 1 << 0,
-};
-
 // Render engine implementation
 class DX12RenderEngine
 {

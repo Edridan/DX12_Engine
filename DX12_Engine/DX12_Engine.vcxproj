@@ -98,8 +98,10 @@
     <ClCompile Include="src\dx12\DX12Material.cpp" />
     <ClCompile Include="src\dx12\DX12Mesh.cpp" />
     <ClCompile Include="src\dx12\DX12MeshBuffer.cpp" />
+    <ClCompile Include="src\dx12\DX12PipelineState.cpp" />
     <ClCompile Include="src\dx12\DX12RenderEngine.cpp" />
     <ClCompile Include="src\dx12\DX12RenderTarget.cpp" />
+    <ClCompile Include="src\dx12\DX12RootSignature.cpp" />
     <ClCompile Include="src\dx12\DX12Shader.cpp" />
     <ClCompile Include="src\dx12\DX12Text.cpp" />
     <ClCompile Include="src\dx12\DX12Texture.cpp" />
@@ -111,6 +113,7 @@
     <ClCompile Include="src\engine\RenderList.cpp" />
     <ClCompile Include="src\engine\ResourcesManager.cpp" />
     <ClCompile Include="src\engine\Transform.cpp" />
+    <ClCompile Include="src\engine\Utils.cpp" />
     <ClCompile Include="src\engine\Window.cpp" />
     <ClCompile Include="src\game\Actor.cpp" />
     <ClCompile Include="src\game\ActorComponent.cpp" />
@@ -139,8 +142,10 @@
     <ClInclude Include="src\dx12\DX12Material.h" />
     <ClInclude Include="src\dx12\DX12Mesh.h" />
     <ClInclude Include="src\dx12\DX12MeshBuffer.h" />
+    <ClInclude Include="src\dx12\DX12PipelineState.h" />
     <ClInclude Include="src\dx12\DX12RenderEngine.h" />
     <ClInclude Include="src\dx12\DX12RenderTarget.h" />
+    <ClInclude Include="src\dx12\DX12RootSignature.h" />
     <ClInclude Include="src\dx12\DX12Shader.h" />
     <ClInclude Include="src\dx12\DX12Text.h" />
     <ClInclude Include="src\dx12\DX12Texture.h" />

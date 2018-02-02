@@ -51,13 +51,17 @@ public:
 
 	// material management
 	void		SetTexture(DX12Texture * i_Texture, ETextureType i_Type);
-	bool		HaveTexture(ETextureType i_Type) const;
+
 	void		SetAmbientColor(const Color & i_Color);
 	void		SetDiffuseColor(const Color & i_Color);
 	void		SetEmissiveColor(const Color & i_Color);
 	void		SetSpecularColor(const Color & i_Color);
 	// reset the material
 	void		Set(const DX12MaterialDesc & i_Desc);
+
+	// flags
+	bool		HaveTexture(ETextureType i_Type) const;
+	bool		IsCompatibleWithFlags(UINT64 i_ElementFlag) const;
 
 	// id
 	UINT64		GetId() const;

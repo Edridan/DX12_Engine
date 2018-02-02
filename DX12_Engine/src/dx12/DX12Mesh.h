@@ -34,6 +34,7 @@ public:
 	enum EElementFlags
 	{
 		eNone			= 0,
+
 		eHaveNormal		= 1 << 0,
 		eHaveTexcoord	= 1 << 1,
 		eHaveColor		= 1 << 2,
@@ -43,7 +44,7 @@ public:
 	static DX12Mesh *	GeneratePrimitiveMesh(EPrimitiveMesh i_Prim);
 	static DX12Mesh *	LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder = nullptr, const char * i_TextureFolder = nullptr);
 
-	// one shape mesh generation
+	// one shape procedural mesh generation
 	DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount);
 	DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount);
 	~DX12Mesh();

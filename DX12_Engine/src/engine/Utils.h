@@ -74,3 +74,8 @@ struct Padding
 {
 	float top, right, bottom, left;
 };
+
+
+
+///////////////////////////////////////////////
+// Math

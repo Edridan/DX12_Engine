@@ -6,5 +6,5 @@ cbuffer GlobalBuffer : register(b1)
 	// other useful matrix for effects
 	float	app_time;		// application time (from engine initialization)
 	float	frame_time;		// frame time
-	float4	cam_pos;		// position of the camera for lighting computation
+	float4	cam_pos;		// position of the camera
 };

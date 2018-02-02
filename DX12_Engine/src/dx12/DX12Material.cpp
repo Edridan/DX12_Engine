@@ -2,6 +2,7 @@
 
 #include "dx12/DX12RenderEngine.h"
 #include "dx12/DX12ConstantBuffer.h"
+#include "dx12/DX12PipelineState.h"
 #include "dx12/DX12Texture.h"
 
 DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
@@ -54,15 +55,6 @@ inline void DX12Material::SetTexture(DX12Texture * i_Texture, ETextureType i_Typ
 	}
 }
 
-inline bool DX12Material::HaveTexture(ETextureType i_Type) const
-{
-	if (i_Type < eCount)
-	{
-		return m_Textures[i_Type] != nullptr;
-	}
-	return false;
-}
-
 void DX12Material::SetAmbientColor(const Color & i_Color)
 {
 	m_HaveChanged = true;
@@ -111,6 +103,25 @@ void DX12Material::Set(const DX12MaterialDesc & i_Desc)
 UINT64 DX12Material::GetId() const
 {
 	return m_Id;
+}
+
+inline bool DX12Material::HaveTexture(ETextureType i_Type) const
+{
+	if (i_Type < eCount)
+	{
+		return m_Textures[i_Type] != nullptr;
+	}
+	return false;
+}
+
+bool DX12Material::IsCompatibleWithFlags(UINT64 i_ElementFlag) const
+{
+	const bool haveTex = HaveTexture(eAmbient) || HaveTexture(eDiffuse) || HaveTexture(eSpecular);
+
+	if (haveTex && !(i_ElementFlag | DX12PipelineState::EElementFlags::eHaveTexcoord))
+		return false;
+
+	return true;
 }
 
 bool DX12Material::NeedUpdate() const
