@@ -94,6 +94,9 @@
     <Filter Include="Header Files\Editor">
       <UniqueIdentifier>{552584b7-bd9e-4e3e-822b-bbedf5a61deb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders\Debug">
+      <UniqueIdentifier>{8d3fc3b4-ebb0-48e8-9c14-1f55845b3bd2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">

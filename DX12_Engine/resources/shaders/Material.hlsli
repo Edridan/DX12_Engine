@@ -50,7 +50,7 @@ float4 GetDiffuse(float2 uv)
 float4 GetAmbient(float2 uv)
 {
 	// if a texture exist
-	if (map_d)	return tex_ambient.Sample(tex_sample, uv).xyzw;
+	if (map_a)	return tex_ambient.Sample(tex_sample, uv).xyzw;
 	else		return ka;
 }
 
@@ -82,7 +82,12 @@ float4 ComputeColor(float4 pos, float3 normal, float3 cam_pos, float2 uv)
 	float spec = pow(max(dot(viewDir, reflectDir), 0.f), ns);
 	float4 specular = SunLightCol * (spec * GetSpecular(uv));
 
-	float4 color = ambient + diffuse + specular;
+	normal = max(normal, -(normal / 4.f));
+
+	return float4(normal, 1.f);
+	return float4(-lightDir.xyz, 1.f);
+
+	float4 color = ambient + GetDiffuse(uv); // +specular;
 
 	return color;
 }
