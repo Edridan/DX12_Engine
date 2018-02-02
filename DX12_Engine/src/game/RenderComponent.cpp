@@ -89,11 +89,15 @@ void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandLis
 		// Setup the pipeline state
 		i_CommandList->SetPipelineState(m_PipelineState);
 
-		// push const buffer
+		// push transform buffer
 		if (m_ConstBuffer != UnavailableAdressId)
 		{
 			i_CommandList->SetGraphicsRootConstantBufferView(0, render.GetConstantBuffer(DX12RenderEngine::eTransform)->GetUploadVirtualAddress(m_ConstBuffer));
 		}
+
+		// push the global buffer
+		i_CommandList->SetGraphicsRootConstantBufferView(1,	// 1 for b1 see the dx12 render engine constant buffer placement 
+			render.GetConstantBuffer(DX12RenderEngine::eGlobal)->GetUploadVirtualAddress(0U));
 
 		m_Material->PushOnCommandList(i_CommandList);
 

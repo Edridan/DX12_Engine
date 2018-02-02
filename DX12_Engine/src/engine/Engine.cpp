@@ -1,8 +1,9 @@
 #include "Engine.h"
 
+// dx12
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12RenderEngine.h"
-
+#include "dx12/DX12ConstantBuffer.h"
 // game include
 #include "game/World.h"
 #include "game/Camera.h"
@@ -75,6 +76,9 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	DX12RenderEngine::Create(i_Desc.HInstance);
 	m_RenderEngine = &DX12RenderEngine::GetInstance();
 	m_RenderEngine->InitializeDX12();
+
+	// intialize constant buffer
+	m_RenderEngine->GetConstantBuffer(DX12RenderEngine::eGlobal)->ReserveVirtualAddress();	// reserve the first address on the constant buffer
 
 	World::WorldDesc worldDesc;
 	// create default camera parameters
@@ -171,6 +175,25 @@ void Engine::Run()
 
 		// prepare the render engine
 		m_RenderEngine->PrepareForRender();	// intialize the command list and other stuff
+
+		// update global buffer
+		{
+			struct GlobalBuffer
+			{
+				// other useful matrix for effects
+				float		Time;		// application time (from engine initialization)
+				float		Elapsed;	// frame time
+				XMFLOAT4	CamPos;		// position of the camera
+			};
+
+			static GlobalBuffer buff = {};
+			buff.Elapsed = elapsed;
+			buff.Time = m_EngineClock->GetElapsedFromStart().ToSeconds();
+			buff.CamPos = m_CurrentWorld->GetCurrentCamera()->m_Position;
+
+			// update constant buffer
+			m_RenderEngine->GetConstantBuffer(DX12RenderEngine::eGlobal)->UpdateConstantBuffer(0, &buff, sizeof(GlobalBuffer));
+		}
 
 		// setup and push render list on the commandlist
 		{

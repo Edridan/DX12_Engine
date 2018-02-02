@@ -186,7 +186,7 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) 
 	// set descriptors
 
 	// parameter 0 is already used by the CBV for transform so we start to the 
-	i_CommandList->SetGraphicsRootConstantBufferView(1, render.GetConstantBuffer(DX12RenderEngine::eMaterial)->GetUploadVirtualAddress(m_ConstantBuffer));
+	i_CommandList->SetGraphicsRootConstantBufferView(2, render.GetConstantBuffer(DX12RenderEngine::eMaterial)->GetUploadVirtualAddress(m_ConstantBuffer));
 
 	// bind textures
 	for (UINT i = 0; i < ETextureType::eCount; ++i)
@@ -196,7 +196,7 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) 
 		{
 			// update the descriptor for the resources
 			i_CommandList->SetDescriptorHeaps(1, descriptors);
-			i_CommandList->SetGraphicsRootDescriptorTable(2 + i, m_Textures[i]->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+			i_CommandList->SetGraphicsRootDescriptorTable(3 + i, m_Textures[i]->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 		}
 	}
 

@@ -63,6 +63,7 @@ public:
 	enum EConstantBufferId
 	{
 		eTransform,		// used for transform matrix 3D space
+		eGlobal,		// used for global buffer
 		eMaterial,		// used for material specs
 
 		// count

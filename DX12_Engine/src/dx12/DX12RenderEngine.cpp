@@ -18,6 +18,7 @@ const DX12RenderEngine::ConstantBufferDef			DX12RenderEngine::s_ConstantBufferSi
 {
 	// {ElementSize, ElementCount}
 	{256, 1024},		// transform
+	{256, 16},			// global buffer (always pointing on the same)
 	{256, 1024},		// materials
 };
 
@@ -756,7 +757,7 @@ inline void DX12RenderEngine::GenerateDefaultPipelineState()
 
 inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 {
-#define CBV_COUNT	2
+#define CBV_COUNT	3
 
 	// The pipeline state is already created
 	if (m_PipelineStateObjects[i_Flags] != nullptr)
@@ -768,7 +769,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	DX12Shader * pixelShader = nullptr, *vertexShader = nullptr;
 	UINT textureCount = 0;
 	UINT samplerCount = 0;
-	UINT bufferCount = CBV_COUNT;	// default buffer count, this include the 2 constant buffer for the materials
+	UINT bufferCount = CBV_COUNT;	// default buffer count : transform, global, material
 
 	// sampler for textures
 	D3D12_STATIC_SAMPLER_DESC	* sampler			= nullptr;
@@ -847,9 +848,12 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	// transform constant buffer (matrix)
 	rootCBVDescriptor[0].RegisterSpace = 0;
 	rootCBVDescriptor[0].ShaderRegister = 0;
-	// material constant buffer
+	// global constant buffer
 	rootCBVDescriptor[1].RegisterSpace = 0;
 	rootCBVDescriptor[1].ShaderRegister = 1;
+	// material constant buffer
+	rootCBVDescriptor[2].RegisterSpace = 0;
+	rootCBVDescriptor[2].ShaderRegister = 2;
 
 	// create the default root parameter and fill it out
 	// this paramater is the model view projection matrix
@@ -857,8 +861,9 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 
 	static const D3D12_SHADER_VISIBILITY shaderVisibility[CBV_COUNT] =
 	{
-		D3D12_SHADER_VISIBILITY_VERTEX,
-		D3D12_SHADER_VISIBILITY_PIXEL,
+		D3D12_SHADER_VISIBILITY_VERTEX,			// transform
+		D3D12_SHADER_VISIBILITY_ALL,			// global
+		D3D12_SHADER_VISIBILITY_PIXEL,			// material
 	};
 
 	static D3D12_SHADER_VISIBILITY * textureShaderVisibility = new D3D12_SHADER_VISIBILITY[textureCount];

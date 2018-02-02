@@ -7,6 +7,12 @@ BOOL					Map_A, Map_D, Map_S;
 float					Ns;
 */
 
+
+/*
+eAmbient,
+eSpecular,
+eDiffuse,
+*/
 // texture sampler for material
 Texture2D tex_ambient		: register(t0);
 Texture2D tex_specular		: register(t1);
@@ -18,7 +24,7 @@ SamplerState tex_sample		: register(s0);
 static const float3		SunLightPos = float3(0.f, 100.f, 0.f);
 static const float4		SunLightCol = float4(1.f, 1.f, 1.f, 1.f);
 
-cbuffer MaterialBuffer : register(b1)	// the material buffer is instanced on the buffer 1
+cbuffer MaterialBuffer : register(b2)	// the material buffer is instanced on the buffer 1
 {
 	// default material implementation
 	float4	ka;
