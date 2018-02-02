@@ -302,5 +302,6 @@ void Engine::CleanUpModules()
 	delete m_Window;
 
 	// delete the render engine
-	DX12RenderEngine::Delete();
+	// To do : fix crash when releasing resources
+	//DX12RenderEngine::Delete();
 }

@@ -799,13 +799,13 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	if (i_Flags & DX12Mesh::EElementFlags::eHaveTexcoord)
 	{
 		// at least one texture
-		textureCount = 2;	// for now only ambient texture is managed
+		textureCount = 3;	// for now only ambient texture is managed
 		samplerCount = 1;	// only one sample to manage all texture right now
-		bufferCount += 1;		// add a descriptor table for each textures
+		bufferCount += textureCount;		// add a descriptor table for each textures
 
 		// create descriptor table ranges
 		D3D12_DESCRIPTOR_RANGE *  descriptorTableRanges = new D3D12_DESCRIPTOR_RANGE[textureCount];
-		descriptorTable = new D3D12_ROOT_DESCRIPTOR_TABLE[1];	// create a descriptor table
+		descriptorTable = new D3D12_ROOT_DESCRIPTOR_TABLE[textureCount];	// create a descriptor table
 
 		for (UINT i = 0; i < textureCount; ++i)
 		{
@@ -814,11 +814,10 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 			descriptorTableRanges[i].BaseShaderRegister = i; // start index of the shader registers in the range
 			descriptorTableRanges[i].RegisterSpace		= 0; // space 0. can usually be zero
 			descriptorTableRanges[i].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
+			// descriptor table
+			descriptorTable[i].NumDescriptorRanges	= 1;	// texture count
+			descriptorTable[i].pDescriptorRanges	= &descriptorTableRanges[i]; // the pointer to the beginning of our ranges array
 		}
-
-		// descriptor table
-		descriptorTable[0].NumDescriptorRanges	= textureCount;	// texture count
-		descriptorTable[0].pDescriptorRanges	= descriptorTableRanges; // the pointer to the beginning of our ranges array
 
 		sampler = new D3D12_STATIC_SAMPLER_DESC[samplerCount]; // create a descriptor table
 
@@ -862,7 +861,6 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 		D3D12_SHADER_VISIBILITY_PIXEL,
 	};
 
-	// material textures
 	static D3D12_SHADER_VISIBILITY * textureShaderVisibility = new D3D12_SHADER_VISIBILITY[textureCount];
 	if (textureCount > 0)	textureShaderVisibility[0] = D3D12_SHADER_VISIBILITY_PIXEL;	// ambient texture
 	if (textureCount > 1)	textureShaderVisibility[1] = D3D12_SHADER_VISIBILITY_PIXEL;	// diffuse texture
@@ -877,12 +875,11 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	}
 
 	// setup the root parameters for textures
-	if (textureCount != 0)
+	for (UINT i = 0; i < (bufferCount - CBV_COUNT); ++i)
 	{
-		// first parameter is always the CBV
-		rootParameters[CBV_COUNT].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
-		rootParameters[CBV_COUNT].DescriptorTable	= descriptorTable[0]; // this is the root descriptor for this root parameter
-		rootParameters[CBV_COUNT].ShaderVisibility	= D3D12_SHADER_VISIBILITY_PIXEL; // our vertex shader will be the only shader accessing this parameter for now
+		rootParameters[CBV_COUNT + i].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameters[CBV_COUNT + i].DescriptorTable	= descriptorTable[i];
+		rootParameters[CBV_COUNT + i].ShaderVisibility	= textureShaderVisibility[i];
 	}
 
 	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT

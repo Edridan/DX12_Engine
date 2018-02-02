@@ -11,7 +11,7 @@ struct VS_OUTPUT
 float4 main(VS_OUTPUT input) : SV_TARGET
 {
 	// compute color of a pixel
-	float3 color = tex_ambient.Sample(tex_sample, input.uv).xyz;
+	float3 color = tex_diffuse.Sample(tex_sample, input.uv).xyz;
 
 	return float4(color, 1.f);
 }
