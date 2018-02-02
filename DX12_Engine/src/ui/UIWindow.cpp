@@ -19,7 +19,7 @@ UIWindow::~UIWindow()
 
 bool UIWindow::IsActive() const
 {
-	return false;
+	return m_Active;
 }
 
 void UIWindow::SetActive(bool i_Active)
@@ -56,12 +56,33 @@ void UIWindow::StartDraw()
 	ImGui::Begin(m_WindowName.c_str(), &m_Active, m_WindowFlags);
 
 	// update data for the current window
-	m_Focused = ImGui::IsWindowFocused();
+	bool isFocused		= ImGui::IsWindowFocused();
+	bool isHovered		= ImGui::IsWindowHovered();
+	bool isCollapsed	= ImGui::IsWindowCollapsed();
+
+	// hover callbacks
+	if (isHovered != m_IsHovered)
+	{
+		if (isHovered)	OnStartHover();
+		else			OnEndHover();
+	}
+	// collapse callbacks
+	if (isCollapsed != m_IsCollapsed)
+	{
+		if (isCollapsed)	OnCollapsed();
+	}
+
+	// update data
+	m_IsHovered		= isHovered;
+	m_IsCollapsed	= isCollapsed;
+	m_Focused		= isFocused;
+
 
 	if (active != m_Active && (!m_Active))
 	{
 		// callback
 		OnClose(false);
+		m_Active = false;
 	}
 }
 
@@ -73,4 +94,24 @@ void UIWindow::EndDraw() const
 void UIWindow::OnClose(bool i_UserCall)
 {
 	// do nothing, close has been called by neither the user or ImGui
+}
+
+void UIWindow::OnOpen()
+{
+}
+
+void UIWindow::OnHover()
+{
+}
+
+void UIWindow::OnStartHover()
+{
+}
+
+void UIWindow::OnEndHover()
+{
+}
+
+void UIWindow::OnCollapsed()
+{
 }

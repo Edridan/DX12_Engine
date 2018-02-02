@@ -77,11 +77,14 @@ float4 ComputeColor(float4 pos, float3 normal, float3 cam_pos, float2 uv)
 	float4 diffuse = SunLightCol * (diff * GetDiffuse(uv));
 
 	// specular
+	float3 viewDir = normalize(cam_pos - pos.xyz);
+	float3 reflectDir = reflect(-lightDir, normal);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.f), ns);
+	float4 specular = SunLightCol * (spec * GetSpecular(uv));
 
+	float4 color = ambient + diffuse + specular;
 
-	float4 color = ambient + diffuse;
-
-	return float4(1.f, 0.f, 0.f, 1.f);
+	return color;
 }
 
 

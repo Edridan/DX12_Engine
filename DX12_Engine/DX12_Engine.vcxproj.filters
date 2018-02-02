@@ -85,14 +85,14 @@
     <Filter Include="Resource Files\Shaders\ImGui">
       <UniqueIdentifier>{85fc765a-f89b-4c26-bcb0-148e9513e0c3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\UI\Editor">
-      <UniqueIdentifier>{2af5e8fd-e7b0-41ed-a312-3baa04cd7634}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\UI\Editor">
-      <UniqueIdentifier>{fa9a2385-acf1-4254-9ba7-95d396c01dbf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Shaders\Forward">
       <UniqueIdentifier>{42fa381b-47f6-452e-8fba-12c6346d2593}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Editor">
+      <UniqueIdentifier>{68688b01-7b69-48c7-aed3-fd9242717c8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Editor">
+      <UniqueIdentifier>{552584b7-bd9e-4e3e-822b-bbedf5a61deb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -195,9 +195,6 @@
     <ClCompile Include="src\engine\Console.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\ui\UITexture.cpp">
-      <Filter>Source Files\UI\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="src\engine\Utils.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
@@ -206,6 +203,12 @@
     </ClCompile>
     <ClCompile Include="src\dx12\DX12PipelineState.cpp">
       <Filter>Source Files\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UITexture.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UIDebug.cpp">
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -326,14 +329,17 @@
     <ClInclude Include="src\ui\UIConsole.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
-    <ClInclude Include="src\ui\UITexture.h">
-      <Filter>Header Files\UI\Editor</Filter>
-    </ClInclude>
     <ClInclude Include="src\dx12\DX12RootSignature.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\dx12\DX12PipelineState.h">
       <Filter>Header Files\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UITexture.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UIDebug.h">
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

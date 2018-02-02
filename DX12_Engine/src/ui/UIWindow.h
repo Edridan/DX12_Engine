@@ -46,7 +46,11 @@ public:
 private:
 	// internal overrited callbacks
 	virtual void		OnClose(bool i_UserCall);
-
+	virtual void		OnOpen();
+	virtual void		OnHover();
+	virtual void		OnStartHover();
+	virtual void		OnEndHover();
+	virtual void		OnCollapsed();
 
 	// window management
 	bool			m_Active;
@@ -54,6 +58,10 @@ private:
 	unsigned int	m_Id;
 	int				m_WindowFlags;
 	std::string		m_WindowName;
+
+	// window callbacks management
+	bool			m_IsHovered;
+	bool			m_IsCollapsed;
 
 	// static
 	static unsigned int s_Instance;

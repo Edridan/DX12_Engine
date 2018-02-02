@@ -122,6 +122,7 @@
     <ClCompile Include="src\game\World.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\ui\UIConsole.cpp" />
+    <ClCompile Include="src\ui\UIDebug.cpp" />
     <ClCompile Include="src\ui\UILayer.cpp" />
     <ClCompile Include="src\ui\UITexture.cpp" />
     <ClCompile Include="src\ui\UIWindow.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="src\game\Camera.h" />
     <ClInclude Include="src\game\RenderComponent.h" />
     <ClInclude Include="src\game\World.h" />
+    <ClInclude Include="src\ui\UIDebug.h" />
     <ClInclude Include="src\ui\UI.h" />
     <ClInclude Include="src\ui\UIConsole.h" />
     <ClInclude Include="src\ui\UILayer.h" />

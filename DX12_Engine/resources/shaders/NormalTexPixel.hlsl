@@ -16,5 +16,7 @@ float4 main(VS_OUTPUT input) : SV_TARGET
 	float3 color2 = tex_specular.Sample(tex_sample, input.uv).xyz;
 	float3 color = lerp(color1, color2, sin(app_time));
 
-	return float4(color, 1.f);
+	return ComputeColor(input.pos, input.normal, cam_pos.xyz, input.uv);
+
+	//return float4(color, 1.f);
 }

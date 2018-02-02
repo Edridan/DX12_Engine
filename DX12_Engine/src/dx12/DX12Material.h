@@ -29,7 +29,7 @@ public:
 			,Kd(color::Blue)
 			,Ks(color::Blue)
 			,Ke(color::Blue)
-			,Ns(0.f)
+			,Ns(1000.f)
 			,map_Kd(nullptr)
 			,map_Ks(nullptr)
 			,map_Ka(nullptr)

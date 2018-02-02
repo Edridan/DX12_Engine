@@ -17,6 +17,7 @@
 // ui
 #include "ui/UILayer.h"
 #include "ui/UIConsole.h"
+#include "ui/UIDebug.h"
 
 
 Engine *		Engine::s_Instance = nullptr;
@@ -102,11 +103,14 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_UILayer = new UILayer(m_Window);
 	m_UILayer->SetEnable(i_Desc.UIEnabled);
 
+#ifdef _DEBUG
 	// ui dev initialization
 	m_UIConsole = new UIConsole;
 
 	// push windows on layer
 	m_UILayer->PushUIWindowOnLayer(m_UIConsole);
+	m_UILayer->PushUIWindowOnLayer(new UIDebug);
+#endif
 
 	// initialize console
 	m_Console = new Console;
@@ -117,6 +121,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_Console->RegisterFunction(new CFHelp);
 	m_Console->RegisterFunction(new CFPrintParam);
 	m_Console->RegisterFunction(new CFSetFrameTarget);
+
 
 
 #ifdef _DEBUG

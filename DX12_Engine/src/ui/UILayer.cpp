@@ -229,10 +229,13 @@ void UILayer::DisplayUIOnLayer()
 	// we create vertices for the UI
 	for (size_t i = 0; i < m_Windows.size(); ++i)
 	{
-		// create vertices for the window
-		m_Windows[i]->StartDraw();
-		m_Windows[i]->DrawWindow();
-		m_Windows[i]->EndDraw();
+		if (m_Windows[i]->IsActive())
+		{
+			// create vertices for the window
+			m_Windows[i]->StartDraw();
+			m_Windows[i]->DrawWindow();
+			m_Windows[i]->EndDraw();
+		}
 	}
 }
 
