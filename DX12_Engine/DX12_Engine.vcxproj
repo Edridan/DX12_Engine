@@ -199,6 +199,10 @@
     <ResourceCompile Include="DX12_Engine.rc" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="resources\shaders\debug\DrawNormalPixels.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="resources\shaders\DefaultPixel.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>

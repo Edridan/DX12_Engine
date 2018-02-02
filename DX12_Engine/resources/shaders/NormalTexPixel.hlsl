@@ -6,17 +6,16 @@ struct VS_OUTPUT
 {
 	float4 pos		: SV_POSITION;
 	float3 normal	: NORMAL;
+	float4 location	: LOCATION;
 	float2 uv		: TEXCOORD;
 };
 
 float4 main(VS_OUTPUT input) : SV_TARGET
 {
 	// compute color of a pixel
-	float3 color1 = tex_diffuse.Sample(tex_sample, input.uv).xyz;
-	float3 color2 = tex_specular.Sample(tex_sample, input.uv).xyz;
-	float3 color = lerp(color1, color2, sin(app_time));
+	float4 sunpos = float4(100.f, 0.f, 0.f, 1.f);
 
-	return ComputeColor(input.pos, input.normal, cam_pos.xyz, input.uv);
+	return ComputeColor(input.location, input.normal, cam_pos.xyz, input.uv, sunpos);
 
 	//return float4(color, 1.f);
 }

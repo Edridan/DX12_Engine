@@ -417,5 +417,8 @@
     <FxCompile Include="resources\shaders\NormalVertex.hlsl">
       <Filter>Resource Files\Shaders\Forward</Filter>
     </FxCompile>
+    <FxCompile Include="resources\shaders\debug\DrawNormalPixels.hlsl">
+      <Filter>Resource Files\Shaders\Debug</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

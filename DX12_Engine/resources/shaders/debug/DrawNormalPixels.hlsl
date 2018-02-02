@@ -6,7 +6,7 @@ struct VS_OUTPUT
 	float3 normal	: NORMAL;
 };
 
-float4 main() : SV_TARGET
+float4 main(VS_OUTPUT input) : SV_TARGET
 {
-	return max(float4(normal, 1.f), float4(-normal / 4.f, 1.f));
+	return max(float4(input.normal, 1.f), float4(-input.normal / 4.f, 1.f));
 }
