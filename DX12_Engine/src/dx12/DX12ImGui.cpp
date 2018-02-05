@@ -234,6 +234,21 @@ HRESULT ImGuiD3D12::InitializeDX12ImGui()
 	return S_OK;
 }
 
+bool ImGuiD3D12::ImguiIsInitialized()
+{
+	return (SrvHeap != nullptr);
+}
+
+void ImGuiD3D12::CleanResources()
+{
+	if (ImguiIsInitialized())
+	{
+		SAFE_RELEASE(SrvHeap);
+		SAFE_RELEASE(RootSignature);
+		SAFE_RELEASE(UploadBuffer);
+	}
+}
+
 void ImGuiD3D12::SetRenderDataImGui(ID3D12GraphicsCommandList * i_CommandList, D3D12_CPU_DESCRIPTOR_HANDLE i_RenderTarget)
 {
 	CommandList = i_CommandList;

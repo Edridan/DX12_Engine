@@ -344,6 +344,9 @@
     <ClInclude Include="src\ui\UIDebug.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="src\engine\StackDebugger.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\fonts\Arial-font.png">

@@ -13,11 +13,20 @@
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12Shader.h"
 
+#ifdef _DEBUG
+#include <D3d12sdklayers.h>
+#endif
+
 // class predef
 class DX12ConstantBuffer;
 
 // define
 #define DEBUG_DX12_ENABLE		1
+
+// debug management
+#if (DEBUG_DX12_ENABLE) && defined(_DEBUG)
+#define DX12_DEBUG
+#endif
 
 // Render engine implementation
 class DX12RenderEngine
@@ -141,8 +150,10 @@ private:
 	int							m_FrameIndex; // current render target view we are on
 	int							m_RtvDescriptorSize; // size of the rtv descriptor on the device (all front and back buffers will be the same size)
 
+#ifdef DX12_DEBUG
 	// Debug
 	ID3D12Debug *				m_DebugController;
+#endif
 
 	// Depth buffer
 	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial

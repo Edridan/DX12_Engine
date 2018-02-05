@@ -157,6 +157,7 @@
     <ClInclude Include="src\engine\Engine.h" />
     <ClInclude Include="src\engine\RenderList.h" />
     <ClInclude Include="src\engine\ResourcesManager.h" />
+    <ClInclude Include="src\engine\StackDebugger.h" />
     <ClInclude Include="src\engine\Transform.h" />
     <ClInclude Include="src\engine\Utils.h" />
     <ClInclude Include="src\engine\Window.h" />

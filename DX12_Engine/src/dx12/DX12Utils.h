@@ -10,7 +10,7 @@
 
 
 // release and delete macros
-#define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
+#define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = nullptr; } }
 
 // Type definition
 typedef UINT64 ADDRESS_ID;

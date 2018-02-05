@@ -53,7 +53,7 @@ float4 GetAmbient(float2 uv)
 	else		return ka;
 }
 
-float4 GetSpecular(float uv)
+float4 GetSpecular(float2 uv)
 {
 	if (map_s)	return tex_specular.Sample(tex_sample, uv).xyzw;
 	else		return ka;
@@ -68,7 +68,7 @@ float4 GetSpecular(float uv)
 float4 ComputeColor(float4 pos, float3 normal, float3 cam_pos, float2 uv, float4 sunPosition)
 {
 	// ambient color
-	float4 ambient = GetAmbient(uv);
+	float4 ambient = GetAmbient(uv) * GetDiffuse(uv);
 
 	// diffuse
 	float3 lightDir = normalize(sunPosition - pos.xyz);
@@ -78,10 +78,8 @@ float4 ComputeColor(float4 pos, float3 normal, float3 cam_pos, float2 uv, float4
 	// specular
 	float3 viewDir = normalize(cam_pos - pos.xyz);
 	float3 reflectDir = reflect(-lightDir, normal);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.f), ns);
-	float4 specular = SunLightCol * (spec * GetSpecular(uv));
-
-	return specular;
+	float spec = pow(max(dot(viewDir, reflectDir), 0.f), 5.f);
+	float4 specular = SunLightCol * spec * GetSpecular(uv);
 
 	float4 color = ambient + diffuse + specular;
 

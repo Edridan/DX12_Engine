@@ -20,6 +20,8 @@ namespace ImGuiD3D12
 {
 	// internal call (UILayer)
 	HRESULT InitializeDX12ImGui();
+	bool	ImguiIsInitialized();
+	void	CleanResources();
 
 	// rendering
 	void	SetRenderDataImGui(ID3D12GraphicsCommandList * i_CommandList, D3D12_CPU_DESCRIPTOR_HANDLE i_RenderTarget);

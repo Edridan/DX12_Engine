@@ -30,7 +30,6 @@ private:
 	int							GetFrameIndex() const;
 
 	// dx12
-	ID3D12DescriptorHeap **		m_MainDescriptorHeap;
 	ID3D12Resource **			m_ConstantBufferUploadHeap;	// memory where constant buffers for each frame will be placed
 	UINT8 **					m_ConstantBufferGPUAdress;	// pointer for each of the resource buffer constant heap
 	bool *						m_ConstantBufferReservedAddress;	// internal constant buffer management

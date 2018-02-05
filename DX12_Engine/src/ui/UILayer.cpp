@@ -40,6 +40,8 @@ UILayer::UILayer(Window * i_Window)
 	io.KeyMap[ImGuiKey_Y] = 'Y';
 	io.KeyMap[ImGuiKey_Z] = 'Z';
 
+	if (ImGuiD3D12::ImguiIsInitialized())	return;
+
 	// setup imgui
 	io.RenderDrawListsFn = ImGuiD3D12::RenderDrawListImGui;	// callback for rendering
 	io.ImeWindowHandle = i_Window->GetHWnd();
@@ -72,6 +74,7 @@ UILayer::UILayer(Window * i_Window, const LayerStyleDesc & i_Style)
 
 UILayer::~UILayer()
 {
+	m_Windows.clear();
 }
 
 void UILayer::SetEnable(const bool i_Enable)

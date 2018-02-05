@@ -6,9 +6,6 @@
 #include "engine/Engine.h"
 
 
-#if (DEBUG_DX12_ENABLE) && defined(_DEBUG)
-#define DX12_DEBUG
-#endif
 
 // Static definition implementation
 DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
@@ -29,13 +26,6 @@ const DX12RenderEngine::HeapProperty DX12RenderEngine::s_HeapProperties[] =
 	{ { D3D12_HEAP_TYPE_READBACK, D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 }, D3D12_RESOURCE_STATE_COPY_DEST },
 };
 
-// Destructor
-#define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = 0; } }
-
-
-#define ASSERT_ERROR(i_Text,...)		\
-	POPUP_ERROR(i_Text, __VA_ARGS__);	\
-	DEBUG_BREAK
 
 DX12RenderEngine & DX12RenderEngine::GetInstance()
 {
@@ -78,8 +68,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	}
 
 	m_DebugController->EnableDebugLayer();
-#else
-	m_DebugController = nullptr;
 #endif
 
 
@@ -673,6 +661,27 @@ void DX12RenderEngine::CleanUp()
 
 	SAFE_RELEASE(m_DepthStencilBuffer);
 	SAFE_RELEASE(m_DepthStencilDescriptorHeap);
+
+	// release pipeline state objects resources
+	auto itr = m_PipelineStateObjects.begin();
+
+	while (itr != m_PipelineStateObjects.end())
+	{
+		SAFE_RELEASE(itr->second->m_PipelineState);
+		++itr;
+	}
+
+	// delete resources
+	//for (int i = 0; i < EConstantBufferId::eCount; ++i)
+	//{
+	//	// delete the constant buffer
+	//	delete (m_ConstantBuffer[i]);
+	//}
+
+	// release debug resources
+#ifdef DX12_DEBUG
+	SAFE_RELEASE(m_DebugController);
+#endif
 }
 
 HRESULT DX12RenderEngine::UpdatePipeline()

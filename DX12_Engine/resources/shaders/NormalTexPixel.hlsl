@@ -13,9 +13,10 @@ struct VS_OUTPUT
 float4 main(VS_OUTPUT input) : SV_TARGET
 {
 	// compute color of a pixel
-	float4 sunpos = float4(100.f, 0.f, 0.f, 1.f);
+	float time = app_time * 2.f;
 
+	//float4 sunpos = float4(5.f * cos(time), 0.f, -5.f * sin(time), 1.f);
+	
+	float4 sunpos = float4(-1.f, 2.f, -0.5f, 1.f);
 	return ComputeColor(input.location, input.normal, cam_pos.xyz, input.uv, sunpos);
-
-	//return float4(color, 1.f);
 }

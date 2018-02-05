@@ -6,6 +6,7 @@ DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize
 	:m_ElementSize((i_ElementSize + 255) & ~255)	// align element size on 256 bytes
 	,m_BufferSize(i_BufferSize)
 	,m_IsDuplicated(i_IsDucpliacted)
+	,m_ConstantBufferUploadHeap(nullptr)
 {
 	// retreive device
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
@@ -18,7 +19,6 @@ DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize
 		m_FrameCount = 1;	// only one buffer
 
 	// initialize arrays
-	m_MainDescriptorHeap		= new ID3D12DescriptorHeap *[m_FrameCount];
 	m_ConstantBufferUploadHeap	= new ID3D12Resource *[m_FrameCount];	// memory where constant buffers for each frame will be placed
 	m_ConstantBufferGPUAdress	= new UINT8 *[m_FrameCount];	// pointer for each of the resource buffer constant heap
 
@@ -50,9 +50,9 @@ DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize
 
 DX12ConstantBuffer::~DX12ConstantBuffer()
 {
-	for (int i = 0; i < DX12RenderEngine::GetInstance().GetFrameBufferCount(); ++i)
+	for (int i = 0; i < m_FrameCount; ++i)
 	{
-		SAFE_RELEASE(m_MainDescriptorHeap[i]);
+		SAFE_RELEASE(m_ConstantBufferUploadHeap[i]);
 	}
 
 	// Delete the array

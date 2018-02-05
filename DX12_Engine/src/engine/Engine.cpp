@@ -4,6 +4,7 @@
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12RenderEngine.h"
 #include "dx12/DX12ConstantBuffer.h"
+#include "dx12/DX12ImGui.h"
 // game include
 #include "game/World.h"
 #include "game/Camera.h"
@@ -331,5 +332,5 @@ void Engine::CleanUpModules()
 
 	// delete the render engine
 	// To do : fix crash when releasing resources
-	//DX12RenderEngine::Delete();
+	DX12RenderEngine::Delete();
 }

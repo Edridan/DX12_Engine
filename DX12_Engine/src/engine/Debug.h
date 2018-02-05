@@ -44,10 +44,17 @@ do																			\
 	}																		\
 } while (false)
 
+
+#define ASSERT_ERROR(i_Text,...)		\
+	POPUP_ERROR(i_Text, __VA_ARGS__);	\
+	DEBUG_BREAK
+
 #else
 
 #define PRINT_DEBUG(i_Text, ...)	
 #define ASSERT(i_Condition)		i_Condition
+#define ASSERT_ERROR(i_Text,...)
+
 
 #endif
 
