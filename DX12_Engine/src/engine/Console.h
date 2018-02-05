@@ -100,7 +100,7 @@ public:
 
 	// output/input management
 	typedef std::function<void(const char*, void*)> OutputFunc;
-	void	RegisterPrintCallback(const OutputFunc & i_Callback, void * i_Data = nullptr);
+	void	RegisterPrintCallback(const OutputFunc & i_Callback /* static event */, void * i_Data = nullptr);
 	void	Print(const char * i_Text, ...);	// this is used for print debug
 
 private:

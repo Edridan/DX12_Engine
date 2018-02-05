@@ -213,6 +213,9 @@
     <ClCompile Include="src\ui\UIDebug.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\Input.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
@@ -345,6 +348,9 @@
       <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\StackDebugger.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Input.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
