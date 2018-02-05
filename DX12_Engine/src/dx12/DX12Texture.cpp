@@ -162,6 +162,11 @@ ID3D12DescriptorHeap * DX12Texture::GetDescriptorHeap() const
 	return m_DescriptorHeap;
 }
 
+const ID3D12Resource * DX12Texture::GetBuffer() const
+{
+	return m_TextureBuffer;
+}
+
 const D3D12_GPU_DESCRIPTOR_HANDLE DX12Texture::GetDescriptorHandle() const
 {
 	return m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();

@@ -30,7 +30,7 @@ void DX12RootSignature::AddRangedParameter(const D3D12_DESCRIPTOR_RANGE & i_Desc
 {
 }
 
-void DX12RootSignature::EndRangeTable()
+void DX12RootSignature::PopRangeTable()
 {
 }
 

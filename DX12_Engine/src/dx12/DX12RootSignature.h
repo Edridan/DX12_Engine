@@ -18,7 +18,7 @@ public:
 	void		AddParameter();
 	void		PushRangeTable();	// call this function to start a range table
 	void		AddRangedParameter(const D3D12_DESCRIPTOR_RANGE & i_Desc);	// add parameters of the current ranged table
-	void		EndRangeTable();	// call this function when the range table is finished
+	void		PopRangeTable();	// call this function when the range table is finished
 
 	// create the root signature on the device
 	HRESULT		Create(ID3D12Device * i_Device, 

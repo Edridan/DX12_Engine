@@ -40,6 +40,7 @@ public:
 
 	// dx12 management
 	ID3D12DescriptorHeap *				GetDescriptorHeap() const;
+	const ID3D12Resource *				GetBuffer() const;
 	const D3D12_GPU_DESCRIPTOR_HANDLE	GetDescriptorHandle() const;
 
 protected:
