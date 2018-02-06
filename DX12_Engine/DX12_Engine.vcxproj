@@ -152,6 +152,7 @@
     <ClInclude Include="src\dx12\DX12Text.h" />
     <ClInclude Include="src\dx12\DX12Texture.h" />
     <ClInclude Include="src\dx12\DX12Utils.h" />
+    <ClInclude Include="src\engine\Callback.h" />
     <ClInclude Include="src\engine\Clock.h" />
     <ClInclude Include="src\engine\Console.h" />
     <ClInclude Include="src\engine\Debug.h" />

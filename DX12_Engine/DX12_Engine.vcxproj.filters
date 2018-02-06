@@ -353,6 +353,9 @@
     <ClInclude Include="src\engine\Input.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\engine\Callback.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\fonts\Arial-font.png">

@@ -6,7 +6,8 @@
 #include <vector>
 #include <Windows.h>
 #include <DirectXMath.h>
-#include "Window.h"
+#include "engine/Window.h"
+#include "engine/Input.h"
 #include "dx12/d3dx12.h"
 #include "../resource.h"
 
@@ -35,6 +36,7 @@ class DX12RenderEngine;
 // ui
 class UILayer;	// layer for UI
 class UIConsole;
+class UIDebug;
 
 // class def
 class Engine
@@ -95,6 +97,15 @@ private:
 	void	CleanUpResources();
 	void	CleanUpModules();
 
+#if  defined(_DEBUG) || defined(WITH_EDITOR)
+	void	OnF1Down(void * i_Void);
+	void	OnF2Down(void * i_Void);
+
+	// debug UI management
+	// ui windows for debug, editor and other
+	UIConsole *			m_UIConsole;
+	UIDebug *			m_UIDebug;
+#endif
 	// window
 	Window *		m_Window;
 
@@ -114,8 +125,7 @@ private:
 
 	// ui
 	UILayer *			m_UILayer;	// To do : add other layer for editor and other
-	// ui windows for debug, editor and other
-	UIConsole *			m_UIConsole;
+
 
 #ifdef ENGINE_DEBUG
 	// debug purpose

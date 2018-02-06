@@ -82,6 +82,9 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	// intialize constant buffer
 	m_RenderEngine->GetConstantBuffer(DX12RenderEngine::eGlobal)->ReserveVirtualAddress();	// reserve the first address on the constant buffer
 
+	// create input management
+	m_Window->RegisterInputCallback(&Input::ProcessInputCallbacks);
+
 	World::WorldDesc worldDesc;
 	// create default camera parameters
 	worldDesc.CameraPosition		= i_Desc.CameraPosition;
@@ -104,13 +107,17 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_UILayer = new UILayer(m_Window);
 	m_UILayer->SetEnable(i_Desc.UIEnabled);
 
-#ifdef _DEBUG
+#ifdef _DEBUG || WITH_EDITOR
 	// ui dev initialization
 	m_UIConsole = new UIConsole;
+	m_UIDebug	= new UIDebug;
 
 	// push windows on layer
 	m_UILayer->PushUIWindowOnLayer(m_UIConsole);
-	m_UILayer->PushUIWindowOnLayer(new UIDebug);
+	m_UILayer->PushUIWindowOnLayer(m_UIDebug);
+
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F2, "F2Debug", Input::eCtrlDown, this, &Engine::OnF2Down, nullptr);
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F1, "F1Debug", this, &Engine::OnF1Down, nullptr);
 #endif
 
 	// initialize console
@@ -334,3 +341,16 @@ void Engine::CleanUpModules()
 	// To do : fix crash when releasing resources
 	DX12RenderEngine::Delete();
 }
+ 
+#if defined(_DEBUG) || defined(WITH_EDITOR)
+void Engine::OnF1Down(void * i_Void)
+{
+	m_UIConsole->SetActive(!m_UIConsole->IsActive());
+}
+
+void Engine::OnF2Down(void * i_Void)
+{
+	m_UIDebug->SetActive(!m_UIDebug->IsActive());
+}
+
+#endif

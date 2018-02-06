@@ -367,4 +367,4 @@ stb_uint stb_compress(stb_uchar *out, stb_uchar *input, stb_uint length)
 }
 
 // re-enable the warning for other codes
-#pragma warning(pop)
+#pragma warning(default : 4244)
