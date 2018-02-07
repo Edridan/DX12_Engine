@@ -19,6 +19,7 @@
 
 // class predef
 class DX12ConstantBuffer;
+class DX12RenderTarget;
 
 // define
 #define DEBUG_DX12_ENABLE		1
@@ -140,7 +141,7 @@ private:
 	IDXGISwapChain3*			m_SwapChain; // swapchain used to switch between render targets
 	DXGI_SWAP_CHAIN_DESC		m_SwapChainDesc;	// swapchain description used for create default pso
 	ID3D12CommandQueue*			m_CommandQueue; // container for command lists
-	ID3D12DescriptorHeap*		m_RtvDescriptorHeap; // render target view descriptor
+	//ID3D12DescriptorHeap*		m_RtvDescriptorHeap; // render target view descriptor
 	ID3D12Resource*				m_RenderTargets[FRAME_BUFFER_COUNT]; // number of render targets equal to buffer count
 	ID3D12CommandAllocator*		m_CommandAllocator[FRAME_BUFFER_COUNT]; // we want enough allocators for each buffer * number of threads (we only have one thread)
 	ID3D12GraphicsCommandList*	m_CommandList; // a command list we can record commands into, then execute them to render the frame
@@ -148,12 +149,15 @@ private:
 	HANDLE						m_FenceEvent; // a handle to an event when our fence is unlocked by the gpu
 	UINT64						m_FenceValue[FRAME_BUFFER_COUNT]; // this value is incremented each frame. each fence will have its own value
 	int							m_FrameIndex; // current render target view we are on
-	int							m_RtvDescriptorSize; // size of the rtv descriptor on the device (all front and back buffers will be the same size)
+	//int							m_RtvDescriptorSize; // size of the rtv descriptor on the device (all front and back buffers will be the same size)
 
 #ifdef DX12_DEBUG
 	// Debug
 	ID3D12Debug *				m_DebugController;
 #endif
+
+	// Render target
+	DX12RenderTarget *			m_BackBuffer;	// back buffer render target
 
 	// Depth buffer
 	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial

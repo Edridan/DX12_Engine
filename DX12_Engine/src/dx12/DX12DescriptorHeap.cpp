@@ -35,16 +35,27 @@ ID3D12DescriptorHeap * DX12DescriptorHeap::GetDescriptorHeap() const
 	return m_DescriptorHeap;
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE DX12DescriptorHeap::GetDescriptorHandle(UINT i_Index) const
+CD3DX12_CPU_DESCRIPTOR_HANDLE DX12DescriptorHeap::GetCPUDescriptorHandle(UINT i_Index) const
 {
 	ASSERT((int)i_Index < m_Size);
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart(), i_Index, m_Size);
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE DX12DescriptorHeap::GetDescriptorHandle() const
+CD3DX12_CPU_DESCRIPTOR_HANDLE DX12DescriptorHeap::GetCPUDescriptorHandle() const
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 }
+
+CD3DX12_GPU_DESCRIPTOR_HANDLE DX12DescriptorHeap::GetGPUDescriptorHandle() const
+{
+	return CD3DX12_GPU_DESCRIPTOR_HANDLE(m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+}
+
+CD3DX12_GPU_DESCRIPTOR_HANDLE DX12DescriptorHeap::GetGPUDescriptorHandle(UINT i_Index) const
+{
+	return CD3DX12_GPU_DESCRIPTOR_HANDLE(m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart(), i_Index, m_Size);
+}
+
 
 int DX12DescriptorHeap::GetDescriptorSize() const
 {

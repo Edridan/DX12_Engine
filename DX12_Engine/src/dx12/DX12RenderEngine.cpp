@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "dx12/d3dx12.h"
 #include "dx12/DX12Mesh.h"
+#include "dx12/DX12RenderTarget.h"
 #include "engine/Engine.h"
 
 
@@ -181,30 +182,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	// -- Create the Back Buffers (render target views) Descriptor Heap -- //
 
-	// describe an rtv descriptor heap and create
-	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-	rtvHeapDesc.NumDescriptors = m_FrameBufferCount; // number of descriptors for this heap.
-	rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV; // this heap is a render target view heap
-
-	// This heap will not be directly referenced by the shaders (not shader visible), as this will store the output from the pipeline
-	// otherwise we would set the heap's flag to D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE
-	rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	hr = m_Device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_RtvDescriptorHeap));
-	if (FAILED(hr))
-	{
-		ASSERT_ERROR("Error : CreateDescriptorHeap");
-		return E_FAIL;
-	}
-
-	// get the size of a descriptor in this heap (this is a rtv heap, so only rtv descriptors should be stored in it.
-	// descriptor sizes may vary from m_Device to m_Device, which is why there is no set size and we must ask the 
-	// m_Device to give us the size. we will use this size to increment a descriptor handle offset
-	m_RtvDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-	// get a handle to the first descriptor in the descriptor heap. a handle is basically a pointer,
-	// but we cannot literally use it like a c++ pointer.
-	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
 	// Create a RTV for each buffer (double buffering is two buffers, tripple buffering is 3).
 	for (int i = 0; i < m_FrameBufferCount; i++)
 	{
@@ -216,13 +193,17 @@ HRESULT DX12RenderEngine::InitializeDX12()
 			ASSERT_ERROR("Error : m_SwapChain->GetBuffer");
 			return E_FAIL;
 		}
-
-		// the we "create" a render target view which binds the swap chain buffer (ID3D12Resource[n]) to the rtv handle
-		m_Device->CreateRenderTargetView(m_RenderTargets[i], nullptr, rtvHandle);
-
-		// we increment the rtv handle by the rtv descriptor size we got above
-		rtvHandle.Offset(1, m_RtvDescriptorSize);
 	}
+
+	DX12RenderTarget::RenderTargetDesc backRTVDesc;
+	backRTVDesc.BufferCount = m_FrameBufferCount;
+	backRTVDesc.Format = backBufferDesc.Format;
+	backRTVDesc.Name = L"Back Buffer";
+	backRTVDesc.IsShaderResource = false;
+	backRTVDesc.Resource = m_RenderTargets;
+	
+
+	m_BackBuffer = new DX12RenderTarget(backRTVDesc);
 
 	// -- Create the Command Allocators -- //
 
@@ -379,7 +360,8 @@ HRESULT DX12RenderEngine::PrepareForRender()
 	m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTargets[m_FrameIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 	// here we again get the handle to our current render target view so we can set it as the render target in the output merger stage of the pipeline
-	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_FrameIndex, m_RtvDescriptorSize);
+	//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_FrameIndex, m_RtvDescriptorSize);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_BackBuffer->GetRenderTargetDescriptor();
 
 	// get a handle to the depth/stencil buffer
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
@@ -398,12 +380,8 @@ HRESULT DX12RenderEngine::PrepareForRender()
 
 	m_CommandList->ClearDepthStencilView(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-
-
-
 	// setup primitive topology
 	m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
-
 
 	return S_OK;
 }
@@ -487,7 +465,7 @@ HRESULT DX12RenderEngine::ResizeRenderTargets(const IntVec2 & i_NewSize)
 		m_RenderTargets[i]->Release();
 	}
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_BackBuffer->GetRenderTargetDescriptorHeap()->GetCPUDescriptorHandle();
 
 
 	for (int i = 0; i < m_FrameBufferCount; ++i)
@@ -498,7 +476,7 @@ HRESULT DX12RenderEngine::ResizeRenderTargets(const IntVec2 & i_NewSize)
 		m_Device->CreateRenderTargetView(m_RenderTargets[i], nullptr, rtvHandle);
 
 		// we increment the rtv handle by the rtv descriptor size we got above
-		rtvHandle.Offset(1, m_RtvDescriptorSize);
+		rtvHandle.Offset(1, m_BackBuffer->GetRenderTargetDescriptorHeap()->GetDescriptorSize());
 	}
 
 	m_SwapChain->ResizeBuffers(0, i_NewSize.x, i_NewSize.y, DXGI_FORMAT_UNKNOWN, 0);
@@ -601,9 +579,11 @@ const DXGI_SWAP_CHAIN_DESC & DX12RenderEngine::GetSwapChainDesc() const
 
 D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderEngine::GetRenderTarget() const
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE ret = m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	/*D3D12_CPU_DESCRIPTOR_HANDLE ret = m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	ret.ptr += (m_FrameIndex * m_RtvDescriptorSize);
-	return ret;
+	return ret;*/
+
+	return m_BackBuffer->GetRenderTargetDescriptor(m_FrameIndex);
 }
 
 bool DX12RenderEngine::IsDX12DebugEnabled() const
@@ -644,12 +624,14 @@ void DX12RenderEngine::CleanUp()
 	if (m_SwapChain->GetFullscreenState(&fs, NULL))
 		m_SwapChain->SetFullscreenState(false, NULL);
 
+	// delete render targets
+	delete m_BackBuffer;
+
 	// To do : release properly data : might have some random crash here
 
 	SAFE_RELEASE(m_Device);
 	SAFE_RELEASE(m_SwapChain);
 	SAFE_RELEASE(m_CommandQueue);
-	SAFE_RELEASE(m_RtvDescriptorHeap);
 	SAFE_RELEASE(m_CommandList);
 
 	for (int i = 0; i < m_FrameBufferCount; ++i)

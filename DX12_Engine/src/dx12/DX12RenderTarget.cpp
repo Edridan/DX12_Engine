@@ -13,7 +13,7 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 	,m_ShaderResourceDesc(nullptr)
 	,m_RenderTargetDesc(nullptr)
 	// resources
-	,m_RenderTarget(nullptr)
+	,m_RenderTarget(i_Desc.Resource)
 {
 	// retreive dx12 utils
 	DX12RenderEngine & render				= DX12RenderEngine::GetInstance();
@@ -77,7 +77,7 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 
 	// get a handle to the first descriptor in the descriptor heap. a handle is basically a pointer,
 	// but we cannot literally use it like a c++ pointer.
-	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_RenderTargetDesc->GetDescriptorHandle();
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_RenderTargetDesc->GetCPUDescriptorHandle();
 
 	for (size_t i = 0; i < m_FrameCount; ++i)
 	{
@@ -103,7 +103,7 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
 
-		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandle = m_ShaderResourceDesc->GetDescriptorHandle();
+		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandle = m_ShaderResourceDesc->GetCPUDescriptorHandle();
 
 		for (size_t i = 0; i < m_FrameCount; ++i)
 		{
@@ -130,42 +130,51 @@ DX12RenderTarget::~DX12RenderTarget()
 	if (m_ShaderResourceDesc != nullptr) delete m_ShaderResourceDesc;
 }
 
+DX12DescriptorHeap * DX12RenderTarget::GetRenderTargetDescriptorHeap() const
+{
+	return m_RenderTargetDesc;
+}
+
+DX12DescriptorHeap * DX12RenderTarget::GetShaderResourceDescriptorHeap() const
+{
+	return m_ShaderResourceDesc;
+}
+
 D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderTarget::GetRenderTargetDescriptor(UINT i_Index /* = ((UINT)-1) */) const
 {
-	if (i_Index == ((UINT)-1))
-	{
-		if (!m_CustomAmount)
-		{
-			const UINT currentFrame = DX12RenderEngine::GetInstance().GetFrameIndex();
-			return m_RenderTargetDesc->GetDescriptorHandle(currentFrame);
-		}
-	}
-	else
-	{
-		if (i_Index < m_FrameCount)
-			return m_RenderTargetDesc->GetDescriptorHandle(i_Index);
-	}
-
 	// default return
-	return m_RenderTargetDesc->GetDescriptorHandle();
+	return m_RenderTargetDesc->GetCPUDescriptorHandle(GetIndex(i_Index));
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderTarget::GetTextureDescriptor(UINT i_Index /* = 0 */) const
 {
+	// assert if it's not a resource view
+	ASSERT(m_IsResourceView);
+	return m_ShaderResourceDesc->GetCPUDescriptorHandle(GetIndex(i_Index));
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE DX12RenderTarget::GetTextureGPUDescriptor(UINT i_Index) const
+{
+	// assert if it's not a resource view
+	ASSERT(m_IsResourceView);
+	return m_ShaderResourceDesc->GetGPUDescriptorHandle(GetIndex(i_Index));
+}
+
+FORCEINLINE UINT DX12RenderTarget::GetIndex(UINT i_Index) const
+{
 	if (i_Index == ((UINT)-1))
 	{
 		if (!m_CustomAmount)
 		{
-			const UINT currentFrame = DX12RenderEngine::GetInstance().GetFrameIndex();
-			return m_ShaderResourceDesc->GetDescriptorHandle(currentFrame);
+			return DX12RenderEngine::GetInstance().GetFrameIndex();
 		}
 	}
 	else
 	{
 		if (i_Index < m_FrameCount)
-			return m_ShaderResourceDesc->GetDescriptorHandle(i_Index);
+			return i_Index;
 	}
 
 	// default return
-	return m_ShaderResourceDesc->GetDescriptorHandle();
+	return i_Index;
 }

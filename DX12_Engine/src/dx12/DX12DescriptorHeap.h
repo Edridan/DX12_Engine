@@ -14,8 +14,13 @@ public:
 
 	// dx12
 	ID3D12DescriptorHeap *			GetDescriptorHeap() const;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE	GetDescriptorHandle() const;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE	GetDescriptorHandle(UINT i_Index) const;
+	// CPU descriptor handle
+	CD3DX12_CPU_DESCRIPTOR_HANDLE	GetCPUDescriptorHandle() const;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE	GetCPUDescriptorHandle(UINT i_Index) const;
+	// GPU descriptor handle
+	CD3DX12_GPU_DESCRIPTOR_HANDLE	GetGPUDescriptorHandle() const;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE	GetGPUDescriptorHandle(UINT i_Index) const;
+
 
 	// information
 	int						GetDescriptorSize() const;

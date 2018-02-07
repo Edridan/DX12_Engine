@@ -25,10 +25,18 @@ public:
 	~DX12RenderTarget();
 
 	// dx12
+	DX12DescriptorHeap *			GetRenderTargetDescriptorHeap() const;
+	DX12DescriptorHeap *			GetShaderResourceDescriptorHeap() const;
+
+	// handle
 	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTargetDescriptor(UINT i_Index = ((UINT)-1)) const;	// get the descriptor as render target (used for drawing in buffer)
-	D3D12_CPU_DESCRIPTOR_HANDLE		GetTextureDescriptor(UINT i_Index = 0) const;		// get the descriptor as texture (used for reading buffer)
+	D3D12_CPU_DESCRIPTOR_HANDLE		GetTextureDescriptor(UINT i_Index = ((UINT)-1)) const;		// get the descriptor as texture (used for reading buffer)
+	D3D12_GPU_DESCRIPTOR_HANDLE		GetTextureGPUDescriptor(UINT i_Index = ((UINT)-1)) const;
 
 private:
+	// helper
+	UINT			GetIndex(UINT i_Index) const;
+
 	// render target 
 	DX12DescriptorHeap *			m_RenderTargetDesc;	// descriptor heap for render target
 	DX12DescriptorHeap *			m_ShaderResourceDesc;	// descriptor heap for shader resource
