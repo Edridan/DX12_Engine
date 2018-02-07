@@ -107,7 +107,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_UILayer = new UILayer(m_Window);
 	m_UILayer->SetEnable(i_Desc.UIEnabled);
 
-#ifdef _DEBUG || WITH_EDITOR
+#if  defined(_DEBUG) || defined(WITH_EDITOR)
 	// ui dev initialization
 	m_UIConsole = new UIConsole;
 	m_UIDebug	= new UIDebug;

@@ -15,6 +15,8 @@ UILayer::UILayer(Window * i_Window)
 	,m_Initialized(false)
 	,m_Enabled(true)
 {
+	if (ImGuiD3D12::ImguiIsInitialized())	return;
+
 	ImGuiIO & io = ImGui::GetIO();
 
 	// Keyboard mapping ImGui will use those indices to peek into the io
@@ -40,7 +42,6 @@ UILayer::UILayer(Window * i_Window)
 	io.KeyMap[ImGuiKey_Y] = 'Y';
 	io.KeyMap[ImGuiKey_Z] = 'Z';
 
-	if (ImGuiD3D12::ImguiIsInitialized())	return;
 
 	// setup imgui
 	io.RenderDrawListsFn = ImGuiD3D12::RenderDrawListImGui;	// callback for rendering

@@ -172,16 +172,6 @@ const D3D12_GPU_DESCRIPTOR_HANDLE DX12Texture::GetDescriptorHandle() const
 	return m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 }
 
-DX12Texture::DX12Texture()
-	:m_Name(L"")
-	,m_IsLoaded(false)
-	,m_DescriptorHeap(nullptr)
-	,m_TextureBuffer(nullptr)
-	,m_TextureBufferUploadHeap(nullptr)
-	,m_Desc()
-{
-}
-
 // retreived from : https://www.braynzarsoft.net/viewtutorial/q16390-directx-12-textures-from-file
 int DX12Texture::LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, ImageDataDesc & o_Desc, LPCWSTR i_Filename)
 {

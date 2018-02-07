@@ -216,6 +216,9 @@
     <ClCompile Include="src\engine\Input.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="src\dx12\DX12DescriptorHeap.cpp">
+      <Filter>Source Files\DX12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
@@ -353,8 +356,11 @@
     <ClInclude Include="src\engine\Input.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\engine\Callback.h">
-      <Filter>Header Files\Engine</Filter>
+    <ClInclude Include="src\ui\UIPlane.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dx12\DX12DescriptorHeap.h">
+      <Filter>Header Files\DX12</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

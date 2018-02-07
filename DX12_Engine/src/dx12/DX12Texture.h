@@ -44,14 +44,11 @@ public:
 	const D3D12_GPU_DESCRIPTOR_HANDLE	GetDescriptorHandle() const;
 
 protected:
-	// information
+	// dx12
 	D3D12_RESOURCE_DESC		m_Desc;
 	ID3D12Resource *		m_TextureBuffer;
 	ID3D12Resource *		m_TextureBufferUploadHeap;
 	ID3D12DescriptorHeap *	m_DescriptorHeap;
-
-	// constructor for DX12RenderTarget
-	DX12Texture();
 
 private:
 	// load image data helper
