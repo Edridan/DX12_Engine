@@ -82,6 +82,19 @@ public:
 
 	DX12ConstantBuffer *		GetConstantBuffer(EConstantBufferId i_Id);
 	
+	// deferred render target management
+	enum ERenderTargetId
+	{
+		eNormal,			// normal buffer for pixels
+		eSpecular,			// specular lighting buffer
+		eDiffuse,			// diffuse color buffer
+
+		// count
+		eCount,
+	};
+
+	DX12RenderTarget *			GetRenderTarget(ERenderTargetId i_Id);
+
 	// dx12 helpers
 	// For creation of resources in the GPU
 	struct HeapProperty
@@ -141,16 +154,12 @@ private:
 	IDXGISwapChain3*			m_SwapChain; // swapchain used to switch between render targets
 	DXGI_SWAP_CHAIN_DESC		m_SwapChainDesc;	// swapchain description used for create default pso
 	ID3D12CommandQueue*			m_CommandQueue; // container for command lists
-	//ID3D12DescriptorHeap*		m_RtvDescriptorHeap; // render target view descriptor
-	ID3D12Resource*				m_RenderTargets[FRAME_BUFFER_COUNT]; // number of render targets equal to buffer count
 	ID3D12CommandAllocator*		m_CommandAllocator[FRAME_BUFFER_COUNT]; // we want enough allocators for each buffer * number of threads (we only have one thread)
 	ID3D12GraphicsCommandList*	m_CommandList; // a command list we can record commands into, then execute them to render the frame
 	ID3D12Fence*				m_Fences[FRAME_BUFFER_COUNT];		// an object that is locked while our command list is being executed by the gpu. We need as many as we have allocators (more if we want to know when the gpu is finished with an asset)
 	HANDLE						m_FenceEvent; // a handle to an event when our fence is unlocked by the gpu
 	UINT64						m_FenceValue[FRAME_BUFFER_COUNT]; // this value is incremented each frame. each fence will have its own value
 	int							m_FrameIndex; // current render target view we are on
-	//int							m_RtvDescriptorSize; // size of the rtv descriptor on the device (all front and back buffers will be the same size)
-
 #ifdef DX12_DEBUG
 	// Debug
 	ID3D12Debug *				m_DebugController;
@@ -158,6 +167,8 @@ private:
 
 	// Render target
 	DX12RenderTarget *			m_BackBuffer;	// back buffer render target
+	ID3D12Resource*				m_RenderTargets[FRAME_BUFFER_COUNT]; // render target pointer (setup with swap buffer in the engine and then pass to DX12RenderTarget)
+
 
 	// Depth buffer
 	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial

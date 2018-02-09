@@ -196,7 +196,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	}
 
 	DX12RenderTarget::RenderTargetDesc backRTVDesc;
-	backRTVDesc.BufferCount = m_FrameBufferCount;
 	backRTVDesc.Format = backBufferDesc.Format;
 	backRTVDesc.Name = L"Back Buffer";
 	backRTVDesc.IsShaderResource = false;
@@ -492,6 +491,11 @@ DX12ConstantBuffer * DX12RenderEngine::GetConstantBuffer(EConstantBufferId i_Id)
 	}
 	
 	return nullptr;	// issue
+}
+
+DX12RenderTarget * DX12RenderEngine::GetRenderTarget(ERenderTargetId i_Id)
+{
+	return nullptr;
 }
 
 ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_HeapProperty, uint64_t i_Size, D3D12_RESOURCE_FLAGS i_Flags) const
