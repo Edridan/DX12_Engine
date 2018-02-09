@@ -67,7 +67,6 @@ public:
 	DX12Shader *				GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type);
 	// close the render engine
 	HRESULT						Close();
-	HRESULT						ResizeRenderTargets(const IntVec2 & i_NewSize);
 
 	// constant buffer management
 	enum EConstantBufferId
@@ -77,7 +76,7 @@ public:
 		eMaterial,		// used for material specs
 
 		// count
-		eCount,
+		eConstantBufferCount,
 	};
 
 	DX12ConstantBuffer *		GetConstantBuffer(EConstantBufferId i_Id);
@@ -90,7 +89,7 @@ public:
 		eDiffuse,			// diffuse color buffer
 
 		// count
-		eCount,
+		eRenderTargetCount,
 	};
 
 	DX12RenderTarget *			GetRenderTarget(ERenderTargetId i_Id);
@@ -167,7 +166,9 @@ private:
 
 	// Render target
 	DX12RenderTarget *			m_BackBuffer;	// back buffer render target
-	ID3D12Resource*				m_RenderTargets[FRAME_BUFFER_COUNT]; // render target pointer (setup with swap buffer in the engine and then pass to DX12RenderTarget)
+	ID3D12Resource*				m_BackBufferResource[FRAME_BUFFER_COUNT]; // render target pointer (setup with swap buffer in the engine and then pass to DX12RenderTarget)
+	// Deferred rendering
+	DX12RenderTarget *			m_RenderTargets[ERenderTargetId::eRenderTargetCount];
 
 
 	// Depth buffer
@@ -180,8 +181,8 @@ private:
 		UINT		ElementSize;
 		UINT		ElementCount;
 	};
-	static const ConstantBufferDef	s_ConstantBufferSize[EConstantBufferId::eCount];	// setup this array to manage the size of the constant buffer
-	DX12ConstantBuffer *			m_ConstantBuffer[EConstantBufferId::eCount];	// constant buffer are created here and used/managed from other space
+	static const ConstantBufferDef	s_ConstantBufferSize[EConstantBufferId::eConstantBufferCount];	// setup this array to manage the size of the constant buffer
+	DX12ConstantBuffer *			m_ConstantBuffer[EConstantBufferId::eConstantBufferCount];	// constant buffer are created here and used/managed from other space
 
 	// size
 	IntVec2						m_WindowSize;

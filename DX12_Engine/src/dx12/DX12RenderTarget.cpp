@@ -160,6 +160,23 @@ D3D12_GPU_DESCRIPTOR_HANDLE DX12RenderTarget::GetTextureGPUDescriptor(UINT i_Ind
 	return m_ShaderResourceDesc->GetGPUDescriptorHandle(GetIndex(i_Index));
 }
 
+HRESULT DX12RenderTarget::ResizeBuffer(const IntVec2 & i_Size)
+{
+	if (!m_IsAllocator)
+	{
+		ASSERT_ERROR("Unable to resize render targets %s [Allocated from extern size]");
+		return E_FAIL;
+	}
+
+	return E_NOTIMPL;
+}
+
+CD3DX12_RESOURCE_BARRIER DX12RenderTarget::GetResourceBarrier(D3D12_RESOURCE_STATES i_StateBefore, D3D12_RESOURCE_STATES i_StateAfter, UINT i_Index) const
+{
+	const UINT id = GetIndex(i_Index);
+	return CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTarget[id], i_StateBefore, i_StateAfter);
+}
+
 FORCEINLINE UINT DX12RenderTarget::GetIndex(UINT i_Index) const
 {
 	if (i_Index == ((UINT)-1))

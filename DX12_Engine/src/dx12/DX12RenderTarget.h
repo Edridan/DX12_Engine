@@ -32,7 +32,9 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTargetDescriptor(UINT i_Index = ((UINT)-1)) const;	// get the descriptor as render target (used for drawing in buffer)
 	D3D12_CPU_DESCRIPTOR_HANDLE		GetTextureDescriptor(UINT i_Index = ((UINT)-1)) const;		// get the descriptor as texture (used for reading buffer)
 	D3D12_GPU_DESCRIPTOR_HANDLE		GetTextureGPUDescriptor(UINT i_Index = ((UINT)-1)) const;
-
+	HRESULT							ResizeBuffer(const IntVec2 & i_Size);
+	// barrier management
+	CD3DX12_RESOURCE_BARRIER		GetResourceBarrier(D3D12_RESOURCE_STATES i_StateBefore, D3D12_RESOURCE_STATES i_StateAfter, UINT i_Index = ((UINT)-1)) const;
 private:
 	// helper
 	UINT			GetIndex(UINT i_Index) const;

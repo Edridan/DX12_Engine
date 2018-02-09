@@ -187,7 +187,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	{
 		// first we get the n'th buffer in the swap chain and store it in the n'th
 		// position of our ID3D12Resource array
-		hr = m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_RenderTargets[i]));
+		hr = m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_BackBufferResource[i]));
 		if (FAILED(hr))
 		{
 			ASSERT_ERROR("Error : m_SwapChain->GetBuffer");
@@ -199,7 +199,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	backRTVDesc.Format = backBufferDesc.Format;
 	backRTVDesc.Name = L"Back Buffer";
 	backRTVDesc.IsShaderResource = false;
-	backRTVDesc.Resource = m_RenderTargets;
+	backRTVDesc.Resource = m_BackBufferResource;
 	
 
 	m_BackBuffer = new DX12RenderTarget(backRTVDesc);
@@ -249,7 +249,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	// -- Create constant buffer -- //
 
-	for (size_t i = 0; i < EConstantBufferId::eCount; ++i)
+	for (size_t i = 0; i < EConstantBufferId::eConstantBufferCount; ++i)
 	{
 		// create constant buffer of 256 slots of 256 bytes
 		m_ConstantBuffer[i] = new DX12ConstantBuffer(
@@ -356,7 +356,7 @@ HRESULT DX12RenderEngine::PrepareForRender()
 	// here we start recording commands into the m_CommandList (which all the commands will be stored in the m_CommandAllocator)
 
 	// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
-	m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTargets[m_FrameIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+	m_CommandList->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 	// here we again get the handle to our current render target view so we can set it as the render target in the output merger stage of the pipeline
 	//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_FrameIndex, m_RtvDescriptorSize);
@@ -449,43 +449,9 @@ HRESULT DX12RenderEngine::Close()
 	return hr;
 }
 
-HRESULT DX12RenderEngine::ResizeRenderTargets(const IntVec2 & i_NewSize)
-{
-	// resize window viewport
-	m_Viewport.Width = (FLOAT)i_NewSize.x;
-	m_Viewport.Height = (FLOAT)i_NewSize.y;
-	// resize scissor
-	m_ScissorRect.right = (LONG)i_NewSize.x;
-	m_ScissorRect.bottom = (LONG)i_NewSize.y;
-
-	for (int i = 0; i < m_FrameBufferCount; ++i)
-	{
-		// have to release the resources before calling ResizeBuffers
-		m_RenderTargets[i]->Release();
-	}
-
-	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_BackBuffer->GetRenderTargetDescriptorHeap()->GetCPUDescriptorHandle();
-
-
-	for (int i = 0; i < m_FrameBufferCount; ++i)
-	{
-		DX12_ASSERT(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_RenderTargets[i])));
-
-		// the we "create" a render target view which binds the swap chain buffer (ID3D12Resource[n]) to the rtv handle
-		m_Device->CreateRenderTargetView(m_RenderTargets[i], nullptr, rtvHandle);
-
-		// we increment the rtv handle by the rtv descriptor size we got above
-		rtvHandle.Offset(1, m_BackBuffer->GetRenderTargetDescriptorHeap()->GetDescriptorSize());
-	}
-
-	m_SwapChain->ResizeBuffers(0, i_NewSize.x, i_NewSize.y, DXGI_FORMAT_UNKNOWN, 0);
-
-	return S_OK;
-}
-
 DX12ConstantBuffer * DX12RenderEngine::GetConstantBuffer(EConstantBufferId i_Id)
 {
-	if (i_Id < EConstantBufferId::eCount)
+	if (i_Id < EConstantBufferId::eConstantBufferCount)
 	{
 		return m_ConstantBuffer[i_Id];
 	}
@@ -634,16 +600,17 @@ void DX12RenderEngine::CleanUp()
 	// To do : release properly data : might have some random crash here
 
 	SAFE_RELEASE(m_Device);
-	SAFE_RELEASE(m_SwapChain);
-	SAFE_RELEASE(m_CommandQueue);
-	SAFE_RELEASE(m_CommandList);
 
 	for (int i = 0; i < m_FrameBufferCount; ++i)
 	{
-		SAFE_RELEASE(m_RenderTargets[i]);
+		SAFE_RELEASE(m_BackBufferResource[i]);
 		SAFE_RELEASE(m_CommandAllocator[i]);
 		SAFE_RELEASE(m_Fences[i]);
 	};
+
+	SAFE_RELEASE(m_SwapChain);
+	SAFE_RELEASE(m_CommandQueue);
+	SAFE_RELEASE(m_CommandList);
 
 	SAFE_RELEASE(m_DepthStencilBuffer);
 	SAFE_RELEASE(m_DepthStencilDescriptorHeap);
@@ -658,7 +625,7 @@ void DX12RenderEngine::CleanUp()
 	}
 
 	// delete resources
-	//for (int i = 0; i < EConstantBufferId::eCount; ++i)
+	//for (int i = 0; i < EConstantBufferId::eConstantBufferCount; ++i)
 	//{
 	//	// delete the constant buffer
 	//	delete (m_ConstantBuffer[i]);
@@ -676,7 +643,7 @@ HRESULT DX12RenderEngine::UpdatePipeline()
 
 	// transition the "m_FrameIndex" render target from the render target state to the present state. If the debug layer is enabled, you will receive a
 	// warning if present is called on the render target when it's not in the present state
-	m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTargets[m_FrameIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	m_CommandList->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
 	hr = m_CommandList->Close();
 
