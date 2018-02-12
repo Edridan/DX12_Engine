@@ -1,9 +1,10 @@
 #include "dx12/DX12MeshBuffer.h"
 
 #include "d3dx12.h"
-#include "dx12/DX12RenderEngine.h"
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12Mesh.h"
+#include "dx12/DX12Context.h"
+#include "dx12/DX12RenderEngine.h"
 
 
 #ifdef _DEBUG
@@ -23,8 +24,10 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	i_InputLayout.NumElements;
 
 	// retreive informations
-	ID3D12GraphicsCommandList * commandList = DX12RenderEngine::GetInstance().GetCommandList();
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
 	ID3D12CommandQueue * commandQueue = DX12RenderEngine::GetInstance().GetCommandQueue();
+
 	const UINT stride = DX12Mesh::GetElementSize(i_InputLayout);
 	const UINT vBufferSize = i_VerticesCount * stride;
 
@@ -49,8 +52,9 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	i_InputLayout.NumElements;
 
 	// retreive informations
-	ID3D12GraphicsCommandList * commandList = DX12RenderEngine::GetInstance().GetCommandList();
-	ID3D12CommandQueue * commandQueue = DX12RenderEngine::GetInstance().GetCommandQueue();
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
+	ID3D12CommandQueue * commandQueue = render.GetCommandQueue();
 	// vertices count
 	const UINT stride = DX12Mesh::GetElementSize(i_InputLayout);
 	const UINT vBufferSize = i_VerticesCount * stride;

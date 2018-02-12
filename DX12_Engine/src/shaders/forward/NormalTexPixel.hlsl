@@ -1,6 +1,6 @@
 // include render light lib
-#include "Material.hlsli"
-#include "GlobalBuffer.hlsli"
+#include "../lib/Material.hlsli"
+#include "../lib/GlobalBuffer.hlsli"
 
 struct VS_OUTPUT
 {

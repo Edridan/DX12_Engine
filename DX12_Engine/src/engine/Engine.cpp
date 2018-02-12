@@ -2,6 +2,7 @@
 
 // dx12
 #include "dx12/DX12Utils.h"
+#include "dx12/DX12Context.h"
 #include "dx12/DX12RenderEngine.h"
 #include "dx12/DX12ConstantBuffer.h"
 #include "dx12/DX12ImGui.h"
@@ -214,7 +215,7 @@ void Engine::Run()
 			Camera * cam = m_CurrentWorld->GetCurrentCamera();
 
 			// dx12 related
-			setup.CommandList = m_RenderEngine->GetCommandList();
+			setup.CommandList = m_RenderEngine->GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
 			// camera related
 			setup.ProjectionMatrix	= XMLoadFloat4x4(&cam->GetProjMatrix());
 			setup.ViewMatrix		= XMLoadFloat4x4(&cam->GetViewMatrix());
@@ -232,7 +233,7 @@ void Engine::Run()
 
 		// render ui
 		{
-			m_UILayer->PushOnCommandList(m_RenderEngine->GetCommandList());
+			m_UILayer->PushOnCommandList(m_RenderEngine->GetContext(DX12RenderEngine::eImmediate)->GetCommandList());
 		}
 
 		// update and display backbuffer, also swap buffer and manage commandqueue

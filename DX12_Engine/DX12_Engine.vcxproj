@@ -95,7 +95,6 @@
     <ClCompile Include="src\dx12\DX12ConstantBuffer.cpp" />
     <ClCompile Include="src\dx12\DX12Context.cpp" />
     <ClCompile Include="src\dx12\DX12DescriptorHeap.cpp" />
-    <ClCompile Include="src\dx12\DX12Font.cpp" />
     <ClCompile Include="src\dx12\DX12ImGui.cpp" />
     <ClCompile Include="src\dx12\DX12Material.cpp" />
     <ClCompile Include="src\dx12\DX12Mesh.cpp" />
@@ -105,7 +104,6 @@
     <ClCompile Include="src\dx12\DX12RenderTarget.cpp" />
     <ClCompile Include="src\dx12\DX12RootSignature.cpp" />
     <ClCompile Include="src\dx12\DX12Shader.cpp" />
-    <ClCompile Include="src\dx12\DX12Text.cpp" />
     <ClCompile Include="src\dx12\DX12Texture.cpp" />
     <ClCompile Include="src\dx12\DX12Utils.cpp" />
     <ClCompile Include="src\engine\Clock.cpp" />
@@ -143,7 +141,6 @@
     <ClInclude Include="src\dx12\DX12ConstantBuffer.h" />
     <ClInclude Include="src\dx12\DX12Context.h" />
     <ClInclude Include="src\dx12\DX12DescriptorHeap.h" />
-    <ClInclude Include="src\dx12\DX12Font.h" />
     <ClInclude Include="src\dx12\DX12ImGui.h" />
     <ClInclude Include="src\dx12\DX12Material.h" />
     <ClInclude Include="src\dx12\DX12Mesh.h" />
@@ -153,7 +150,6 @@
     <ClInclude Include="src\dx12\DX12RenderTarget.h" />
     <ClInclude Include="src\dx12\DX12RootSignature.h" />
     <ClInclude Include="src\dx12\DX12Shader.h" />
-    <ClInclude Include="src\dx12\DX12Text.h" />
     <ClInclude Include="src\dx12\DX12Texture.h" />
     <ClInclude Include="src\dx12\DX12Utils.h" />
     <ClInclude Include="src\engine\Clock.h" />
@@ -199,65 +195,46 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\fonts\Arial.fnt" />
-    <None Include="resources\shaders\GlobalBuffer.hlsli" />
-    <None Include="resources\shaders\TransformBuffer.hlsli" />
-    <None Include="resources\shaders\Material.hlsli" />
+    <None Include="src\shaders\lib\EffectLib.hlsli" />
+    <None Include="src\shaders\lib\GlobalBuffer.hlsli" />
+    <None Include="src\shaders\lib\Material.hlsli" />
+    <None Include="src\shaders\lib\TransformBuffer.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX12_Engine.rc" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\debug\DrawNormalPixels.hlsl">
+    <FxCompile Include="src\shaders\forward\DefaultPixel.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultPixel.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\ImGuiPixel.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\ImGuiVertex.hlsl">
+    <FxCompile Include="src\shaders\forward\NormalColorVertex.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.1</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.1</ShaderModel>
     </FxCompile>
-    <FxCompile Include="resources\shaders\NormalColorVertex.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\NormalTexPixel.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\NormalTexVertex.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\NormalVertex.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\TextPixel.hlsl">
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    <FxCompile Include="src\shaders\forward\NormalTexPixel.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="resources\shaders\TextVertex.hlsl">
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    <FxCompile Include="src\shaders\forward\NormalTexVertex.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.1</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\forward\NormalVertex.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.1</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\ui\ImGuiPixel.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\shaders\ui\ImGuiVertex.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

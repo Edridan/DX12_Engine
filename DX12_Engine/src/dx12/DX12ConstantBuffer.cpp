@@ -50,7 +50,7 @@ DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize
 
 DX12ConstantBuffer::~DX12ConstantBuffer()
 {
-	for (int i = 0; i < m_FrameCount; ++i)
+	for (UINT i = 0; i < m_FrameCount; ++i)
 	{
 		SAFE_RELEASE(m_ConstantBufferUploadHeap[i]);
 	}

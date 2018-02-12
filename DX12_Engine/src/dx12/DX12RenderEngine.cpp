@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "dx12/d3dx12.h"
 #include "dx12/DX12Mesh.h"
+#include "dx12/DX12Context.h"
 #include "dx12/DX12RenderTarget.h"
 #include "engine/Engine.h"
 
@@ -180,6 +181,26 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_SwapChain = static_cast<IDXGISwapChain3*>(tempSwapChain);
 	m_FrameIndex = m_SwapChain->GetCurrentBackBufferIndex();
 
+
+	// -- Create Context -- //
+
+	const std::wstring contextNames[eContextCount] = {
+		L"Deferred",			// the GBuffer update context
+		L"Immediate",			// the Immediate (final rendering)
+		L"Copy",				// copy commandlist for resources
+	};
+
+	DX12Context::ContextDesc desc[eContextCount];
+
+	// setup for somes context
+	desc[EContextId::eUpload].CommandListType = D3D12_COMMAND_LIST_TYPE_COPY;
+
+	for (UINT i = 0; i < eContextCount; ++i)
+	{
+		desc[i].Name = contextNames[i];
+		m_Context[i] = new DX12Context(desc[i]);
+	}
+
 	// -- Create the Back Buffers (render target views) Descriptor Heap -- //
 
 	// Create a RTV for each buffer (double buffering is two buffers, tripple buffering is 3).
@@ -196,48 +217,12 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	}
 
 	DX12RenderTarget::RenderTargetDesc backRTVDesc;
-	backRTVDesc.Format = backBufferDesc.Format;
-	backRTVDesc.Name = L"Back Buffer";
-	backRTVDesc.IsShaderResource = false;
-	backRTVDesc.Resource = m_BackBufferResource;
+	backRTVDesc.Format				= backBufferDesc.Format;
+	backRTVDesc.Name				= L"Back Buffer";
+	backRTVDesc.IsShaderResource	= false;
+	backRTVDesc.Resource			= m_BackBufferResource;
 	
-
 	m_BackBuffer = new DX12RenderTarget(backRTVDesc);
-
-	// -- Create the Command Allocators -- //
-
-	for (int i = 0; i < m_FrameBufferCount; i++)
-	{
-		hr = m_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocator[i]));
-		if (FAILED(hr))
-		{
-			ASSERT_ERROR("Error : CreateCommandAllocator");
-			return E_FAIL;
-		}
-	}
-
-	// -- Create a Command List -- //
-
-	// create the command list with the first allocator
-	hr = m_Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocator[m_FrameIndex], NULL, IID_PPV_ARGS(&m_CommandList));
-	if (FAILED(hr))
-	{
-		ASSERT_ERROR("Error : CreateCommandList");
-		return E_FAIL;
-	}
-
-	// -- Create a Fence & Fence Event -- //
-
-	for (int i = 0; i < m_FrameBufferCount; i++)
-	{
-		hr = m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fences[i]));
-		if (FAILED(hr))
-		{
-			ASSERT_ERROR("Error : Fences -> CreateFence");
-			return E_FAIL;
-		}
-		m_FenceValue[i] = 0; // set the initial m_Fences value to 0
-	}
 
 	// create a handle to a m_Fences event
 	m_FenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -281,14 +266,14 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	}
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-	depthStencilViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	depthStencilViewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	depthStencilViewDesc.Flags = D3D12_DSV_FLAG_NONE;
+	depthStencilViewDesc.Format			= DXGI_FORMAT_D32_FLOAT;
+	depthStencilViewDesc.ViewDimension	= D3D12_DSV_DIMENSION_TEXTURE2D;
+	depthStencilViewDesc.Flags			= D3D12_DSV_FLAG_NONE;
 
 	D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
-	depthOptimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
-	depthOptimizedClearValue.DepthStencil.Depth = 1.0f;
-	depthOptimizedClearValue.DepthStencil.Stencil = 0;
+	depthOptimizedClearValue.Format					= DXGI_FORMAT_D32_FLOAT;
+	depthOptimizedClearValue.DepthStencil.Depth		= 1.0f;
+	depthOptimizedClearValue.DepthStencil.Stencil	= 0;
 
 	m_Device->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
@@ -326,37 +311,18 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 HRESULT DX12RenderEngine::PrepareForRender()
 {
-	HRESULT hr;
-
+	DX12Context * context = GetContext(eImmediate);
+	
 	// We have to wait for the gpu to finish with the command allocator before we reset it
 	WaitForPreviousFrame();
 
-	// we can only reset an allocator once the gpu is done with it
-	// resetting an allocator frees the memory that the command list was stored in
-	hr = m_CommandAllocator[m_FrameIndex]->Reset();
-	if (FAILED(hr))
-	{
-		POPUP_ERROR("Error : Failed to reset command allocator");
-		return hr;
-	}
-
-	// reset the command list. by resetting the command list we are putting it into
-	// a recording state so we can start recording commands into the command allocator.
-	// the command allocator that we reference here may have multiple command lists
-	// associated with it, but only one can be recording at any time. Make sure
-	// that any other command lists associated to this command allocator are in
-	// the closed state (not recording).
-	hr = m_CommandList->Reset(m_CommandAllocator[m_FrameIndex], nullptr);
-	if (FAILED(hr))
-	{
-		POPUP_ERROR("Error in prepare for render");
-		return hr;
-	}
+	// reset the immediate context
+	context->ResetContext();
 
 	// here we start recording commands into the m_CommandList (which all the commands will be stored in the m_CommandAllocator)
 
 	// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
-	m_CommandList->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+	context->GetCommandList()->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 	// here we again get the handle to our current render target view so we can set it as the render target in the output merger stage of the pipeline
 	//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_FrameIndex, m_RtvDescriptorSize);
@@ -366,21 +332,21 @@ HRESULT DX12RenderEngine::PrepareForRender()
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 	// set the render target for the output merger stage (the output of the pipeline)
-	m_CommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+	context->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
 	// Clear the render target by using the ClearRenderTargetView command
 	//const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	const float clearColor[] = { 0.4f, 0.4f, 0.4f, 1.0f };
-	m_CommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+	context->GetCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
 	// Setting up the command list
-	m_CommandList->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
-	m_CommandList->RSSetScissorRects(1, &DX12RenderEngine::GetInstance().GetScissor());
+	context->GetCommandList()->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
+	context->GetCommandList()->RSSetScissorRects(1, &DX12RenderEngine::GetInstance().GetScissor());
 
-	m_CommandList->ClearDepthStencilView(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	context->GetCommandList()->ClearDepthStencilView(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	// setup primitive topology
-	m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
+	context->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
 
 	return S_OK;
 }
@@ -394,8 +360,12 @@ HRESULT DX12RenderEngine::Render()
 	}
 	else
 	{
+		DX12Context * context = GetContext(eImmediate);
+
 		// create an array of command lists (only one command list here)
-		ID3D12CommandList* ppCommandLists[] = { m_CommandList };
+		ID3D12CommandList* ppCommandLists[] = { context->GetCommandList() };
+		UINT64 fenceValue = context->GetFenceValue(m_FrameIndex);
+		ID3D12Fence * fence = context->GetFence(m_FrameIndex);
 
 		// execute the array of command lists
 		m_CommandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
@@ -403,19 +373,13 @@ HRESULT DX12RenderEngine::Render()
 		// this command goes in at the end of our command queue. we will know when our command queue 
 		// has finished because the m_Fences value will be set to "m_FenceValue" from the GPU since the command
 		// queue is being executed on the GPU
-		DX12_ASSERT(m_CommandQueue->Signal(m_Fences[m_FrameIndex], m_FenceValue[m_FrameIndex]));
+		DX12_ASSERT(m_CommandQueue->Signal(fence, fenceValue));
 
 		// present the current back buffer
 		DX12_ASSERT(m_SwapChain->Present(0, 0));
 	}
 
 	return S_OK;
-}
-
-HRESULT DX12RenderEngine::IncrementFence()
-{
-	++(m_FenceValue[m_FrameIndex]);
-	return m_CommandQueue->Signal(m_Fences[m_FrameIndex], m_FenceValue[m_FrameIndex]);
 }
 
 DX12RenderEngine::PipelineStateObject * DX12RenderEngine::GetPipelineStateObject(UINT64 i_Flag)
@@ -449,19 +413,22 @@ HRESULT DX12RenderEngine::Close()
 	return hr;
 }
 
-DX12ConstantBuffer * DX12RenderEngine::GetConstantBuffer(EConstantBufferId i_Id)
+DX12ConstantBuffer * DX12RenderEngine::GetConstantBuffer(EConstantBufferId i_Id) const
 {
-	if (i_Id < EConstantBufferId::eConstantBufferCount)
-	{
-		return m_ConstantBuffer[i_Id];
-	}
-	
-	return nullptr;	// issue
+	ASSERT(i_Id < eConstantBufferCount);
+	return m_ConstantBuffer[i_Id];
 }
 
-DX12RenderTarget * DX12RenderEngine::GetRenderTarget(ERenderTargetId i_Id)
+DX12RenderTarget * DX12RenderEngine::GetRenderTarget(ERenderTargetId i_Id) const
 {
-	return nullptr;
+	ASSERT(i_Id < eRenderTargetCount);
+	return m_RenderTargets[i_Id];
+}
+
+DX12Context * DX12RenderEngine::GetContext(EContextId i_Id) const
+{
+	ASSERT(i_Id < eContextCount);
+	return m_Context[i_Id];
 }
 
 ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_HeapProperty, uint64_t i_Size, D3D12_RESOURCE_FLAGS i_Flags) const
@@ -522,11 +489,6 @@ D3D12_VIEWPORT & DX12RenderEngine::GetViewport()
 	return m_Viewport;
 }
 
-ID3D12GraphicsCommandList * DX12RenderEngine::GetCommandList() const
-{
-	return m_CommandList;
-}
-
 IDXGISwapChain3 * DX12RenderEngine::SwapChain() const
 {
 	return m_SwapChain;
@@ -542,17 +504,8 @@ ID3D12CommandQueue * DX12RenderEngine::GetCommandQueue() const
 	return m_CommandQueue;
 }
 
-const DXGI_SWAP_CHAIN_DESC & DX12RenderEngine::GetSwapChainDesc() const
-{
-	return m_SwapChainDesc;
-}
-
 D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderEngine::GetRenderTarget() const
 {
-	/*D3D12_CPU_DESCRIPTOR_HANDLE ret = m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	ret.ptr += (m_FrameIndex * m_RtvDescriptorSize);
-	return ret;*/
-
 	return m_BackBuffer->GetRenderTargetDescriptor(m_FrameIndex);
 }
 
@@ -601,16 +554,19 @@ void DX12RenderEngine::CleanUp()
 
 	SAFE_RELEASE(m_Device);
 
+	// delete context
+	for (UINT i = 0; i < eContextCount; ++i)
+	{
+		delete m_Context[i];
+	}
+
 	for (int i = 0; i < m_FrameBufferCount; ++i)
 	{
 		SAFE_RELEASE(m_BackBufferResource[i]);
-		SAFE_RELEASE(m_CommandAllocator[i]);
-		SAFE_RELEASE(m_Fences[i]);
 	};
 
 	SAFE_RELEASE(m_SwapChain);
 	SAFE_RELEASE(m_CommandQueue);
-	SAFE_RELEASE(m_CommandList);
 
 	SAFE_RELEASE(m_DepthStencilBuffer);
 	SAFE_RELEASE(m_DepthStencilDescriptorHeap);
@@ -637,15 +593,39 @@ void DX12RenderEngine::CleanUp()
 #endif
 }
 
+FORCEINLINE void DX12RenderEngine::WaitForContext(EContextId i_Context, UINT i_FrameIndex, HANDLE & i_Handle) const
+{
+	HRESULT hr;
+	DX12Context * context = GetContext(i_Context);
+
+	ID3D12Fence * fence = context->GetFence(i_FrameIndex);
+	UINT64 fenceValue = context->GetFenceValue(i_FrameIndex);
+
+	// if the current m_Fences value is still less than "m_FenceValue", then we know the GPU has not finished executing
+	// the command queue since it has not reached the "m_CommandQueue->Signal(m_Fences, m_FenceValue)" command
+	if (fence->GetCompletedValue() < fenceValue)
+	{
+		// we have the m_Fences create an event which is signaled once the m_Fences's current value is "m_FenceValue"
+		hr = fence->SetEventOnCompletion(fenceValue, i_Handle);
+
+		// We will wait until the m_Fences has triggered the event that it's current value has reached "m_FenceValue". once it's value
+		// has reached "m_FenceValue", we know the command queue has finished executing
+		WaitForSingleObject(i_Handle, INFINITE);
+	}
+
+	// increment m_FenceValue for next frame
+	context->IncrementFenceValue(m_FrameIndex);
+}
+
 HRESULT DX12RenderEngine::UpdatePipeline()
 {
 	HRESULT hr;
 
 	// transition the "m_FrameIndex" render target from the render target state to the present state. If the debug layer is enabled, you will receive a
 	// warning if present is called on the render target when it's not in the present state
-	m_CommandList->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	GetContext(eImmediate)->GetCommandList()->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
-	hr = m_CommandList->Close();
+	hr = GetContext(eImmediate)->GetCommandList()->Close();
 
 	return hr;
 }
@@ -653,16 +633,20 @@ HRESULT DX12RenderEngine::UpdatePipeline()
 HRESULT DX12RenderEngine::WaitForPreviousFrame()
 {
 	HRESULT hr;
+	DX12Context * context = GetContext(eImmediate);
 
 	// swap the current rtv buffer index so we draw on the correct buffer
 	m_FrameIndex = m_SwapChain->GetCurrentBackBufferIndex();
 
+	ID3D12Fence * fence		= context->GetFence(m_FrameIndex);
+	UINT64 fenceValue		= context->GetFenceValue(m_FrameIndex);
+
 	// if the current m_Fences value is still less than "m_FenceValue", then we know the GPU has not finished executing
 	// the command queue since it has not reached the "m_CommandQueue->Signal(m_Fences, m_FenceValue)" command
-	if (m_Fences[m_FrameIndex]->GetCompletedValue() < m_FenceValue[m_FrameIndex])
+	if (fence->GetCompletedValue() < fenceValue)
 	{
 		// we have the m_Fences create an event which is signaled once the m_Fences's current value is "m_FenceValue"
-		hr = m_Fences[m_FrameIndex]->SetEventOnCompletion(m_FenceValue[m_FrameIndex], m_FenceEvent);
+		hr = fence->SetEventOnCompletion(fenceValue, m_FenceEvent);
 		if (FAILED(hr))
 		{
 			return hr;
@@ -674,7 +658,7 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 	}
 
 	// increment m_FenceValue for next frame
-	m_FenceValue[m_FrameIndex]++;
+	context->IncrementFenceValue(m_FrameIndex);
 
 	return S_OK;
 }
@@ -683,7 +667,7 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 
 inline void DX12RenderEngine::GenerateDefaultPipelineState()
 {
-	const std::wstring ShaderFolder = L"resources/shaders/";
+	const std::wstring ShaderFolder = L"src/shaders/forward/";
 
 	// preload shaders
 	LoadShader(ToWStr(ShaderFolder + L"DefaultPixel.hlsl"), DX12Shader::ePixel,

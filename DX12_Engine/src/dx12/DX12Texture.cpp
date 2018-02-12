@@ -1,6 +1,7 @@
 #include "dx12/DX12Texture.h"
 
 #include "dx12/DX12Utils.h"
+#include "dx12/DX12Context.h"
 #include "dx12/DX12RenderEngine.h"
 
 DX12Texture::DX12Texture(const wchar_t * i_Filename)
@@ -26,8 +27,9 @@ DX12Texture::DX12Texture(const wchar_t * i_Filename)
 	}
 
 	// copy the data to the texture resource
-	ID3D12Device * device					= DX12RenderEngine::GetInstance().GetDevice();
-	ID3D12GraphicsCommandList * commandList = DX12RenderEngine::GetInstance().GetCommandList();
+	DX12RenderEngine & render				= DX12RenderEngine::GetInstance();
+	ID3D12Device * device					= render.GetDevice();
+	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
 
 	// create heap and resource buffer for the texture
 	std::wstring heapName(i_Filename);
@@ -78,8 +80,9 @@ DX12Texture::DX12Texture(const ImageDesc & i_Desc)
 	,m_Desc()
 {
 	// copy the data to the texture resource
-	ID3D12Device * device = DX12RenderEngine::GetInstance().GetDevice();
-	ID3D12GraphicsCommandList * commandList = DX12RenderEngine::GetInstance().GetCommandList();
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+	ID3D12Device * device = render.GetDevice();
+	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
 
 	m_Desc.Dimension			= D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	m_Desc.Alignment			= 0;

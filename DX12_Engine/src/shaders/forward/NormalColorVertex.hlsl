@@ -1,4 +1,4 @@
-#include "TransformBuffer.hlsli"
+#include "../lib/TransformBuffer.hlsli"
 
 struct VS_INPUT
 {

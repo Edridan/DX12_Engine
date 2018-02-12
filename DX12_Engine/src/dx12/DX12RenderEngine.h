@@ -20,6 +20,7 @@
 // class predef
 class DX12ConstantBuffer;
 class DX12RenderTarget;
+class DX12Context;
 
 // define
 #define DEBUG_DX12_ENABLE		1
@@ -56,10 +57,7 @@ public:
 	HRESULT			Render();
 
 	//** DX12 Management **//
-	// fences
-	HRESULT						IncrementFence();
-	// pipeline state management
-	// this is used for default basic rendering
+	// pipeline state management, this is used for default basic rendering
 	// if you need other pipeline states (skinned objects for example) create a pipeline state objects on your side
 	PipelineStateObject *		GetPipelineStateObject(UINT64 i_Flag);
 	DXGI_SAMPLE_DESC			GetSampleDesc() const;
@@ -79,7 +77,7 @@ public:
 		eConstantBufferCount,
 	};
 
-	DX12ConstantBuffer *		GetConstantBuffer(EConstantBufferId i_Id);
+	DX12ConstantBuffer *		GetConstantBuffer(EConstantBufferId i_Id) const;
 	
 	// deferred render target management
 	enum ERenderTargetId
@@ -92,7 +90,20 @@ public:
 		eRenderTargetCount,
 	};
 
-	DX12RenderTarget *			GetRenderTarget(ERenderTargetId i_Id);
+	DX12RenderTarget *			GetRenderTarget(ERenderTargetId i_Id) const;
+
+	// deferred contexts
+	enum EContextId
+	{
+		eDeferred,		// deferred context that will render GBuffer
+		eImmediate,		// immediate context that will render the frame using G-Buffer
+
+		eUpload,		// upload resources to GPU or change state
+
+		// count
+		eContextCount,
+	};
+	DX12Context *			GetContext(EContextId i_Id) const;	// context management
 
 	// dx12 helpers
 	// For creation of resources in the GPU
@@ -119,22 +130,30 @@ public:
 	// Get/Set
 	int								GetFrameIndex() const;
 	int								GetFrameBufferCount() const;
+
 	D3D12_RECT &					GetScissor();
 	D3D12_VIEWPORT &				GetViewport();
-	IDXGISwapChain3 *				SwapChain() const;
-	ID3D12Device*					GetDevice() const;
-	ID3D12GraphicsCommandList *		GetCommandList() const;;
-	ID3D12CommandQueue*				GetCommandQueue() const;
-	const DXGI_SWAP_CHAIN_DESC &	GetSwapChainDesc() const;
-	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTarget() const;
-	bool							IsDX12DebugEnabled() const;
 	IntVec2							GetRenderSize() const;
 
+	IDXGISwapChain3 *				SwapChain() const;
+	ID3D12Device*					GetDevice() const;
+	ID3D12CommandQueue*				GetCommandQueue() const;
+
+	const DXGI_SWAP_CHAIN_DESC &	GetSwapChainDesc() const;
+	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTarget() const;
+	
+	bool							IsDX12DebugEnabled() const;
+	
+	
 private:
 	DX12RenderEngine(HINSTANCE & i_HInstance);
 	~DX12RenderEngine();
 
+	// internal
 	void		CleanUp();
+
+	// helper
+	void		WaitForContext(EContextId i_Context, UINT i_FrameIndex, HANDLE & i_Handle) const;
 
 	// DX12 Internal management
 	HRESULT				UpdatePipeline();
@@ -148,19 +167,15 @@ private:
 #define FRAME_BUFFER_COUNT		3
 	const int m_FrameBufferCount = FRAME_BUFFER_COUNT; // number of buffers we want, 2 for double buffering, 3 for tripple buffering
 
-	// DX12 Implementation
+	// dx12
 	ID3D12Device*				m_Device; // direct3d device
 	IDXGISwapChain3*			m_SwapChain; // swapchain used to switch between render targets
 	DXGI_SWAP_CHAIN_DESC		m_SwapChainDesc;	// swapchain description used for create default pso
 	ID3D12CommandQueue*			m_CommandQueue; // container for command lists
-	ID3D12CommandAllocator*		m_CommandAllocator[FRAME_BUFFER_COUNT]; // we want enough allocators for each buffer * number of threads (we only have one thread)
-	ID3D12GraphicsCommandList*	m_CommandList; // a command list we can record commands into, then execute them to render the frame
-	ID3D12Fence*				m_Fences[FRAME_BUFFER_COUNT];		// an object that is locked while our command list is being executed by the gpu. We need as many as we have allocators (more if we want to know when the gpu is finished with an asset)
 	HANDLE						m_FenceEvent; // a handle to an event when our fence is unlocked by the gpu
-	UINT64						m_FenceValue[FRAME_BUFFER_COUNT]; // this value is incremented each frame. each fence will have its own value
 	int							m_FrameIndex; // current render target view we are on
+
 #ifdef DX12_DEBUG
-	// Debug
 	ID3D12Debug *				m_DebugController;
 #endif
 
@@ -169,7 +184,7 @@ private:
 	ID3D12Resource*				m_BackBufferResource[FRAME_BUFFER_COUNT]; // render target pointer (setup with swap buffer in the engine and then pass to DX12RenderTarget)
 	// Deferred rendering
 	DX12RenderTarget *			m_RenderTargets[ERenderTargetId::eRenderTargetCount];
-
+	DX12Context *				m_Context[EContextId::eContextCount];
 
 	// Depth buffer
 	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial

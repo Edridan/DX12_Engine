@@ -25,9 +25,6 @@
     <Filter Include="Header Files\Game">
       <UniqueIdentifier>{a372c1ad-bd63-4c6c-8d80-d13987fbd013}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Shaders">
-      <UniqueIdentifier>{b7083b0a-8f2e-463d-a8c5-e40542779e02}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Icon">
       <UniqueIdentifier>{d718eeac-b874-4504-8c31-94cf00d632ef}</UniqueIdentifier>
     </Filter>
@@ -49,9 +46,6 @@
     <Filter Include="Resource Files\Fonts">
       <UniqueIdentifier>{cc447125-4554-4896-964d-8a67c5734530}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Shaders\Text">
-      <UniqueIdentifier>{a9a52a30-e568-445a-a371-43a35ea60c52}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine">
       <UniqueIdentifier>{16f53298-5a74-45fb-adf4-419ff4475a77}</UniqueIdentifier>
     </Filter>
@@ -70,23 +64,11 @@
     <Filter Include="Header Files\UI">
       <UniqueIdentifier>{0700e06b-467a-4e9e-a717-c8f781a88f0e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Shaders\Lib">
-      <UniqueIdentifier>{f87fe18e-e814-4eb0-8c23-befc7960e620}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Shaders\Default">
-      <UniqueIdentifier>{d5ba787a-102e-4290-bd9a-82179be14af5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Lib\ImGui">
       <UniqueIdentifier>{eec23cb5-11c6-41c3-a036-ff0ce572d032}</UniqueIdentifier>
     </Filter>
     <Filter Include="Lib\ImGui\ExtraFonts">
       <UniqueIdentifier>{f8ffcc17-7320-4006-871f-19a176ef8fa2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Shaders\ImGui">
-      <UniqueIdentifier>{85fc765a-f89b-4c26-bcb0-148e9513e0c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Shaders\Forward">
-      <UniqueIdentifier>{42fa381b-47f6-452e-8fba-12c6346d2593}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Editor">
       <UniqueIdentifier>{68688b01-7b69-48c7-aed3-fd9242717c8b}</UniqueIdentifier>
@@ -94,8 +76,20 @@
     <Filter Include="Header Files\Editor">
       <UniqueIdentifier>{552584b7-bd9e-4e3e-822b-bbedf5a61deb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Shaders\Debug">
-      <UniqueIdentifier>{8d3fc3b4-ebb0-48e8-9c14-1f55845b3bd2}</UniqueIdentifier>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{010134ec-ca8d-40f9-91c1-c3989d68e9cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Lib">
+      <UniqueIdentifier>{1c518152-6443-44ef-a000-d238e535251a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Forward">
+      <UniqueIdentifier>{1a4984f3-a49e-4418-8a54-fb3c4516ce4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\UI">
+      <UniqueIdentifier>{1d97e091-60a8-4cd0-809b-d69bd5d442a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Deferred">
+      <UniqueIdentifier>{ecdd2920-c1e1-4be7-abf0-7d34ea934f47}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -105,9 +99,6 @@
     <ClCompile Include="src\dx12\DX12Shader.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="src\dx12\DX12Text.cpp">
-      <Filter>Source Files\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="src\dx12\DX12Texture.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
@@ -115,9 +106,6 @@
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="src\dx12\DX12ConstantBuffer.cpp">
-      <Filter>Source Files\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\dx12\DX12Font.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="src\dx12\DX12Material.cpp">
@@ -239,9 +227,6 @@
     <ClInclude Include="src\dx12\DX12ConstantBuffer.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="src\dx12\DX12Font.h">
-      <Filter>Header Files\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="src\dx12\DX12Material.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
@@ -255,9 +240,6 @@
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\dx12\DX12Shader.h">
-      <Filter>Header Files\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\dx12\DX12Text.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Clock.h">
@@ -398,14 +380,17 @@
     <None Include="resources\fonts\Arial.fnt">
       <Filter>Resource Files\Fonts</Filter>
     </None>
-    <None Include="resources\shaders\Material.hlsli">
-      <Filter>Resource Files\Shaders\Lib</Filter>
+    <None Include="src\shaders\lib\GlobalBuffer.hlsli">
+      <Filter>Shaders\Lib</Filter>
     </None>
-    <None Include="resources\shaders\TransformBuffer.hlsli">
-      <Filter>Resource Files\Shaders\Lib</Filter>
+    <None Include="src\shaders\lib\TransformBuffer.hlsli">
+      <Filter>Shaders\Lib</Filter>
     </None>
-    <None Include="resources\shaders\GlobalBuffer.hlsli">
-      <Filter>Resource Files\Shaders\Lib</Filter>
+    <None Include="src\shaders\lib\EffectLib.hlsli">
+      <Filter>Shaders\Lib</Filter>
+    </None>
+    <None Include="src\shaders\lib\Material.hlsli">
+      <Filter>Shaders\Lib</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -414,35 +399,26 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\TextVertex.hlsl">
-      <Filter>Resource Files\Shaders\Text</Filter>
+    <FxCompile Include="src\shaders\ui\ImGuiPixel.hlsl">
+      <Filter>Shaders\UI</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\TextPixel.hlsl">
-      <Filter>Resource Files\Shaders\Text</Filter>
+    <FxCompile Include="src\shaders\ui\ImGuiVertex.hlsl">
+      <Filter>Shaders\UI</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\ImGuiVertex.hlsl">
-      <Filter>Resource Files\Shaders\ImGui</Filter>
+    <FxCompile Include="src\shaders\forward\NormalVertex.hlsl">
+      <Filter>Shaders\Forward</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\ImGuiPixel.hlsl">
-      <Filter>Resource Files\Shaders\ImGui</Filter>
+    <FxCompile Include="src\shaders\forward\DefaultPixel.hlsl">
+      <Filter>Shaders\Forward</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultPixel.hlsl">
-      <Filter>Resource Files\Shaders\Forward</Filter>
+    <FxCompile Include="src\shaders\forward\NormalColorVertex.hlsl">
+      <Filter>Shaders\Forward</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\NormalColorVertex.hlsl">
-      <Filter>Resource Files\Shaders\Forward</Filter>
+    <FxCompile Include="src\shaders\forward\NormalTexPixel.hlsl">
+      <Filter>Shaders\Forward</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\NormalTexPixel.hlsl">
-      <Filter>Resource Files\Shaders\Forward</Filter>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\NormalTexVertex.hlsl">
-      <Filter>Resource Files\Shaders\Forward</Filter>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\NormalVertex.hlsl">
-      <Filter>Resource Files\Shaders\Forward</Filter>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\debug\DrawNormalPixels.hlsl">
-      <Filter>Resource Files\Shaders\Debug</Filter>
+    <FxCompile Include="src\shaders\forward\NormalTexVertex.hlsl">
+      <Filter>Shaders\Forward</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

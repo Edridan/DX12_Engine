@@ -20,7 +20,6 @@ public:
 		DXGI_FORMAT			Format				= DXGI_FORMAT_R32G32B32A32_FLOAT;	// format of the resource
 	};
 
-
 	DX12RenderTarget(const RenderTargetDesc & i_Desc);
 	~DX12RenderTarget();
 

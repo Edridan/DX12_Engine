@@ -1,6 +1,7 @@
 #include "DX12RenderTarget.h"
 
 #include "dx12/DX12RenderEngine.h"
+#include "dx12/DX12Context.h"
 #include "engine/Debug.h"
 
 DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
@@ -17,7 +18,7 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 {
 	// retreive dx12 utils
 	DX12RenderEngine & render				= DX12RenderEngine::GetInstance();
-	ID3D12GraphicsCommandList * commandList = render.GetCommandList();
+	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
 	ID3D12Device * device					= render.GetDevice();
 	HRESULT hr;
 
