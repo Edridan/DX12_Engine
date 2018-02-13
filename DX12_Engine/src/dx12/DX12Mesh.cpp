@@ -238,6 +238,11 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 			stride += 2;
 		}
 		// do not support vertex color for now
+		//if (attrib.colors.size() != 0 && (attrib.colors[0] != -1.0f) /* verify that color is really present in the model */)
+		//{
+		//	flags |= DX12PipelineState::EElementFlags::eHaveColor;
+		//	stride += 3;
+		//}
 
 		FLOAT * const verticeBuffer = new FLOAT[verticeCount * stride];
 		FLOAT * bufferItr = verticeBuffer;
