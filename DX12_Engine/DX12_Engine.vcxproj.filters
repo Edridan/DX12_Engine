@@ -91,6 +91,9 @@
     <Filter Include="Shaders\Deferred">
       <UniqueIdentifier>{ecdd2920-c1e1-4be7-abf0-7d34ea934f47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Markup">
+      <UniqueIdentifier>{85225fdb-0ab0-4f1f-be0d-7a72a8343e3b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
@@ -195,9 +198,6 @@
     <ClCompile Include="src\dx12\DX12PipelineState.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="src\ui\UITexture.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
     <ClCompile Include="src\ui\UIDebug.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
@@ -209,6 +209,9 @@
     </ClCompile>
     <ClCompile Include="src\dx12\DX12Context.cpp">
       <Filter>Source Files\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UITexture.cpp">
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -350,6 +353,9 @@
     <ClInclude Include="src\ui\UITexture.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="src\editor\Editor.h">
+      <Filter>Header Files\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\fonts\Arial-font.png">
@@ -391,6 +397,12 @@
     </None>
     <None Include="src\shaders\lib\Material.hlsli">
       <Filter>Shaders\Lib</Filter>
+    </None>
+    <None Include="src\shaders\markup\MaterialMarkupPS.hlsl">
+      <Filter>Shaders\Markup</Filter>
+    </None>
+    <None Include="src\shaders\markup\MaterialMarkupVS.hlsl">
+      <Filter>Shaders\Markup</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

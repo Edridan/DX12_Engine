@@ -3,6 +3,7 @@
 #pragma once
 
 #include "dx12/DX12Utils.h"
+#include "dx12/DX12Shader.h"
 
 #include <string>
 
@@ -72,6 +73,9 @@ public:
 	void		PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
 
 private:
+	// helpers
+	void		CreateShaderCode(std::wstring & o_Code, const DX12MaterialDesc & i_Desc, DX12Shader::EShaderType i_Type);
+	
 	// color of material
 	Color	m_ColorAmbient;
 	Color	m_ColorDiffuse;
@@ -86,6 +90,9 @@ private:
 	ID3D12DescriptorHeap *	m_Descriptors[eCount];	// descriptor count
 	// id for the material
 	UINT64					m_Id;
+	// pipeline state object
+	ID3D12RootSignature *	m_RootSignature;
+	ID3D12PipelineState *	m_PipelineState;
 
 	// other
 	float	m_SpecularExponent;

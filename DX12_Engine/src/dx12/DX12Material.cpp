@@ -4,6 +4,9 @@
 #include "dx12/DX12ConstantBuffer.h"
 #include "dx12/DX12PipelineState.h"
 #include "dx12/DX12Texture.h"
+#include "engine/Utils.h"
+
+
 
 DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	:m_ColorAmbient(i_Desc.Ka)
@@ -26,6 +29,16 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	// reserve address for constant buffer
 	m_ConstantBuffer = render.GetConstantBuffer(DX12RenderEngine::eMaterial)->ReserveVirtualAddress();
 	UpdateConstantBufferView();	// update to constant buffer
+	
+	// create root signature
+
+
+
+	// create shaders
+
+
+	// create pipeline state object
+
 }
 
 DX12Material::~DX12Material()
@@ -199,5 +212,10 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) 
 			i_CommandList->SetGraphicsRootDescriptorTable(3 + i, m_Textures[i]->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 		}
 	}
+
+}
+
+void DX12Material::CreateShaderCode(std::wstring & o_Code, const DX12MaterialDesc & i_Desc, DX12Shader::EShaderType i_Type)
+{
 
 }

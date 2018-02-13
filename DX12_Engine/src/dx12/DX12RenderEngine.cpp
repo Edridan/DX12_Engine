@@ -270,6 +270,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	// this is going to create default pipeline state for drawing default objects
 	// this features : vertex coloring, one texture handling
 	GenerateDefaultPipelineState();
+	GenerateImmediatePipelineState();
 
 	// -- Create depth/stencil buffer -- //
 
@@ -377,6 +378,14 @@ HRESULT DX12RenderEngine::Render()
 DX12RenderEngine::PipelineStateObject * DX12RenderEngine::GetPipelineStateObject(UINT64 i_Flag)
 {
 	return m_PipelineStateObjects[i_Flag];
+}
+
+DX12RenderEngine::PipelineStateObject DX12RenderEngine::GetImmediatePipelineStateObject() const
+{
+	PipelineStateObject ret;
+	ret.m_DefaultRootSignature	= m_ImmediateRootSignature;
+	ret.m_PipelineState			= m_ImmediatePipelineState;
+	return ret;
 }
 
 DXGI_SAMPLE_DESC DX12RenderEngine::GetSampleDesc() const
@@ -527,7 +536,6 @@ void DX12RenderEngine::CleanUp()
 {
 	// Cleanup resources
 	// wait for the gpu to finish all frames
-	// To do : fix the infinite loop
 	for (int i = 0; i < m_FrameBufferCount; ++i)
 	{
 		m_FrameIndex = i;
@@ -577,11 +585,11 @@ void DX12RenderEngine::CleanUp()
 	}
 
 	// delete resources
-	//for (int i = 0; i < EConstantBufferId::eConstantBufferCount; ++i)
-	//{
-	//	// delete the constant buffer
-	//	delete (m_ConstantBuffer[i]);
-	//}
+	for (int i = 0; i < EConstantBufferId::eConstantBufferCount; ++i)
+	{
+		// delete the constant buffer
+		delete (m_ConstantBuffer[i]);
+	}
 
 	// release debug resources
 #ifdef DX12_DEBUG
@@ -740,9 +748,6 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 
 	// setup primitive topology
 	context->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
-
-	return S_OK;
-
 
 	return S_OK;
 }
@@ -996,4 +1001,17 @@ HRESULT DX12RenderEngine::LoadShader(const wchar_t * i_Filename, DX12Shader::ESh
 	}
 	
 	return S_OK;
+}
+
+void DX12RenderEngine::GenerateImmediatePipelineState()
+{
+	// 6 paramters (1 CBV (global), 3 textures) 
+	CD3DX12_ROOT_PARAMETER rootParam[4];
+	CD3DX12_DESCRIPTOR_RANGE DescRange[1];
+
+
+	rootParam[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_PIXEL);	// b0
+	rootParam[1].InitAsShaderResourceView(0, 0, D3D12_SHADER_VISIBILITY_PIXEL);	// t0-t3
+	rootParam[2].InitAsShaderResourceView(0, 0, D3D12_SHADER_VISIBILITY_PIXEL);	// t0-t3
+	rootParam[3].InitAsShaderResourceView(0, 0, D3D12_SHADER_VISIBILITY_PIXEL);	// t0-t3
 }

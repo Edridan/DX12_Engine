@@ -1,5 +1,7 @@
 #include "DX12RootSignature.h"
 
+#include "engine/Debug.h"
+
 DX12RootSignature::DX12RootSignature()
 	:m_IsCreated(false)
 	,m_ParamCount(0)
@@ -16,29 +18,66 @@ void DX12RootSignature::CreateDefaultRootSignature()
 
 void DX12RootSignature::AddStaticSampler(const D3D12_STATIC_SAMPLER_DESC & i_Sampler)
 {
+	// push back a static sampler to the root signature
+	m_StaticSampler.push_back(i_Sampler);
 }
 
-void DX12RootSignature::AddParameter()
+void DX12RootSignature::AddShaderResourceView(UINT32 i_ShaderRegister, UINT32 i_Register, D3D12_SHADER_VISIBILITY i_Visibility, UINT32 i_RegisterSpace)
 {
+	ASSERT(!m_IsCreated);
+
+	// create the root descriptor
+	D3D12_ROOT_DESCRIPTOR rootDesc = CreateRootDescriptor(i_ShaderRegister, i_RegisterSpace);
+
+	// create the root parameter
+	D3D12_ROOT_PARAMETER rootParam;
+	rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+	rootParam.ShaderVisibility = i_Visibility;
+	rootParam.Descriptor = rootDesc;
 }
 
-void DX12RootSignature::PushRangeTable()
+void DX12RootSignature::AddConstantBuffer(UINT32 i_ShaderRegister, UINT32 i_Register, D3D12_SHADER_VISIBILITY i_Visibility, UINT32 i_RegisterSpace)
 {
+	ASSERT(!m_IsCreated);
+
+	// create the root descriptor
+	D3D12_ROOT_DESCRIPTOR rootDesc = CreateRootDescriptor(i_ShaderRegister, i_RegisterSpace);
+
+	// create the root parameter
+	D3D12_ROOT_PARAMETER rootParam;
+	rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParam.ShaderVisibility = i_Visibility;
+	rootParam.Descriptor = rootDesc;
 }
 
-void DX12RootSignature::AddRangedParameter(const D3D12_DESCRIPTOR_RANGE & i_Desc)
+void DX12RootSignature::AddDescriptorRange(UINT32 i_ShaderRegister, UINT32 i_Register, const D3D12_DESCRIPTOR_RANGE * i_RangeTable, UINT32 i_RangeSize, D3D12_SHADER_VISIBILITY i_Visibility, UINT32 i_RegisterSpace)
 {
-}
+	ASSERT(!m_IsCreated);
 
-void DX12RootSignature::PopRangeTable()
-{
+	// copy the array
+	D3D12_DESCRIPTOR_RANGE * rangeTable = new D3D12_DESCRIPTOR_RANGE[i_RangeSize];
+	// create the table descriptor
+	D3D12_ROOT_DESCRIPTOR_TABLE tableDesc;
+	tableDesc.NumDescriptorRanges = i_RangeSize;
+	tableDesc.pDescriptorRanges = rangeTable;
+
+	for (UINT i = 0; i < i_RangeSize; ++i)
+	{
+		// copy the range table in a local range table
+		rangeTable[i] = i_RangeTable[i];
+	}
+
+	m_DescriptorTable.push_back(tableDesc);
 }
 
 HRESULT DX12RootSignature::Create(ID3D12Device * i_Device, D3D12_ROOT_SIGNATURE_FLAGS i_Flags)
 {
+	ASSERT(!m_IsCreated);	// can't recreate an already created root signature
+
 	HRESULT hr;
 
-	return E_NOTIMPL;
+
+	return hr;
 }
 
 bool DX12RootSignature::IsCreated() const
@@ -54,6 +93,23 @@ UINT DX12RootSignature::GetParamCount() const
 UINT DX12RootSignature::GetStaticSamplerCount() const
 {
 	return m_SamplerCount;
+}
+
+FORCEINLINE D3D12_ROOT_DESCRIPTOR DX12RootSignature::CreateRootDescriptor(UINT32 i_ShaderRegister, UINT32 i_ShaderSpace)
+{
+	D3D12_ROOT_DESCRIPTOR rootDesc;
+
+	// Update the root desc and push it to the already binded roots
+	rootDesc.RegisterSpace = i_ShaderSpace;
+	rootDesc.ShaderRegister = i_ShaderRegister;
+
+	return rootDesc;
+}
+
+bool DX12RootSignature::RegisterParameter(UINT i_ShaderRegister, UINT32 i_ShaderSpace, D3D12_ROOT_PARAMETER_TYPE i_Type)
+{
+	// To do : register param to buffer to get error (if 2 params on the same register)
+	return false;
 }
 
 /*

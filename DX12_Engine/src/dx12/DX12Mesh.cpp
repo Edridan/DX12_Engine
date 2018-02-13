@@ -155,7 +155,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 	std::string error;
 	Clock timer;
 	timer.Restart();
-
+	  
 	// create load directory
 	std::string textureFolder;
 	std::string materialFolder;
@@ -243,6 +243,9 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		//	flags |= DX12PipelineState::EElementFlags::eHaveColor;
 		//	stride += 3;
 		//}
+
+		// only one supported type for now
+		ASSERT(flags & DX12PipelineState::EElementFlags::eHaveNormal && flags & DX12PipelineState::EElementFlags::eHaveTexcoord);
 
 		FLOAT * const verticeBuffer = new FLOAT[verticeCount * stride];
 		FLOAT * bufferItr = verticeBuffer;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 const float Zero = 0.f;
 const float One = 1.f;
 
@@ -79,3 +81,14 @@ struct Padding
 
 ///////////////////////////////////////////////
 // Math
+namespace Math
+{
+
+}
+
+///////////////////////////////////////////////
+// Files
+namespace Files
+{
+	void	FileToWStr(std::wstring & o_Out, const char * i_Filename);
+}

@@ -59,7 +59,8 @@ public:
 	//** DX12 Management **//
 	// pipeline state management, this is used for default basic rendering
 	// if you need other pipeline states (skinned objects for example) create a pipeline state objects on your side
-	PipelineStateObject *		GetPipelineStateObject(UINT64 i_Flag);
+	PipelineStateObject *		GetPipelineStateObject(UINT64 i_Flag);	// To do : remove, pipeline state objects are managed outside the render engine
+	PipelineStateObject 		GetImmediatePipelineStateObject() const;
 	DXGI_SAMPLE_DESC			GetSampleDesc() const;
 	// get the shaders for default pipeline state objects
 	DX12Shader *				GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type);
@@ -164,6 +165,7 @@ private:
 	void				GenerateDefaultPipelineState();	// load shaders, root and pipeline state for rendering objects
 	void				CreatePipelineState(UINT64 i_Flags);
 	HRESULT				LoadShader(const wchar_t * i_Filename, DX12Shader::EShaderType i_ShaderType, UINT64 i_Flags);
+	void				GenerateImmediatePipelineState();
 
 	// Desc
 #define FRAME_BUFFER_COUNT		3
@@ -187,6 +189,10 @@ private:
 	// Deferred rendering
 	DX12RenderTarget *			m_RenderTargets[ERenderTargetId::eRenderTargetCount];
 	DX12Context *				m_Context[EContextId::eContextCount];
+
+	// Immediate context pipeline state
+	ID3D12RootSignature *		m_ImmediateRootSignature;
+	ID3D12PipelineState *		m_ImmediatePipelineState;
 
 	// Depth buffer
 	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial
