@@ -4,6 +4,7 @@
 #include "dx12/d3dx12.h"
 #include "dx12/DX12Mesh.h"
 #include "dx12/DX12Context.h"
+#include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RenderTarget.h"
 #include "engine/Engine.h"
 
@@ -541,9 +542,13 @@ void DX12RenderEngine::CleanUp()
 	// delete render targets
 	delete m_BackBuffer;
 
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		delete m_RenderTargets[i];
+	}
+
 	// To do : release properly data : might have some random crash here
 
-	SAFE_RELEASE(m_Device);
 
 	// delete context
 	for (UINT i = 0; i < eContextCount; ++i)
@@ -582,6 +587,8 @@ void DX12RenderEngine::CleanUp()
 #ifdef DX12_DEBUG
 	SAFE_RELEASE(m_DebugController);
 #endif
+
+	SAFE_RELEASE(m_Device);
 }
 
 FORCEINLINE void DX12RenderEngine::WaitForContext(EContextId i_Context, UINT i_FrameIndex, HANDLE & i_Handle) const
@@ -748,34 +755,24 @@ inline void DX12RenderEngine::GenerateDefaultPipelineState()
 
 	// preload shaders
 	LoadShader(ToWStr(ShaderFolder + L"DefaultPixel.hlsl"), DX12Shader::ePixel,
-		DX12Mesh::EElementFlags::eHaveNormal);
+		DX12PipelineState::EElementFlags::eHaveNormal);
 	LoadShader(ToWStr(ShaderFolder + L"NormalVertex.hlsl"), DX12Shader::eVertex,
-		DX12Mesh::EElementFlags::eHaveNormal);
+		DX12PipelineState::EElementFlags::eHaveNormal);
 
 	LoadShader(ToWStr(ShaderFolder + L"NormalTexPixel.hlsl"), DX12Shader::ePixel,
-		DX12Mesh::EElementFlags::eHaveNormal 
-		| DX12Mesh::EElementFlags::eHaveTexcoord);
+		DX12PipelineState::EElementFlags::eHaveNormal
+		| DX12PipelineState::EElementFlags::eHaveTexcoord);
 	LoadShader(ToWStr(ShaderFolder + L"NormalTexVertex.hlsl"), DX12Shader::eVertex,
-		DX12Mesh::EElementFlags::eHaveNormal 
-		| DX12Mesh::EElementFlags::eHaveTexcoord);
-
-	LoadShader(ToWStr(ShaderFolder + L"DefaultPixel.hlsl"), DX12Shader::ePixel,
-		DX12Mesh::EElementFlags::eHaveNormal 
-		| DX12Mesh::EElementFlags::eHaveColor);
-	LoadShader(ToWStr(ShaderFolder + L"NormalColorVertex.hlsl"), DX12Shader::eVertex,
-		DX12Mesh::EElementFlags::eHaveNormal 
-		| DX12Mesh::EElementFlags::eHaveColor);
+		DX12PipelineState::EElementFlags::eHaveNormal
+		| DX12PipelineState::EElementFlags::eHaveTexcoord);
 
 	// here we are going to build each pipeline state for rendering
 	// this is a default rendering pipeline and root signatures
 	// if a mesh need other pipeline state object to be rendered don't use them
-	CreatePipelineState(DX12Mesh::EElementFlags::eHaveNormal);
+	CreatePipelineState(DX12PipelineState::EElementFlags::eHaveNormal);
 
-	CreatePipelineState(DX12Mesh::EElementFlags::eHaveNormal
-		| DX12Mesh::EElementFlags::eHaveTexcoord);
-
-	CreatePipelineState(DX12Mesh::EElementFlags::eHaveNormal 
-		| DX12Mesh::EElementFlags::eHaveColor);
+	CreatePipelineState(DX12PipelineState::EElementFlags::eHaveNormal
+		| DX12PipelineState::EElementFlags::eHaveTexcoord);
 }
 
 inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
@@ -799,7 +796,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	D3D12_ROOT_DESCRIPTOR_TABLE * descriptorTable	= nullptr;
 
 	// create input layout
-	DX12Mesh::CreateInputLayoutFromFlags(desc, i_Flags);
+	DX12PipelineState::CreateInputLayoutFromFlags(desc, i_Flags);
 
 	// layout order definition depending flags : 
 	// 1 - Position
@@ -820,7 +817,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 	// we are going to use static samplers that are samplers that we can't change when they are set to the pipeline state
 	// this mean we have to save samplers in files and read them when loading the mesh
 	// To do : multiple textures count
-	if (i_Flags & DX12Mesh::EElementFlags::eHaveTexcoord)
+	if (i_Flags & DX12PipelineState::EElementFlags::eHaveTexcoord)
 	{
 		// at least one texture
 		textureCount = 3;	// for now only ambient texture is managed
@@ -915,7 +912,7 @@ inline void DX12RenderEngine::CreatePipelineState(UINT64 i_Flags)
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
-	if (!(i_Flags & DX12Mesh::EElementFlags::eHaveTexcoord))
+	if (!(i_Flags & DX12PipelineState::EElementFlags::eHaveTexcoord))
 	{
 		rootSignatureFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 	}

@@ -4,6 +4,7 @@
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12Mesh.h"
 #include "dx12/DX12Context.h"
+#include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RenderEngine.h"
 
 
@@ -17,7 +18,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	,m_IndexBufferView()
 	,m_HaveIndex(false)
 	,m_Name(i_Name.c_str())
-	,m_ElementFlags(DX12Mesh::CreateFlagsFromInputLayout(i_InputLayout))
+	,m_ElementFlags(DX12PipelineState::CreateFlagsFromInputLayout(i_InputLayout))
 {
 	// get size of the input layout
 	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
@@ -28,7 +29,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
 	ID3D12CommandQueue * commandQueue = DX12RenderEngine::GetInstance().GetCommandQueue();
 
-	const UINT stride = DX12Mesh::GetElementSize(i_InputLayout);
+	const UINT stride = DX12PipelineState::GetElementSize(i_InputLayout);
 	const UINT vBufferSize = i_VerticesCount * stride;
 
 	// create vertex buffer
@@ -45,7 +46,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	:m_Count(i_IndexCount)
 	,m_HaveIndex(true)
 	,m_Name(i_Name.c_str())
-	,m_ElementFlags(DX12Mesh::CreateFlagsFromInputLayout(i_InputLayout))
+	,m_ElementFlags(DX12PipelineState::CreateFlagsFromInputLayout(i_InputLayout))
 {
 	// get size of the input layout
 	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
@@ -56,7 +57,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
 	ID3D12CommandQueue * commandQueue = render.GetCommandQueue();
 	// vertices count
-	const UINT stride = DX12Mesh::GetElementSize(i_InputLayout);
+	const UINT stride = DX12PipelineState::GetElementSize(i_InputLayout);
 	const UINT vBufferSize = i_VerticesCount * stride;
 	// index count
 	const UINT iBufferSize = sizeof(DWORD) * i_IndexCount;

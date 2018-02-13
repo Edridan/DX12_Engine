@@ -18,7 +18,6 @@ public:
 		// start
 		eHaveNormal		= 1 << 0,	// required for rendering (if not present, crash)
 		eHaveTexcoord	= 1 << 1,	// required for texture rendering or post process effects
-		eHaveColor		= 1 << 2,	// [optional]
 	};
 
 	// input element layout helper

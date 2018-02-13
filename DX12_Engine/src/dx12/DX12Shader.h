@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d12.h>
+#include <string>
 
 class DX12Shader
 {
@@ -13,7 +14,8 @@ public:
 	};
 
 	// DX12Shader
-	DX12Shader(EShaderType i_Type, const wchar_t *i_Filename);
+	DX12Shader(EShaderType i_Type, const wchar_t *i_Filename, const D3D_SHADER_MACRO * i_Defines = nullptr);
+	DX12Shader(EShaderType i_Type, const std::wstring & i_Code, const D3D_SHADER_MACRO * i_Defines = nullptr);
 	~DX12Shader();
 
 	// Get/Set

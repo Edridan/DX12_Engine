@@ -3,6 +3,7 @@
 #include "dx12/DX12MeshBuffer.h"
 #include "dx12/DX12Texture.h"
 #include "dx12/DX12Material.h"
+#include "dx12/DX12PipelineState.h"
 
 #include "d3dx12.h"
 
@@ -100,8 +101,8 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	DX12Mesh * returnMesh = nullptr;
 	// default primitive mesh flags
 	static const UINT64 flags = 
-		DX12Mesh::EElementFlags::eHaveNormal |
-		DX12Mesh::EElementFlags::eHaveTexcoord;
+		DX12PipelineState::EElementFlags::eHaveNormal |
+		DX12PipelineState::EElementFlags::eHaveTexcoord;
 
 	switch (i_Prim)
 	{
@@ -223,24 +224,20 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		// compute the flag :
 		// by default the mesh always have normals
 		const tinyobj::index_t origin = shape->mesh.indices[0];
-		UINT64 flags = DX12Mesh::EElementFlags::eNone;
+		UINT64 flags = DX12PipelineState::EElementFlags::eNone;
 
 		// compute stride and flags for the mesh
 		if (origin.normal_index != -1)
 		{
-			flags |= DX12Mesh::EElementFlags::eHaveNormal;
+			flags |= DX12PipelineState::EElementFlags::eHaveNormal;
 			stride += 3;
 		}
 		if (origin.texcoord_index != -1)
 		{
-			flags |= DX12Mesh::EElementFlags::eHaveTexcoord;
+			flags |= DX12PipelineState::EElementFlags::eHaveTexcoord;
 			stride += 2;
 		}
-		if (attrib.colors.size() != 0 && (attrib.colors[0] != -1.0f) /* verify that color is really present in the model */)
-		{
-			flags |= DX12Mesh::EElementFlags::eHaveColor;
-			stride += 3;
-		}
+		// do not support vertex color for now
 
 		FLOAT * const verticeBuffer = new FLOAT[verticeCount * stride];
 		FLOAT * bufferItr = verticeBuffer;
@@ -258,24 +255,24 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 			// copy the position to the buffer
 			memcpy(bufferItr, & attrib.vertices[3 * index.vertex_index], 3 * sizeof(FLOAT));
 			bufferItr += 3;
-			if (flags & DX12Mesh::EElementFlags::eHaveNormal)
+			if (flags & DX12PipelineState::EElementFlags::eHaveNormal)
 			{
 				// copy the normal
 				memcpy(bufferItr, &attrib.normals[3 * index.normal_index], 3 * sizeof(FLOAT));
 				bufferItr += 3;
 			}
-			if (flags & DX12Mesh::EElementFlags::eHaveTexcoord)
+			if (flags & DX12PipelineState::EElementFlags::eHaveTexcoord)
 			{
 				// copy the uv
 				memcpy(bufferItr, &attrib.texcoords[2 * index.texcoord_index], 2 * sizeof(FLOAT));
 				bufferItr += 2;
 			}
-			if (flags & DX12Mesh::EElementFlags::eHaveColor)
-			{
-				// copy the color
-				memcpy(bufferItr, &attrib.colors[3 * index.vertex_index], 3 * sizeof(FLOAT));
-				bufferItr += 3;
-			}
+			//if (flags & DX12Mesh::EElementFlags::eHaveColor)
+			//{
+			//	// copy the color
+			//	memcpy(bufferItr, &attrib.colors[3 * index.vertex_index], 3 * sizeof(FLOAT));
+			//	bufferItr += 3;
+			//}
 		}
 
 		// Get the name of the shape
@@ -283,7 +280,7 @@ DX12Mesh * DX12Mesh::LoadMeshObj(const char * i_Filename, const char * i_Materia
 		std::wstring wname = stringConverter.from_bytes(shape->name);
 
 		D3D12_INPUT_LAYOUT_DESC layout;
-		CreateInputLayoutFromFlags(layout, flags);
+		DX12PipelineState::CreateInputLayoutFromFlags(layout, flags);
 
 		DX12MeshBuffer * meshBuffer = new DX12MeshBuffer(
 			layout,	// the generated layout depending on the flags
@@ -417,85 +414,4 @@ const DX12MeshBuffer* DX12Mesh::GetSubMeshes(size_t i_Index) const
 	}
 	
 	return nullptr;
-}
-
-UINT DX12Mesh::GetElementSize(D3D12_INPUT_LAYOUT_DESC i_InputLayout)
-{
-	// size of one element
-	UINT elementSize = 0;
-
-	// go into the structure and get the size of the buffer
-	for (UINT i = 0; i < i_InputLayout.NumElements; ++i)
-	{
-		D3D12_INPUT_ELEMENT_DESC element = i_InputLayout.pInputElementDescs[i];
-
-		if ((element.AlignedByteOffset != D3D12_APPEND_ALIGNED_ELEMENT) && (element.AlignedByteOffset != elementSize))
-		{
-			elementSize = element.AlignedByteOffset;
-		}
-
-		// update the size of the current buffer
-		elementSize += SizeOfFormatElement(element.Format);
-	}
-
-	return elementSize;
-}
-
-UINT64 DX12Mesh::CreateFlagsFromInputLayout(D3D12_INPUT_LAYOUT_DESC i_InputLayout)
-{
-	UINT64 flags = EElementFlags::eNone;
-	// go into the structure and get the size of the buffer
-	for (UINT i = 0; i < i_InputLayout.NumElements; ++i)
-	{
-		D3D12_INPUT_ELEMENT_DESC element = i_InputLayout.pInputElementDescs[i];
-
-		if (strcmp(element.SemanticName, "TEXCOORD") == 0)	flags |= EElementFlags::eHaveTexcoord;
-		else if (strcmp(element.SemanticName, "COLOR") == 0)	flags |= EElementFlags::eHaveColor;
-		else if (strcmp(element.SemanticName, "NORMAL") == 0)	flags |= EElementFlags::eHaveNormal;
-	}
-
-	return flags;
-}
-
-void DX12Mesh::CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_InputLayout, UINT64 i_Flags)
-{
-	// compute size of elements
-	D3D12_INPUT_ELEMENT_DESC * elements;
-	UINT size = 1;
-	UINT index = 0;
-	UINT offset = 0;
-
-	if (i_Flags & EElementFlags::eHaveColor)			++size;
-	if (i_Flags & EElementFlags::eHaveTexcoord)			++size;
-	if (i_Flags & EElementFlags::eHaveNormal)			++size;
-
-	elements = new D3D12_INPUT_ELEMENT_DESC[size];
-	o_InputLayout.NumElements = size;
-	o_InputLayout.pInputElementDescs = elements;
-
-	// layout order definition depending flags : 
-	// 1 - Position
-	// 2 - Normal
-	// 3 - Texcoord
-	// 4 - Color
-
-	// default position
-	elements[index++] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-	offset += 3 * sizeof(float);
-
-	if (i_Flags & EElementFlags::eHaveNormal)
-	{
-		elements[index++] = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-		offset += 3 * sizeof(float);
-	}
-	if (i_Flags & EElementFlags::eHaveTexcoord)
-	{
-		elements[index++] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-		offset += 2 * sizeof(float);
-	}
-	if (i_Flags & EElementFlags::eHaveColor)
-	{
-		elements[index++] = { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-		offset += 3 * sizeof(float);
-	}
 }

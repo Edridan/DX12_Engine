@@ -39,7 +39,6 @@ UINT64 DX12PipelineState::CreateFlagsFromInputLayout(D3D12_INPUT_LAYOUT_DESC i_I
 		D3D12_INPUT_ELEMENT_DESC element = i_InputLayout.pInputElementDescs[i];
 
 		if (strcmp(element.SemanticName, "TEXCOORD") == 0)	flags |= EElementFlags::eHaveTexcoord;
-		else if (strcmp(element.SemanticName, "COLOR") == 0)	flags |= EElementFlags::eHaveColor;
 		else if (strcmp(element.SemanticName, "NORMAL") == 0)	flags |= EElementFlags::eHaveNormal;
 	}
 
@@ -54,7 +53,6 @@ void DX12PipelineState::CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_I
 	UINT index = 0;
 	UINT offset = 0;
 
-	if (i_Flags & EElementFlags::eHaveColor)			++size;
 	if (i_Flags & EElementFlags::eHaveTexcoord)			++size;
 	if (i_Flags & EElementFlags::eHaveNormal)			++size;
 
@@ -81,11 +79,6 @@ void DX12PipelineState::CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_I
 	{
 		elements[index++] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 		offset += 2 * sizeof(float);
-	}
-	if (i_Flags & EElementFlags::eHaveColor)
-	{
-		elements[index++] = { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
-		offset += 3 * sizeof(float);
 	}
 }
 
