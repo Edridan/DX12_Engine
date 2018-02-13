@@ -232,6 +232,26 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		return E_FAIL;
 	}
 
+	// -- Create different render targets for the deferred rendering -- //
+
+	const std::wstring rtName[eRenderTargetCount] =
+	{
+		L"Normal",
+		L"Specular",
+		L"Diffuse",
+	};
+
+	// same description for each render target
+	DX12RenderTarget::RenderTargetDesc rtDesc;
+	rtDesc.BufferSize = m_WindowSize;
+	rtDesc.IsShaderResource = true;
+
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		rtDesc.Name = rtName[i];
+		m_RenderTargets[i] = new DX12RenderTarget(rtDesc);
+	}
+
 	// -- Create constant buffer -- //
 
 	for (size_t i = 0; i < EConstantBufferId::eConstantBufferCount; ++i)
@@ -311,42 +331,13 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 HRESULT DX12RenderEngine::PrepareForRender()
 {
-	DX12Context * context = GetContext(eImmediate);
 	
 	// We have to wait for the gpu to finish with the command allocator before we reset it
 	WaitForPreviousFrame();
-
-	// reset the immediate context
-	context->ResetContext();
-
-	// here we start recording commands into the m_CommandList (which all the commands will be stored in the m_CommandAllocator)
-
-	// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
-	context->GetCommandList()->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
-
-	// here we again get the handle to our current render target view so we can set it as the render target in the output merger stage of the pipeline
-	//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_FrameIndex, m_RtvDescriptorSize);
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_BackBuffer->GetRenderTargetDescriptor();
-
-	// get a handle to the depth/stencil buffer
-	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
-	// set the render target for the output merger stage (the output of the pipeline)
-	context->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
-
-	// Clear the render target by using the ClearRenderTargetView command
-	//const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
-	const float clearColor[] = { 0.4f, 0.4f, 0.4f, 1.0f };
-	context->GetCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-
-	// Setting up the command list
-	context->GetCommandList()->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
-	context->GetCommandList()->RSSetScissorRects(1, &DX12RenderEngine::GetInstance().GetScissor());
-
-	context->GetCommandList()->ClearDepthStencilView(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-	// setup primitive topology
-	context->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
+	
+	// initialize contexts
+	InitializeDeferredContext();
+	InitializeImmediateContext();
 
 	return S_OK;
 }
@@ -504,7 +495,7 @@ ID3D12CommandQueue * DX12RenderEngine::GetCommandQueue() const
 	return m_CommandQueue;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderEngine::GetRenderTarget() const
+D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderEngine::GetBackBufferDesc() const
 {
 	return m_BackBuffer->GetRenderTargetDescriptor(m_FrameIndex);
 }
@@ -619,15 +610,20 @@ FORCEINLINE void DX12RenderEngine::WaitForContext(EContextId i_Context, UINT i_F
 
 HRESULT DX12RenderEngine::UpdatePipeline()
 {
-	HRESULT hr;
-
 	// transition the "m_FrameIndex" render target from the render target state to the present state. If the debug layer is enabled, you will receive a
 	// warning if present is called on the render target when it's not in the present state
 	GetContext(eImmediate)->GetCommandList()->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	DX12_ASSERT(GetContext(eImmediate)->GetCommandList()->Close());
 
-	hr = GetContext(eImmediate)->GetCommandList()->Close();
+	// setup the resource barriere for each render textures
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		GetContext(eDeferred)->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	}
+	// we close the command list
+	DX12_ASSERT(GetContext(eDeferred)->GetCommandList()->Close());
 
-	return hr;
+	return S_OK;
 }
 
 HRESULT DX12RenderEngine::WaitForPreviousFrame()
@@ -659,6 +655,87 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 
 	// increment m_FenceValue for next frame
 	context->IncrementFenceValue(m_FrameIndex);
+
+	return S_OK;
+}
+
+FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
+{
+	DX12Context * context = GetContext(eImmediate);
+
+	// reset the immediate context
+	context->ResetContext();
+
+	// here we start recording commands into the m_CommandList (which all the commands will be stored in the m_CommandAllocator)
+
+	// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
+	context->GetCommandList()->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
+	// here we again get the handle to our current render target view so we can set it as the render target in the output merger stage of the pipeline
+	//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_FrameIndex, m_RtvDescriptorSize);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_BackBuffer->GetRenderTargetDescriptor();
+
+	// get a handle to the depth/stencil buffer
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	// set the render target for the output merger stage (the output of the pipeline)
+	context->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+
+	// Clear the render target by using the ClearRenderTargetView command
+	//const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	static const float clearColor[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+	context->GetCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+
+	// Setting up the command list
+	context->GetCommandList()->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
+	context->GetCommandList()->RSSetScissorRects(1, &DX12RenderEngine::GetInstance().GetScissor());
+
+	context->GetCommandList()->ClearDepthStencilView(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+	// setup primitive topology
+	context->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
+
+	return S_OK;
+}
+
+FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
+{
+	// create deferred handle for render targets
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[ERenderTargetId::eRenderTargetCount] =
+	{
+		m_RenderTargets[ERenderTargetId::eDiffuse]->GetRenderTargetDescriptor(),
+		m_RenderTargets[ERenderTargetId::eNormal]->GetRenderTargetDescriptor(),
+		m_RenderTargets[ERenderTargetId::eSpecular]->GetRenderTargetDescriptor(),
+	};
+
+	DX12Context * context = GetContext(eDeferred);
+	context->ResetContext();
+
+	// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
+	context->GetCommandList()->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
+	// get a handle to the depth/stencil buffer
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	// set the render target for the output merger stage (the output of the pipeline)
+	context->GetCommandList()->OMSetRenderTargets(eRenderTargetCount, rtvHandle, FALSE, &dsvHandle);
+
+	static const float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		context->GetCommandList()->ClearRenderTargetView(rtvHandle[i], clearColor, 0, nullptr);
+	}
+
+	// Setting up the command list
+	context->GetCommandList()->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
+	context->GetCommandList()->RSSetScissorRects(1, &DX12RenderEngine::GetInstance().GetScissor());
+
+	// setup primitive topology
+	context->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
+
+	return S_OK;
+
 
 	return S_OK;
 }

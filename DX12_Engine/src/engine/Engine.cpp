@@ -160,7 +160,7 @@ void Engine::Run()
 
 		// retreive performance data
 		if (elapsed != 0.f)
-		{
+		{ 
 			m_FramePerSecond = (UINT)(1.f / elapsed);
 		}
 
@@ -189,6 +189,7 @@ void Engine::Run()
 
 		// prepare the render engine
 		m_RenderEngine->PrepareForRender();	// intialize the command list and other stuff
+		ID3D12GraphicsCommandList * commandList = m_RenderEngine->GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
 
 		// update global buffer
 		{
@@ -215,7 +216,7 @@ void Engine::Run()
 			Camera * cam = m_CurrentWorld->GetCurrentCamera();
 
 			// dx12 related
-			setup.CommandList = m_RenderEngine->GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
+			setup.CommandList = commandList;
 			// camera related
 			setup.ProjectionMatrix	= XMLoadFloat4x4(&cam->GetProjMatrix());
 			setup.ViewMatrix		= XMLoadFloat4x4(&cam->GetViewMatrix());
@@ -233,7 +234,7 @@ void Engine::Run()
 
 		// render ui
 		{
-			m_UILayer->PushOnCommandList(m_RenderEngine->GetContext(DX12RenderEngine::eImmediate)->GetCommandList());
+			m_UILayer->PushOnCommandList(commandList);
 		}
 
 		// update and display backbuffer, also swap buffer and manage commandqueue

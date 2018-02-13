@@ -248,7 +248,7 @@ void UILayer::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList)
 	if (m_Enabled)
 	{
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
-		ImGuiD3D12::SetRenderDataImGui(i_CommandList, render.GetRenderTarget());
+		ImGuiD3D12::SetRenderDataImGui(i_CommandList, render.GetBackBufferDesc());
 		ImGui::Render();	// call to render
 	}
 }

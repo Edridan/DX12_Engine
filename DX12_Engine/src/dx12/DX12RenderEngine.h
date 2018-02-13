@@ -139,8 +139,7 @@ public:
 	ID3D12Device*					GetDevice() const;
 	ID3D12CommandQueue*				GetCommandQueue() const;
 
-	const DXGI_SWAP_CHAIN_DESC &	GetSwapChainDesc() const;
-	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTarget() const;
+	D3D12_CPU_DESCRIPTOR_HANDLE		GetBackBufferDesc() const;
 	
 	bool							IsDX12DebugEnabled() const;
 	
@@ -156,8 +155,11 @@ private:
 	void		WaitForContext(EContextId i_Context, UINT i_FrameIndex, HANDLE & i_Handle) const;
 
 	// DX12 Internal management
-	HRESULT				UpdatePipeline();
-	HRESULT				WaitForPreviousFrame();
+	HRESULT				UpdatePipeline();				// called in Render()
+	HRESULT				WaitForPreviousFrame();			// called in PrepareForRender()
+	// Initialize contexts to prepare for render
+	HRESULT				InitializeImmediateContext();
+	HRESULT				InitializeDeferredContext();
 	// Engine initialization
 	void				GenerateDefaultPipelineState();	// load shaders, root and pipeline state for rendering objects
 	void				CreatePipelineState(UINT64 i_Flags);

@@ -23,9 +23,13 @@ public:
 
 	// input element layout helper
 	static bool		IsValid(EElementFlags i_Flag);
+
+	// input layout description
 	static UINT		GetElementSize(D3D12_INPUT_LAYOUT_DESC i_InputLayout);
 	static UINT64	CreateFlagsFromInputLayout(D3D12_INPUT_LAYOUT_DESC i_InputLayout);
 	static void		CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_InputLayout, UINT64 i_Flags);
+
+
 
 	// pipeline state object implementation
 	DX12PipelineState();
@@ -33,7 +37,6 @@ public:
 
 	// set root signature
 	void		SetRootSignature(const DX12RootSignature * i_RootSignature);	// manage the parameters for the pipeline state
-
 
 	// information
 	bool	IsCreated() const;

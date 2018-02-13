@@ -197,7 +197,7 @@ inline HRESULT DX12MeshBuffer::UpdateData(ID3D12GraphicsCommandList* i_CommandLi
 	
 	// return if failed
 	if (size != i_BufferSize) return E_UNEXPECTED;
-	
+
 	// transition the vertex buffer data from copy destination state to vertex buffer state
 	i_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(i_Buffer, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
 

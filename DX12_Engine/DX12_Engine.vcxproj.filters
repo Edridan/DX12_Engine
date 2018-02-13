@@ -208,7 +208,7 @@
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="src\dx12\DX12Context.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\DX12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -329,9 +329,6 @@
     <ClInclude Include="src\dx12\DX12PipelineState.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="src\ui\UITexture.h">
-      <Filter>Header Files\UI</Filter>
-    </ClInclude>
     <ClInclude Include="src\ui\UIDebug.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
@@ -349,6 +346,9 @@
     </ClInclude>
     <ClInclude Include="src\dx12\DX12Context.h">
       <Filter>Header Files\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UITexture.h">
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -419,6 +419,18 @@
     </FxCompile>
     <FxCompile Include="src\shaders\forward\NormalTexVertex.hlsl">
       <Filter>Shaders\Forward</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\ui\UITexturePS.hlsl">
+      <Filter>Shaders\UI</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\ui\UITextureVS.hlsl">
+      <Filter>Shaders\UI</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\deferred\GBufferPixel.hlsl">
+      <Filter>Shaders\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\deferred\GBufferVertex.hlsl">
+      <Filter>Shaders\Deferred</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
