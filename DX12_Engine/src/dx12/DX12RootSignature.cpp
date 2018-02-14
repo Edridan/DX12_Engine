@@ -1,19 +1,57 @@
 #include "DX12RootSignature.h"
 
 #include "engine/Debug.h"
+#include "dx12/DX12RenderEngine.h"
+
+#define ASSERT_AND_EXIT(i_Condition)										\
+do {																		\
+	if (!(i_Condition))														\
+	{																		\
+		PRINT_DEBUG("%s assert an error file : %s, [%i]", #i_Condition,		\
+				__FILE__, __LINE__);										\
+		PopUpWindow(eError, "Assert", " %s Assert error file : %s [%i]",	\
+				#i_Condition, __FILE__, __LINE__);							\
+		DEBUG_BREAK;														\
+		return;																\
+	}																		\
+} while (false)
+
 
 DX12RootSignature::DX12RootSignature()
 	:m_IsCreated(false)
-	,m_ParamCount(0)
+	,m_RootSignature(nullptr)
 {
 }
 
 DX12RootSignature::~DX12RootSignature()
 {
+	// clear resources
+	for (UINT i = 0; i < m_RootParameters.size(); i++)
+	{
+		if (m_RootParameters[i].ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE)
+		{
+			delete [] m_RootParameters[i].DescriptorTable.pDescriptorRanges;
+		}
+	}
+
+	// clear vectors
+	m_RootParameters.clear();
+	m_DescriptorTable.clear();
+	m_StaticSampler.clear();
+
+	// clear dx12 resources
+	if (m_IsCreated)
+	{
+		SAFE_RELEASE(m_RootSignature);
+	}
 }
 
 void DX12RootSignature::CreateDefaultRootSignature()
 {
+	// bind buffer this way
+	AddConstantBuffer(0, 0, D3D12_SHADER_VISIBILITY_ALL);		// [0] b0 CBV for global constants (time, camera position etc...)
+	AddConstantBuffer(1, 0, D3D12_SHADER_VISIBILITY_VERTEX);	// [1] b1 CBV for transform matrix
+	AddConstantBuffer(2, 0, D3D12_SHADER_VISIBILITY_PIXEL);		// [2] b2 CBV for material
 }
 
 void DX12RootSignature::AddStaticSampler(const D3D12_STATIC_SAMPLER_DESC & i_Sampler)
@@ -24,7 +62,8 @@ void DX12RootSignature::AddStaticSampler(const D3D12_STATIC_SAMPLER_DESC & i_Sam
 
 void DX12RootSignature::AddShaderResourceView(UINT32 i_ShaderRegister, UINT32 i_Register, D3D12_SHADER_VISIBILITY i_Visibility, UINT32 i_RegisterSpace)
 {
-	ASSERT(!m_IsCreated);
+	ASSERT_AND_EXIT(!m_IsCreated);
+	
 
 	// create the root descriptor
 	D3D12_ROOT_DESCRIPTOR rootDesc = CreateRootDescriptor(i_ShaderRegister, i_RegisterSpace);
@@ -34,6 +73,9 @@ void DX12RootSignature::AddShaderResourceView(UINT32 i_ShaderRegister, UINT32 i_
 	rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
 	rootParam.ShaderVisibility = i_Visibility;
 	rootParam.Descriptor = rootDesc;
+
+	// push the root parameter
+	RegisterParameter(rootParam);
 }
 
 void DX12RootSignature::AddConstantBuffer(UINT32 i_ShaderRegister, UINT32 i_Register, D3D12_SHADER_VISIBILITY i_Visibility, UINT32 i_RegisterSpace)
@@ -48,6 +90,8 @@ void DX12RootSignature::AddConstantBuffer(UINT32 i_ShaderRegister, UINT32 i_Regi
 	rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParam.ShaderVisibility = i_Visibility;
 	rootParam.Descriptor = rootDesc;
+
+	RegisterParameter(rootParam);
 }
 
 void DX12RootSignature::AddDescriptorRange(UINT32 i_ShaderRegister, UINT32 i_Register, const D3D12_DESCRIPTOR_RANGE * i_RangeTable, UINT32 i_RangeSize, D3D12_SHADER_VISIBILITY i_Visibility, UINT32 i_RegisterSpace)
@@ -68,6 +112,14 @@ void DX12RootSignature::AddDescriptorRange(UINT32 i_ShaderRegister, UINT32 i_Reg
 	}
 
 	m_DescriptorTable.push_back(tableDesc);
+
+	// create the root parameter
+	D3D12_ROOT_PARAMETER rootParam;
+	rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParam.ShaderVisibility = i_Visibility;
+	rootParam.DescriptorTable = tableDesc;
+
+	RegisterParameter(rootParam);
 }
 
 HRESULT DX12RootSignature::Create(ID3D12Device * i_Device, D3D12_ROOT_SIGNATURE_FLAGS i_Flags)
@@ -75,7 +127,32 @@ HRESULT DX12RootSignature::Create(ID3D12Device * i_Device, D3D12_ROOT_SIGNATURE_
 	ASSERT(!m_IsCreated);	// can't recreate an already created root signature
 
 	HRESULT hr;
+	ID3D12Device * device = DX12RenderEngine::GetInstance().GetDevice();
+	
 
+	// create the root signature description from root parameters
+	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+
+	rootSignatureDesc.Init(
+		(UINT)m_RootParameters.size(),	// number of parameters entry
+		&m_RootParameters[0],		// a pointer to the beginning of our root parameters array
+		(UINT)m_StaticSampler.size(),		// static samplers count
+		&m_StaticSampler[0],		// static samplers pointer
+		i_Flags						// flags
+	);
+
+	ID3DBlob* signature;
+	hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, nullptr);
+	if (FAILED(hr))
+	{
+		ASSERT_ERROR("Error : D3D12SerializeRootSignature");
+	}
+
+	hr = device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
+	if (FAILED(hr))
+	{
+		ASSERT_ERROR("Error : CreateRootSignature");
+	}
 
 	return hr;
 }
@@ -87,12 +164,55 @@ bool DX12RootSignature::IsCreated() const
 
 UINT DX12RootSignature::GetParamCount() const
 {
-	return m_ParamCount;
+	return (UINT)m_RootParameters.size();
 }
 
 UINT DX12RootSignature::GetStaticSamplerCount() const
 {
-	return m_SamplerCount;
+	return (UINT)m_StaticSampler.size();
+}
+
+bool DX12RootSignature::IsRegisterFilled(const char * i_Register) const
+{
+	return GetRegisterParamIndex(i_Register) != (UINT(-1));
+}
+
+bool DX12RootSignature::IsRegisterFilled(D3D12_DESCRIPTOR_RANGE_TYPE i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace)
+{
+	std::string buffer;
+	GenerateBufferId(buffer, i_Type, i_ShaderRegister, i_ShaderSpace);
+	return IsRegisterFilled(buffer.c_str());
+}
+
+bool DX12RootSignature::IsRegisterFilled(D3D12_ROOT_PARAMETER_TYPE i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace)
+{
+	std::string buffer;
+	GenerateBufferId(buffer, i_Type, i_ShaderRegister, i_ShaderSpace);
+	return IsRegisterFilled(buffer.c_str());
+}
+
+UINT DX12RootSignature::GetRegisterParamIndex(const char * i_Register) const
+{
+	for (UINT i = 0; i < m_RegisterBinded.size(); ++i)
+	{
+		if (m_RegisterBinded[i].find(i_Register) != std::string::npos)	return i;
+	}
+
+	return (UINT(-1));	// didn't found
+}
+
+UINT DX12RootSignature::GetRegisterParamIndex(D3D12_ROOT_PARAMETER_TYPE i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace)
+{
+	std::string buffer;
+	GenerateBufferId(buffer, i_Type, i_ShaderRegister, i_ShaderSpace);
+	return GetRegisterParamIndex(buffer.c_str());
+}
+
+UINT DX12RootSignature::GetRegisterParamIndex(D3D12_DESCRIPTOR_RANGE_TYPE i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace)
+{
+	std::string buffer;
+	GenerateBufferId(buffer, i_Type, i_ShaderRegister, i_ShaderSpace);
+	return GetRegisterParamIndex(buffer.c_str());
 }
 
 FORCEINLINE D3D12_ROOT_DESCRIPTOR DX12RootSignature::CreateRootDescriptor(UINT32 i_ShaderRegister, UINT32 i_ShaderSpace)
@@ -106,163 +226,86 @@ FORCEINLINE D3D12_ROOT_DESCRIPTOR DX12RootSignature::CreateRootDescriptor(UINT32
 	return rootDesc;
 }
 
-bool DX12RootSignature::RegisterParameter(UINT i_ShaderRegister, UINT32 i_ShaderSpace, D3D12_ROOT_PARAMETER_TYPE i_Type)
+FORCEINLINE bool DX12RootSignature::RegisterParameter(const D3D12_ROOT_PARAMETER & i_Parameter)
 {
-	// To do : register param to buffer to get error (if 2 params on the same register)
-	return false;
+	std::string registers;
+
+	// register parameter for each shader register in table
+	if (i_Parameter.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE)
+	{
+		// iterate throught the table and add the register
+		D3D12_ROOT_DESCRIPTOR_TABLE tableDesc = i_Parameter.DescriptorTable;
+		const D3D12_DESCRIPTOR_RANGE * desc = tableDesc.pDescriptorRanges;
+
+		for (UINT i = 0; i < tableDesc.NumDescriptorRanges; ++i)
+		{
+			std::string buffer;
+			GenerateBufferId(buffer, desc[i].RangeType, desc[i].BaseShaderRegister, desc[i].RegisterSpace);
+			registers.append(buffer);
+			registers.append(";");
+		}
+	}
+	else
+	{
+		// push back the register
+		GenerateBufferId(registers, i_Parameter.ParameterType, i_Parameter.Descriptor.ShaderRegister, i_Parameter.Descriptor.RegisterSpace);
+	}
+
+	// add the root parameter to the list
+	m_RegisterBinded.push_back(registers);
+	m_RootParameters.push_back(i_Parameter);
+	return true;
 }
 
-/*
-// each elements are rendered need a position
-	HRESULT hr;
-	D3D12_INPUT_LAYOUT_DESC desc;
-	DX12Shader * pixelShader = nullptr, *vertexShader = nullptr;
-	UINT textureCount = 0;
-	UINT samplerCount = 0;
-	UINT bufferCount = CBV_COUNT;	// default buffer count, this include the 2 constant buffer for the materials
-
-	// sampler for textures
-	D3D12_STATIC_SAMPLER_DESC	* sampler			= nullptr;
-	D3D12_ROOT_DESCRIPTOR_TABLE * descriptorTable	= nullptr;
-
-	// create input layout
-	DX12Mesh::CreateInputLayoutFromFlags(desc, i_Flags);
-
-	// layout order definition depending flags : 
-	// 1 - Position
-	// 2 - Normal
-	// 3 - Texcoord
-	// 4 - Color
-	pixelShader		= GetShader(i_Flags, DX12Shader::ePixel);
-	vertexShader	= GetShader(i_Flags, DX12Shader::eVertex);
-	
-	if (pixelShader == nullptr || vertexShader == nullptr)
+FORCEINLINE void DX12RootSignature::GenerateBufferId(std::string & o_Buffer, D3D12_ROOT_PARAMETER_TYPE i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace)
+{
+	switch (i_Type)
 	{
-		PopUpWindow(PopUpIcon::eWarning, "Warning", "Trying to create a pipeline state but pixel or vertex shaders are not loaded");
-		DEBUG_BREAK;
-		return;
+	case D3D12_ROOT_PARAMETER_TYPE_CBV:	o_Buffer = "b";	break;
+	case D3D12_ROOT_PARAMETER_TYPE_SRV: o_Buffer = "t";	break;
+	case D3D12_ROOT_PARAMETER_TYPE_UAV: o_Buffer = "u";	break;
+	default:
+		break;
 	}
 
-	// create sampler for mesh buffer with tex coord
-	// we are going to use static samplers that are samplers that we can't change when they are set to the pipeline state
-	// this mean we have to save samplers in files and read them when loading the mesh
-	// To do : multiple textures count
-	if (i_Flags & DX12Mesh::EElementFlags::eHaveTexcoord)
+	char buff[3];
+
+	// retreive buffer index
+	_itoa_s(i_ShaderRegister, buff, 2);
+	o_Buffer.append(buff);
+
+	// retreive buffer space
+	if (i_ShaderSpace != 0)
 	{
-		// at least one texture
-		textureCount = 2;	// for now only ambient texture is managed
-		samplerCount = 1;	// only one sample to manage all texture right now
-		bufferCount += textureCount;		// add a descriptor table for each textures
+		o_Buffer.append(":space");
+		_itoa_s(i_ShaderSpace, buff, 2);
+		o_Buffer.append(buff);
+	}
+}
 
-		// create descriptor table ranges
-		D3D12_DESCRIPTOR_RANGE *  descriptorTableRanges = new D3D12_DESCRIPTOR_RANGE[textureCount];
-		descriptorTable = new D3D12_ROOT_DESCRIPTOR_TABLE[1];	// create a descriptor table
-
-		for (UINT i = 0; i < textureCount; ++i)
-		{
-			descriptorTableRanges[i].RangeType			= D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // this is a range of shader resource views (descriptors)
-			descriptorTableRanges[i].NumDescriptors		= 1; // we only have one texture right now, so the range is only 1
-			descriptorTableRanges[i].BaseShaderRegister = i; // start index of the shader registers in the range
-			descriptorTableRanges[i].RegisterSpace		= 0; // space 0. can usually be zero
-			descriptorTableRanges[i].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
-		}
-
-		// descriptor table
-		descriptorTable[0].NumDescriptorRanges	= textureCount;	// texture count
-		descriptorTable[0].pDescriptorRanges	= descriptorTableRanges; // the pointer to the beginning of our ranges array
-
-		sampler = new D3D12_STATIC_SAMPLER_DESC[samplerCount]; // create a descriptor table
-
-		for (UINT i = 0; i < samplerCount; ++i)
-		{
-			sampler[0].Filter			= D3D12_FILTER_MIN_MAG_MIP_POINT;
-			sampler[0].AddressU			= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-			sampler[0].AddressV			= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-			sampler[0].AddressW			= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-			sampler[0].MipLODBias		= 0;
-			sampler[0].MaxAnisotropy	= 0;
-			sampler[0].ComparisonFunc	= D3D12_COMPARISON_FUNC_NEVER;
-			sampler[0].BorderColor		= D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
-			sampler[0].MinLOD			= 0.0f;
-			sampler[0].MaxLOD			= D3D12_FLOAT32_MAX;
-			sampler[0].ShaderRegister	= 0;
-			sampler[0].RegisterSpace	= 0;
-			sampler[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-		}
+FORCEINLINE void DX12RootSignature::GenerateBufferId(std::string & o_Buffer, D3D12_DESCRIPTOR_RANGE_TYPE i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace)
+{
+	switch (i_Type)
+	{
+	case D3D12_DESCRIPTOR_RANGE_TYPE_CBV:		o_Buffer = "b";	break;
+	case D3D12_DESCRIPTOR_RANGE_TYPE_SRV:		o_Buffer = "t";	break;
+	case D3D12_DESCRIPTOR_RANGE_TYPE_UAV:		o_Buffer = "u";	break;
+	case D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER:	o_Buffer = "s"; break;
+	default:
+		break;
 	}
 
-	// -- Create root signature -- //
+	char buff[3];
 
-	// Constant buffer for materials and transform
-	// create the root descriptor : where to find the data for this root parameter
-	D3D12_ROOT_DESCRIPTOR * rootCBVDescriptor = new D3D12_ROOT_DESCRIPTOR[CBV_COUNT];
-	// transform constant buffer (matrix)
-	rootCBVDescriptor[0].RegisterSpace = 0;
-	rootCBVDescriptor[0].ShaderRegister = 0;
-	// material constant buffer
-	rootCBVDescriptor[1].RegisterSpace = 0;
-	rootCBVDescriptor[1].ShaderRegister = 1;
+	// retreive buffer index
+	_itoa_s(i_ShaderRegister, buff, 2);
+	o_Buffer.append(buff);
 
-	// create the default root parameter and fill it out
-	// this paramater is the model view projection matrix
-	D3D12_ROOT_PARAMETER *  rootParameters = new D3D12_ROOT_PARAMETER[bufferCount];  // constant buffer plus table range for textures
-
-	static const D3D12_SHADER_VISIBILITY shaderVisibility[CBV_COUNT] =
+	// retreive buffer space
+	if (i_ShaderSpace != 0)
 	{
-		D3D12_SHADER_VISIBILITY_VERTEX,
-		D3D12_SHADER_VISIBILITY_PIXEL,
-	};
-
-	// material textures
-	static D3D12_SHADER_VISIBILITY * textureShaderVisibility = new D3D12_SHADER_VISIBILITY[textureCount];
-	if (textureCount > 0)	textureShaderVisibility[0] = D3D12_SHADER_VISIBILITY_PIXEL;	// ambient texture
-	if (textureCount > 1)	textureShaderVisibility[1] = D3D12_SHADER_VISIBILITY_PIXEL;	// diffuse texture
-	if (textureCount > 2)	textureShaderVisibility[2] = D3D12_SHADER_VISIBILITY_PIXEL;	// specular texture
-
-	for (UINT i = 0; i < CBV_COUNT; ++i)
-	{
-		// first parameter is always the CBV
-		rootParameters[i].ParameterType		= D3D12_ROOT_PARAMETER_TYPE_CBV; // this is a constant buffer view root descriptor
-		rootParameters[i].Descriptor		= rootCBVDescriptor[i]; // this is the root descriptor for this root parameter
-		rootParameters[i].ShaderVisibility	= shaderVisibility[i]; // our vertex shader will be the only shader accessing this parameter for now
+		o_Buffer.append(":space");
+		_itoa_s(i_ShaderSpace, buff, 2);
+		o_Buffer.append(buff);
 	}
-
-	// setup the root parameters for textures
-	if (textureCount != 0)
-	{
-
-	}
-
-	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
-		| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
-		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
-		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
-
-	if (!(i_Flags & DX12Mesh::EElementFlags::eHaveTexcoord))
-	{
-		rootSignatureFlags |= D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
-	}
-
-	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Init(
-		bufferCount,				// number of buffer entry
-		rootParameters,				// a pointer to the beginning of our root parameters array
-		samplerCount,				// static samplers count
-		sampler,					// static samplers pointer
-		rootSignatureFlags			// flags
-	);		
-
-	ID3DBlob* signature;
-	hr = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, nullptr);
-	if (FAILED(hr))
-	{
-		ASSERT_ERROR("Error : D3D12SerializeRootSignature");
-	}
-
-	ID3D12RootSignature * rootSignature = nullptr;
-	hr = m_Device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-	if (FAILED(hr))
-	{
-		ASSERT_ERROR("Error : CreateRootSignature");
-	}
-*/
+}
