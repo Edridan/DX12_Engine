@@ -128,3 +128,8 @@ bool DX12Shader::IsLoaded() const
 {
 	return m_IsLoaded;
 }
+
+DX12Shader::EShaderType DX12Shader::GetType() const
+{
+	return m_ShaderType;
+}

@@ -15,6 +15,8 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 	,m_RenderTargetDesc(nullptr)
 	// resources
 	,m_RenderTarget(i_Desc.Resource)
+	// informations
+	,m_Format(i_Desc.Format)
 {
 	// retreive dx12 utils
 	DX12RenderEngine & render				= DX12RenderEngine::GetInstance();
@@ -176,6 +178,11 @@ CD3DX12_RESOURCE_BARRIER DX12RenderTarget::GetResourceBarrier(D3D12_RESOURCE_STA
 {
 	const UINT id = GetIndex(i_Index);
 	return CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTarget[id], i_StateBefore, i_StateAfter);
+}
+
+DXGI_FORMAT DX12RenderTarget::GetFormat() const
+{
+	return m_Format;
 }
 
 FORCEINLINE UINT DX12RenderTarget::GetIndex(UINT i_Index) const

@@ -28,22 +28,45 @@ public:
 	static UINT64	CreateFlagsFromInputLayout(D3D12_INPUT_LAYOUT_DESC i_InputLayout);
 	static void		CreateInputLayoutFromFlags(D3D12_INPUT_LAYOUT_DESC & o_InputLayout, UINT64 i_Flags);
 
-
+	// pipeline state descriptor
+	struct PipelineStateDesc
+	{
+		// engine
+		DX12RootSignature *		RootSignature;
+		const DX12Shader *		VertexShader, * PixelShader;	// to do : support other shader
+		// dx12
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE	PrimitiveTopologyType;
+		D3D12_INPUT_LAYOUT_DESC			InputLayout;
+		DXGI_FORMAT						RenderTargetFormat[8];	// 8 render target maximum
+		UINT							RenderTargetCount = 1;	// render target count
+		CD3DX12_DEPTH_STENCIL_DESC		DepthStencilDesc;
+		DXGI_FORMAT						DepthStencilFormat;
+		D3D12_BLEND_DESC				BlendState;
+	};
 
 	// pipeline state object implementation
-	DX12PipelineState();
+	DX12PipelineState(const PipelineStateDesc & i_Desc);
 	~DX12PipelineState();
 
-	// set root signature
-	void		SetRootSignature(const DX12RootSignature * i_RootSignature);	// manage the parameters for the pipeline state
-
 	// information
-	bool	IsCreated() const;
+	const D3D12_INPUT_LAYOUT_DESC	&	GetLayoutDesc() const;
+	UINT								GetRenderTargetCount() const;
+	const DX12RootSignature *			GetRootSignature() const;
 
 private:
-	
+	// helpers
+	void			CopyInputLayout(D3D12_INPUT_LAYOUT_DESC & o_Buffer, const D3D12_INPUT_LAYOUT_DESC & i_InputLayout);
+
+	// dx12
+	D3D12_INPUT_LAYOUT_DESC		m_InputLayout;	// saved input layout
+	ID3D12PipelineState *		m_PipelineState;
 
 	// internal
-	bool			m_IsCreated;
+	const UINT					m_RenderTargetCount;
+	bool						m_IsCreated;
+	const DX12Shader *			m_PixelShader;
+	const DX12Shader *			m_VertexShader;
+	const DX12RootSignature *	m_RootSignature;
+
 
 };

@@ -34,6 +34,9 @@ public:
 	HRESULT							ResizeBuffer(const IntVec2 & i_Size);
 	// barrier management
 	CD3DX12_RESOURCE_BARRIER		GetResourceBarrier(D3D12_RESOURCE_STATES i_StateBefore, D3D12_RESOURCE_STATES i_StateAfter, UINT i_Index = ((UINT)-1)) const;
+
+	// information
+	DXGI_FORMAT						GetFormat() const;
 private:
 	// helper
 	UINT			GetIndex(UINT i_Index) const;
@@ -42,6 +45,9 @@ private:
 	DX12DescriptorHeap *			m_RenderTargetDesc;	// descriptor heap for render target
 	DX12DescriptorHeap *			m_ShaderResourceDesc;	// descriptor heap for shader resource
 	ID3D12Resource **				m_RenderTarget;		// render target resources
+
+	// information
+	DXGI_FORMAT		m_Format;
 
 	// internal
 	UINT				m_FrameCount;

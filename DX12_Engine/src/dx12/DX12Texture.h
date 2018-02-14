@@ -37,22 +37,23 @@ public:
 	IntVec2					GetSize() const;
 	const std::wstring &	GetName() const;
 	bool					IsLoaded() const;
+	DXGI_FORMAT				GetFormat() const;
 
 	// dx12 management
 	ID3D12DescriptorHeap *				GetDescriptorHeap() const;
 	const ID3D12Resource *				GetBuffer() const;
 	const D3D12_GPU_DESCRIPTOR_HANDLE	GetDescriptorHandle() const;
 
-protected:
+private:
+	// load image data helper
+	static int		LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, ImageDataDesc & o_Desc, LPCWSTR i_Filename);
+
 	// dx12
 	D3D12_RESOURCE_DESC		m_Desc;
 	ID3D12Resource *		m_TextureBuffer;
 	ID3D12Resource *		m_TextureBufferUploadHeap;
 	ID3D12DescriptorHeap *	m_DescriptorHeap;
-
-private:
-	// load image data helper
-	static int		LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, ImageDataDesc & o_Desc, LPCWSTR i_Filename);
+	DXGI_FORMAT				m_Format;
 
 	// helpers
 	HRESULT			CreateTextureBufferResourceHeap(ID3D12Device * i_Device, const std::wstring & i_BufferName);

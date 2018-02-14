@@ -59,6 +59,9 @@ DX12Texture::DX12Texture(const wchar_t * i_Filename)
 	srvDesc.ViewDimension				= D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels			= 1;
 
+	// save format
+	m_Format = m_Desc.Format;
+
 	device->CreateShaderResourceView(m_TextureBuffer, &srvDesc, m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 	std::wstring descriptorName(i_Filename);
@@ -128,6 +131,9 @@ DX12Texture::DX12Texture(const ImageDesc & i_Desc)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 
+	// save format
+	m_Format = m_Desc.Format;
+
 	device->CreateShaderResourceView(m_TextureBuffer, &srvDesc, m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 	// the image is loaded on GPU
@@ -158,6 +164,11 @@ const std::wstring & DX12Texture::GetName() const
 bool DX12Texture::IsLoaded() const
 {
 	return m_IsLoaded;
+}
+
+DXGI_FORMAT DX12Texture::GetFormat() const
+{
+	return m_Format;
 }
 
 ID3D12DescriptorHeap * DX12Texture::GetDescriptorHeap() const

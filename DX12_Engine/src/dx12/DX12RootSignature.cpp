@@ -157,6 +157,11 @@ HRESULT DX12RootSignature::Create(ID3D12Device * i_Device, D3D12_ROOT_SIGNATURE_
 	return hr;
 }
 
+ID3D12RootSignature * DX12RootSignature::GetRootSignature() const
+{
+	return m_RootSignature;
+}
+
 bool DX12RootSignature::IsCreated() const
 {
 	return m_IsCreated;

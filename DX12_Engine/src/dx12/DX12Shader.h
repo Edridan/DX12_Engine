@@ -21,6 +21,7 @@ public:
 	// Get/Set
 	const D3D12_SHADER_BYTECODE &	GetByteCode() const;
 	bool							IsLoaded() const;
+	EShaderType						GetType() const;
 
 private:
 	// Information

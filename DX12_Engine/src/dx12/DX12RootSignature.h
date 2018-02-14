@@ -37,6 +37,9 @@ public:
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS);
 
+	// dx12
+	ID3D12RootSignature *		GetRootSignature() const;
+
 	// information
 	bool		IsCreated() const;
 	UINT		GetParamCount() const;
@@ -48,7 +51,6 @@ public:
 	UINT		GetRegisterParamIndex(const char * i_Register) const;
 	UINT		GetRegisterParamIndex(D3D12_ROOT_PARAMETER_TYPE  i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace);
 	UINT		GetRegisterParamIndex(D3D12_DESCRIPTOR_RANGE_TYPE  i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace);
-
 
 private:
 	// internal helper
