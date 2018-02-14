@@ -27,6 +27,16 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 	// retreive buffer count if needed
 	if (m_FrameCount == 0)	m_FrameCount = render.GetFrameBufferCount();
 	
+	// create clear color
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Format = i_Desc.Format;
+	
+	for (UINT i = 0; i < 4; ++i)
+	{
+		m_ClearColor[i] = i_Desc.ClearValue[i];
+		clearValue.Color[i] = m_ClearColor[i];
+	}
+
 	// describe an rtv descriptor heap and create
 	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
 	rtvHeapDesc.NumDescriptors = m_FrameCount; // number of descriptors for this heap.
@@ -63,7 +73,7 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 				D3D12_HEAP_FLAG_NONE, // no flags
 				&resourceDesc, // the description of our texture
 				D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_RENDER_TARGET, // We will copy the texture from the upload heap to here, so we start it out in a copy dest state
-				nullptr, // used for render targets and depth/stencil buffers
+				& clearValue, // used for render targets and depth/stencil buffers
 				IID_PPV_ARGS(&m_RenderTarget[i]));
 
 			std::wstring renderTargetName = m_Name;
@@ -183,6 +193,11 @@ CD3DX12_RESOURCE_BARRIER DX12RenderTarget::GetResourceBarrier(D3D12_RESOURCE_STA
 DXGI_FORMAT DX12RenderTarget::GetFormat() const
 {
 	return m_Format;
+}
+
+const float * DX12RenderTarget::GetClearValue() const
+{
+	return m_ClearColor;
 }
 
 FORCEINLINE UINT DX12RenderTarget::GetIndex(UINT i_Index) const

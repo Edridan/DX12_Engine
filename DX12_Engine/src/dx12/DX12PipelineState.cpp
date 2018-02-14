@@ -118,7 +118,7 @@ DX12PipelineState::DX12PipelineState(const PipelineStateDesc & i_Desc)
 	pipelineDesc.SampleDesc = sampleDesc;
 	pipelineDesc.SampleMask = 0xffffffff;
 	pipelineDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	pipelineDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	pipelineDesc.BlendState = i_Desc.BlendState;
 	pipelineDesc.NumRenderTargets = i_Desc.RenderTargetCount;
 	pipelineDesc.DSVFormat = i_Desc.DepthStencilFormat;
 	pipelineDesc.DepthStencilState = i_Desc.DepthStencilDesc; // a default depth stencil state
@@ -151,6 +151,11 @@ UINT DX12PipelineState::GetRenderTargetCount() const
 	return m_RenderTargetCount;
 }
 
+const ID3D12PipelineState * DX12PipelineState::GetPipelineState() const
+{
+	return m_PipelineState;
+}
+
 const DX12RootSignature * DX12PipelineState::GetRootSignature() const
 {
 	return m_RootSignature;
@@ -161,6 +166,10 @@ FORCEINLINE void DX12PipelineState::CopyInputLayout(D3D12_INPUT_LAYOUT_DESC & o_
 	D3D12_INPUT_ELEMENT_DESC *pElement = new D3D12_INPUT_ELEMENT_DESC[i_InputLayout.NumElements];
 	for (UINT i = 0; i < i_InputLayout.NumElements; ++i)
 	{
-		pElement[i] = o_Buffer.pInputElementDescs[i];
+		pElement[i] = i_InputLayout.pInputElementDescs[i];
 	}
+
+	// setup the buffer input layout
+	o_Buffer.pInputElementDescs = pElement;
+	o_Buffer.NumElements = i_InputLayout.NumElements;
 }

@@ -13,9 +13,16 @@ public:
 		eVertex		= 1,
 	};
 
+	struct ShaderCode
+	{
+		const std::wstring &		Code;
+		const D3D_SHADER_MACRO *	Defines = nullptr;
+
+	};
+
 	// DX12Shader
 	DX12Shader(EShaderType i_Type, const wchar_t *i_Filename, const D3D_SHADER_MACRO * i_Defines = nullptr);
-	DX12Shader(EShaderType i_Type, const std::wstring & i_Code, const D3D_SHADER_MACRO * i_Defines = nullptr);
+	DX12Shader(EShaderType i_Type, const ShaderCode & i_Code);
 	~DX12Shader();
 
 	// Get/Set

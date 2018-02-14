@@ -51,7 +51,7 @@ void DX12RootSignature::CreateDefaultRootSignature()
 	// bind buffer this way
 	AddConstantBuffer(0, 0, D3D12_SHADER_VISIBILITY_ALL);		// [0] b0 CBV for global constants (time, camera position etc...)
 	AddConstantBuffer(1, 0, D3D12_SHADER_VISIBILITY_VERTEX);	// [1] b1 CBV for transform matrix
-	AddConstantBuffer(2, 0, D3D12_SHADER_VISIBILITY_PIXEL);		// [2] b2 CBV for material
+	AddConstantBuffer(2, 0, D3D12_SHADER_VISIBILITY_PIXEL);	// [2] b2 CBV for material
 }
 
 void DX12RootSignature::AddStaticSampler(const D3D12_STATIC_SAMPLER_DESC & i_Sampler)
@@ -60,7 +60,7 @@ void DX12RootSignature::AddStaticSampler(const D3D12_STATIC_SAMPLER_DESC & i_Sam
 	m_StaticSampler.push_back(i_Sampler);
 }
 
-void DX12RootSignature::AddShaderResourceView(UINT32 i_ShaderRegister, UINT32 i_Register, D3D12_SHADER_VISIBILITY i_Visibility, UINT32 i_RegisterSpace)
+void DX12RootSignature::AddShaderResourceView(UINT32 i_ShaderRegister, UINT32 i_RegisterSpace, D3D12_SHADER_VISIBILITY i_Visibility)
 {
 	ASSERT_AND_EXIT(!m_IsCreated);
 	
@@ -78,7 +78,7 @@ void DX12RootSignature::AddShaderResourceView(UINT32 i_ShaderRegister, UINT32 i_
 	RegisterParameter(rootParam);
 }
 
-void DX12RootSignature::AddConstantBuffer(UINT32 i_ShaderRegister, UINT32 i_Register, D3D12_SHADER_VISIBILITY i_Visibility, UINT32 i_RegisterSpace)
+void DX12RootSignature::AddConstantBuffer(UINT32 i_ShaderRegister, UINT32 i_RegisterSpace, D3D12_SHADER_VISIBILITY i_Visibility)
 {
 	ASSERT(!m_IsCreated);
 
@@ -94,7 +94,7 @@ void DX12RootSignature::AddConstantBuffer(UINT32 i_ShaderRegister, UINT32 i_Regi
 	RegisterParameter(rootParam);
 }
 
-void DX12RootSignature::AddDescriptorRange(UINT32 i_ShaderRegister, UINT32 i_Register, const D3D12_DESCRIPTOR_RANGE * i_RangeTable, UINT32 i_RangeSize, D3D12_SHADER_VISIBILITY i_Visibility, UINT32 i_RegisterSpace)
+void DX12RootSignature::AddDescriptorRange(const D3D12_DESCRIPTOR_RANGE * i_RangeTable, UINT32 i_RangeSize, D3D12_SHADER_VISIBILITY i_Visibility)
 {
 	ASSERT(!m_IsCreated);
 
@@ -125,19 +125,25 @@ void DX12RootSignature::AddDescriptorRange(UINT32 i_ShaderRegister, UINT32 i_Reg
 HRESULT DX12RootSignature::Create(ID3D12Device * i_Device, D3D12_ROOT_SIGNATURE_FLAGS i_Flags)
 {
 	ASSERT(!m_IsCreated);	// can't recreate an already created root signature
+	ASSERT(m_RootParameters.size() > 0);
 
 	HRESULT hr;
 	ID3D12Device * device = DX12RenderEngine::GetInstance().GetDevice();
-	
 
 	// create the root signature description from root parameters
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
 
+	D3D12_ROOT_PARAMETER * rootParam			= nullptr;
+	D3D12_STATIC_SAMPLER_DESC * staticSampler	= nullptr;
+
+	if (m_RootParameters.size() > 0) rootParam	= &m_RootParameters[0];
+	if (m_StaticSampler.size() > 0)	staticSampler = &m_StaticSampler[0];
+
 	rootSignatureDesc.Init(
 		(UINT)m_RootParameters.size(),	// number of parameters entry
-		&m_RootParameters[0],		// a pointer to the beginning of our root parameters array
+		rootParam,		// a pointer to the beginning of our root parameters array
 		(UINT)m_StaticSampler.size(),		// static samplers count
-		&m_StaticSampler[0],		// static samplers pointer
+		staticSampler,		// static samplers pointer
 		i_Flags						// flags
 	);
 
@@ -276,14 +282,14 @@ FORCEINLINE void DX12RootSignature::GenerateBufferId(std::string & o_Buffer, D3D
 	char buff[3];
 
 	// retreive buffer index
-	_itoa_s(i_ShaderRegister, buff, 2);
+	_itoa_s(i_ShaderRegister, buff, 10);
 	o_Buffer.append(buff);
 
 	// retreive buffer space
 	if (i_ShaderSpace != 0)
 	{
 		o_Buffer.append(":space");
-		_itoa_s(i_ShaderSpace, buff, 2);
+		_itoa_s(i_ShaderSpace, buff, 10);
 		o_Buffer.append(buff);
 	}
 }
@@ -303,14 +309,14 @@ FORCEINLINE void DX12RootSignature::GenerateBufferId(std::string & o_Buffer, D3D
 	char buff[3];
 
 	// retreive buffer index
-	_itoa_s(i_ShaderRegister, buff, 2);
+	_itoa_s(i_ShaderRegister, buff, 10);
 	o_Buffer.append(buff);
 
 	// retreive buffer space
 	if (i_ShaderSpace != 0)
 	{
 		o_Buffer.append(":space");
-		_itoa_s(i_ShaderSpace, buff, 2);
+		_itoa_s(i_ShaderSpace, buff, 10);
 		o_Buffer.append(buff);
 	}
 }

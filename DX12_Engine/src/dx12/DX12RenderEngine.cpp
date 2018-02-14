@@ -726,8 +726,11 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 	DX12Context * context = GetContext(eDeferred);
 	context->ResetContext();
 
-	// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
-	context->GetCommandList()->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
+		context->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+	}
 
 	// get a handle to the depth/stencil buffer
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
@@ -735,11 +738,9 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 	// set the render target for the output merger stage (the output of the pipeline)
 	context->GetCommandList()->OMSetRenderTargets(eRenderTargetCount, rtvHandle, FALSE, &dsvHandle);
 
-	static const float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-
 	for (UINT i = 0; i < eRenderTargetCount; ++i)
 	{
-		context->GetCommandList()->ClearRenderTargetView(rtvHandle[i], clearColor, 0, nullptr);
+		context->GetCommandList()->ClearRenderTargetView(rtvHandle[i], m_RenderTargets[i]->GetClearValue(), 0, nullptr);
 	}
 
 	// Setting up the command list

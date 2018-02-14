@@ -18,6 +18,7 @@ public:
 		std::wstring		Name				= L"RenderTarget";
 		bool				IsShaderResource	= false;	// if true : the render target can also be binded as texture
 		DXGI_FORMAT			Format				= DXGI_FORMAT_R32G32B32A32_FLOAT;	// format of the resource
+		float				ClearValue[4]		= {0.f, 0.f, 0.f, 1.f};				// optimized clear value
 	};
 
 	DX12RenderTarget(const RenderTargetDesc & i_Desc);
@@ -37,6 +38,7 @@ public:
 
 	// information
 	DXGI_FORMAT						GetFormat() const;
+	const float *					GetClearValue() const;
 private:
 	// helper
 	UINT			GetIndex(UINT i_Index) const;
@@ -52,8 +54,10 @@ private:
 	// internal
 	UINT				m_FrameCount;
 	const std::wstring	m_Name;
+
 	// resource management
 	bool		m_CustomAmount;
 	const bool	m_IsAllocator;
 	const bool	m_IsResourceView;
+	float 		m_ClearColor[4];
 };

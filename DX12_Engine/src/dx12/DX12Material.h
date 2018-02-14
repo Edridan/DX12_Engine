@@ -9,6 +9,9 @@
 
 // class predef
 class DX12Texture;
+// root and pipeline state
+class DX12RootSignature;
+class DX12PipelineState;
 
 
 class DX12Material
@@ -91,8 +94,8 @@ private:
 	// id for the material
 	UINT64					m_Id;
 	// pipeline state object
-	ID3D12RootSignature *	m_RootSignature;
-	ID3D12PipelineState *	m_PipelineState;
+	DX12RootSignature *		m_RootSignature;
+	DX12PipelineState *		m_PipelineState;
 
 	// other
 	float	m_SpecularExponent;

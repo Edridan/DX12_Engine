@@ -52,7 +52,7 @@ DX12ConstantBuffer::~DX12ConstantBuffer()
 {
 	for (UINT i = 0; i < m_FrameCount; ++i)
 	{
-		SAFE_RELEASE(m_ConstantBufferUploadHeap[i]);
+		//SAFE_RELEASE(m_ConstantBufferUploadHeap[i]);
 	}
 
 	// Delete the array

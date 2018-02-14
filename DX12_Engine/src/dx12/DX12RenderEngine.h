@@ -20,6 +20,8 @@
 // class predef
 class DX12ConstantBuffer;
 class DX12RenderTarget;
+class DX12RootSignature;
+class DX12PipelineState;
 class DX12Context;
 
 // define

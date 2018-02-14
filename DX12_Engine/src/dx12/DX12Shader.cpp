@@ -1,7 +1,8 @@
 #include "dx12/DX12Shader.h"
 
 #include <d3dcompiler.h>
-#include <string.h> 
+#include <string> 
+#include <string.h>
 
 DX12Shader::DX12Shader(EShaderType i_Type, const wchar_t * i_Filename, const D3D_SHADER_MACRO * i_Defines)
 	:m_ShaderType(i_Type)
@@ -56,15 +57,17 @@ DX12Shader::DX12Shader(EShaderType i_Type, const wchar_t * i_Filename, const D3D
 	m_IsLoaded = true;
 }
 
-DX12Shader::DX12Shader(EShaderType i_Type, const std::wstring & i_Code, const D3D_SHADER_MACRO * i_Defines)
+DX12Shader::DX12Shader(EShaderType i_Type, const ShaderCode & i_Code)
 	:m_ShaderType(i_Type)
-	,m_Name(L"GeneratedShader")
-	,m_IsLoaded(false)
+	, m_Name(L"GeneratedShader")
+	, m_IsLoaded(false)
 {
-	// generate name
-	char buffer[64];
-	itoa((int)this, buffer, 64);
-	mbstowcs(&m_Name[16], buffer, 64);
+	// procedural name generation
+#pragma warning(disable:4311 4302)
+	wchar_t wbuffer[64];
+	_itow_s((int)this, wbuffer, 64);
+	wcscpy_s(&m_Name[16], 64 * sizeof(wchar_t), wbuffer);
+#pragma warning(default:4311 4302)
 
 	// Load and generate the shader
 	ID3DBlob* shader; // d3d blob for holding vertex shader bytecode
@@ -86,10 +89,10 @@ DX12Shader::DX12Shader(EShaderType i_Type, const std::wstring & i_Code, const D3
 	}
 
 	// Compile shader from file
-	hr = D3DCompile(i_Code.c_str(),
-		i_Code.size(),
+	hr = D3DCompile(i_Code.Code.c_str(),
+		i_Code.Code.size(),
 		nullptr,
-		i_Defines,
+		i_Code.Defines,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main",
 		shaderTarget,
