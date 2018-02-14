@@ -12,28 +12,11 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 	:ActorComponent(i_Actor)
 	,m_Mesh(i_Desc.Mesh)
 	,m_ConstBuffer(UnavailableAdressId)
-	,m_PipelineState(nullptr)
-	,m_RootSignature(nullptr)
 	,m_Material(nullptr)
 	,m_RenderPass(RenderPass::eOpaqueGeometry)
 {
 	// retreive the engine and load the mesh if needed
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
-
-	// retreive the pipeline state object depending the elements flags
-	DX12RenderEngine::PipelineStateObject * pso = render.GetPipelineStateObject(m_Mesh->GetElementFlags());
-
-	if (pso)
-	{
-		m_PipelineState = pso->m_PipelineState;
-		m_RootSignature = pso->m_DefaultRootSignature;
-	}
-	else
-	{
-		PRINT_DEBUG("Error when creating mesh : PSO do not exist for this type of vertex declaration");
-		POPUP_ERROR("Error when creating mesh : PSO do not exist for this type of vertex declaration");
-		DEBUG_BREAK;
-	}
 
 	// material management
 	if (i_Desc.Material == nullptr)
@@ -57,8 +40,6 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 	// assert for debug
 	ASSERT(m_Material != nullptr);
 	ASSERT(m_Mesh != nullptr);
-	ASSERT(m_RootSignature != nullptr);
-	ASSERT(m_PipelineState != nullptr);
 
 	// retreive a constant buffer address
 	//m_ConstBuffer = render.ReserveConstantBufferVirtualAddress();
@@ -84,10 +65,11 @@ void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandLis
 	{
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
-		// add pso and root signature to the commandlist
-		i_CommandList->SetGraphicsRootSignature(m_RootSignature);
-		// Setup the pipeline state
-		i_CommandList->SetPipelineState(m_PipelineState);
+		//// add pso and root signature to the commandlist
+		//i_CommandList->SetGraphicsRootSignature(m_RootSignature);
+		//// Setup the pipeline state
+		//i_CommandList->SetPipelineState(m_PipelineState);
+		m_Material->SetupPipeline(i_CommandList);
 
 		// push transform buffer
 		if (m_ConstBuffer != UnavailableAdressId)

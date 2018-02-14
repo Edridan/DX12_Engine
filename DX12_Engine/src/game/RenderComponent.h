@@ -62,8 +62,6 @@ private:
 	DX12Material *				m_Material;	// material instance that manage the rendering pass
 
 	// dx12
-	ID3D12PipelineState *		m_PipelineState;
-	ID3D12RootSignature *		m_RootSignature;
 	ADDRESS_ID					m_ConstBuffer;	// const buffer for 3D matrices
 
 	// informations

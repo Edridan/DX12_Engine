@@ -252,6 +252,14 @@ inline void DX12Material::UpdateConstantBufferView()
 	}
 }
 
+void DX12Material::SetupPipeline(ID3D12GraphicsCommandList * i_CommandList) const
+{
+	// add pso and root signature to the commandlist
+	i_CommandList->SetGraphicsRootSignature(m_RootSignature->GetRootSignature());
+	// Setup the pipeline state
+	i_CommandList->SetPipelineState(m_PipelineState->GetPipelineState());
+}
+
 void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();

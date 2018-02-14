@@ -151,7 +151,7 @@ UINT DX12PipelineState::GetRenderTargetCount() const
 	return m_RenderTargetCount;
 }
 
-const ID3D12PipelineState * DX12PipelineState::GetPipelineState() const
+ID3D12PipelineState * DX12PipelineState::GetPipelineState() const
 {
 	return m_PipelineState;
 }

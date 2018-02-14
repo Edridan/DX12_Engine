@@ -73,6 +73,7 @@ public:
 	// dx12
 	bool		NeedUpdate() const;
 	void		UpdateConstantBufferView();
+	void		SetupPipeline(ID3D12GraphicsCommandList * i_CommandList) const;
 	void		PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
 
 private:

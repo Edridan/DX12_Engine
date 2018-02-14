@@ -164,9 +164,6 @@ private:
 	HRESULT				InitializeImmediateContext();
 	HRESULT				InitializeDeferredContext();
 	// Engine initialization
-	void				GenerateDefaultPipelineState();	// load shaders, root and pipeline state for rendering objects
-	void				CreatePipelineState(UINT64 i_Flags);
-	HRESULT				LoadShader(const wchar_t * i_Filename, DX12Shader::EShaderType i_ShaderType, UINT64 i_Flags);
 	void				GenerateImmediatePipelineState();
 
 	// Desc
