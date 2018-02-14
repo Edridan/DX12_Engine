@@ -374,33 +374,12 @@ HRESULT DX12RenderEngine::Render()
 	return S_OK;
 }
 
-DX12RenderEngine::PipelineStateObject * DX12RenderEngine::GetPipelineStateObject(UINT64 i_Flag)
-{
-	return m_PipelineStateObjects[i_Flag];
-}
-
-DX12RenderEngine::PipelineStateObject DX12RenderEngine::GetImmediatePipelineStateObject() const
-{
-	PipelineStateObject ret;
-	ret.m_DefaultRootSignature	= m_ImmediateRootSignature;
-	ret.m_PipelineState			= m_ImmediatePipelineState;
-	return ret;
-}
-
 DXGI_SAMPLE_DESC DX12RenderEngine::GetSampleDesc() const
 {
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1; // multisample count (no multisampling, so we just put 1, since we still need 1 sample)
 
 	return sampleDesc;
-}
-
-DX12Shader * DX12RenderEngine::GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type)
-{
-	// return the shader depending the flag
-	std::unordered_map<UINT64, DX12Shader*> & shaders = (i_Type == DX12Shader::ePixel ? m_PixelShaders : m_VertexShaders);
-	DX12Shader * shader = shaders[i_Flags];
-	return shader;
 }
 
 HRESULT DX12RenderEngine::Close()
@@ -573,15 +552,6 @@ void DX12RenderEngine::CleanUp()
 
 	SAFE_RELEASE(m_DepthStencilBuffer);
 	SAFE_RELEASE(m_DepthStencilDescriptorHeap);
-
-	// release pipeline state objects resources
-	auto itr = m_PipelineStateObjects.begin();
-
-	while (itr != m_PipelineStateObjects.end())
-	{
-		SAFE_RELEASE(itr->second->m_PipelineState);
-		++itr;
-	}
 
 	// delete resources
 	for (int i = 0; i < EConstantBufferId::eConstantBufferCount; ++i)

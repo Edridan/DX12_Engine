@@ -36,12 +36,6 @@ class DX12Context;
 class DX12RenderEngine
 {
 public:
-	struct PipelineStateObject
-	{
-		ID3D12PipelineState *	m_PipelineState;
-		ID3D12RootSignature *	m_DefaultRootSignature;
-	};
-
 	struct ShaderPipeline
 	{
 		DX12Shader *		m_Pixel;
@@ -61,11 +55,7 @@ public:
 	//** DX12 Management **//
 	// pipeline state management, this is used for default basic rendering
 	// if you need other pipeline states (skinned objects for example) create a pipeline state objects on your side
-	PipelineStateObject *		GetPipelineStateObject(UINT64 i_Flag);	// To do : remove, pipeline state objects are managed outside the render engine
-	PipelineStateObject 		GetImmediatePipelineStateObject() const;
 	DXGI_SAMPLE_DESC			GetSampleDesc() const;
-	// get the shaders for default pipeline state objects
-	DX12Shader *				GetShader(UINT64 i_Flags, DX12Shader::EShaderType i_Type);
 	// close the render engine
 	HRESULT						Close();
 
@@ -190,8 +180,8 @@ private:
 	DX12Context *				m_Context[EContextId::eContextCount];
 
 	// Immediate context pipeline state
-	ID3D12RootSignature *		m_ImmediateRootSignature;
-	ID3D12PipelineState *		m_ImmediatePipelineState;
+	DX12RootSignature *		m_ImmediateRootSignature;
+	DX12PipelineState *		m_ImmediatePipelineState;
 
 	// Depth buffer
 	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial
@@ -209,14 +199,9 @@ private:
 	// size
 	IntVec2						m_WindowSize;
 
-
 	// Shader
 	DX12Shader *				m_DefaultPixelShader;
 	DX12Shader *				m_DefaultVertexShader;
-
-	// all default pipeline state objects for rendering are stored in this map (this is used only for basic rendering, if it need alpha, rigging and skinning create your own Pipeline State)
-	std::unordered_map<UINT64, PipelineStateObject*>	m_PipelineStateObjects;	// this containing pipeline states and root
-	std::unordered_map<UINT64, DX12Shader*>				m_PixelShaders, m_VertexShaders;	// this containing pixel and vertices shaders depending the flags
 
 	// Render
 	D3D12_VIEWPORT				m_Viewport; // area that output from rasterizer will be stretched to.
