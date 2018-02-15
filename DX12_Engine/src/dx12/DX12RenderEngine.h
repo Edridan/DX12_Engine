@@ -150,11 +150,10 @@ private:
 	// DX12 Internal management
 	HRESULT				UpdatePipeline();				// called in Render()
 	HRESULT				WaitForPreviousFrame();			// called in PrepareForRender()
+	HRESULT				GenerateImmediateContext();		// create immediate context, final rendering pipelines(later : post process management)
 	// Initialize contexts to prepare for render
 	HRESULT				InitializeImmediateContext();
 	HRESULT				InitializeDeferredContext();
-	// Engine initialization
-	void				GenerateImmediatePipelineState();
 
 	// Desc
 #define FRAME_BUFFER_COUNT		3
@@ -165,6 +164,7 @@ private:
 	IDXGISwapChain3*			m_SwapChain; // swapchain used to switch between render targets
 	DXGI_SWAP_CHAIN_DESC		m_SwapChainDesc;	// swapchain description used for create default pso
 	ID3D12CommandQueue*			m_CommandQueue; // container for command lists
+	ID3D12CommandQueue*			m_DeferredQueue;
 	HANDLE						m_FenceEvent; // a handle to an event when our fence is unlocked by the gpu
 	int							m_FrameIndex; // current render target view we are on
 

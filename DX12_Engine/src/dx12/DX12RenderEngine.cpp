@@ -60,7 +60,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	// -- Debug -- //
 
-
 #ifdef DX12_DEBUG
 	hr = D3D12GetDebugInterface(IID_PPV_ARGS(&m_DebugController));
 
@@ -88,7 +87,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	int adapterIndex = 0; // we'll start looking for directx 12  compatible graphics devices starting at index 0
 	bool adapterFound = false; // set this to true when a good one was found
-							   // find first hardware gpu that supports d3d 12
+	// find first hardware gpu that supports d3d 12
 
 	while (dxgiFactory->EnumAdapters1(adapterIndex, &adapter) != DXGI_ERROR_NOT_FOUND)
 	{
@@ -269,7 +268,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	// generate default pipeline states objects
 	// this is going to create default pipeline state for drawing default objects
 	// this features : vertex coloring, one texture handling
-	GenerateImmediatePipelineState();
+	GenerateImmediateContext();
 
 	// -- Create depth/stencil buffer -- //
 
@@ -352,6 +351,28 @@ HRESULT DX12RenderEngine::Render()
 	}
 	else
 	{
+		DX12Context * deferred = GetContext(eDeferred);
+		UINT64 deferredFenceValue = deferred->GetFenceValue(m_FrameIndex);
+		ID3D12Fence * deferredFence = deferred->GetFence(m_FrameIndex);
+		
+		// create an array of command lists (only one command list here)
+		ID3D12CommandList* deferredCommandList[] = { deferred->GetCommandList() };
+
+		// execute the array of command lists
+		m_CommandQueue->ExecuteCommandLists(_countof(deferredCommandList), deferredCommandList);
+
+		// this command goes in at the end of our command queue. we will know when our command queue 
+		// has finished because the m_Fences value will be set to "m_FenceValue" from the GPU since the command
+		// queue is being executed on the GPU
+		DX12_ASSERT(m_CommandQueue->Signal(deferredFence, deferredFenceValue));
+
+		// we have the m_Fences create an event which is signaled once the m_Fences's current value is "m_FenceValue"
+		DX12_ASSERT(deferredFence->SetEventOnCompletion(deferredFenceValue, m_FenceEvent));
+
+		// we wait for the deferred context to be executed by the GPU
+		WaitForSingleObject(m_FenceEvent, INFINITE);
+
+		// render the immediate context at the end
 		DX12Context * context = GetContext(eImmediate);
 
 		// create an array of command lists (only one command list here)
@@ -604,6 +625,7 @@ HRESULT DX12RenderEngine::UpdatePipeline()
 	{
 		GetContext(eDeferred)->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	}
+
 	// we close the command list
 	DX12_ASSERT(GetContext(eDeferred)->GetCommandList()->Close());
 
@@ -641,6 +663,13 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 	context->IncrementFenceValue(m_FrameIndex);
 
 	return S_OK;
+}
+
+HRESULT DX12RenderEngine::GenerateImmediateContext()
+{
+
+
+	return E_NOTIMPL;
 }
 
 FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
@@ -720,9 +749,4 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 	context->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
 
 	return S_OK;
-}
-
-void DX12RenderEngine::GenerateImmediatePipelineState()
-{
-	
 }

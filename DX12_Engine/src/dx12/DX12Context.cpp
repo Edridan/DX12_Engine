@@ -5,6 +5,8 @@
 #include "dx12/DX12RenderEngine.h"
 #include "engine/Debug.h"
 
+#include <string.h>
+
 
 DX12Context::DX12Context(const ContextDesc & i_Desc)
 {
@@ -22,11 +24,20 @@ DX12Context::DX12Context(const ContextDesc & i_Desc)
 	// command allocator
 	m_CommandAllocator = new ID3D12CommandAllocator*[m_FrameCount];
 
+
 	// create the fences
 	for (UINT i = 0; i < m_FrameCount; ++i)
 	{
 		// create command allocator
 		DX12_ASSERT(m_Device->CreateCommandAllocator(i_Desc.CommandListType, IID_PPV_ARGS(&m_CommandAllocator[i])));
+
+		// Add name to the command buffer
+		std::wstring commandName = i_Desc.Name + L" Command Allocator ";
+		wchar_t buffer[8u];
+		_itow_s(i, buffer, 10);
+		commandName.append(buffer);
+
+		m_CommandAllocator[i]->SetName(commandName.c_str());
 
 		// initialize fences
 		DX12_ASSERT(m_Device->CreateFence(0, i_Desc.FencesFlags, IID_PPV_ARGS(&m_Fences[i])));
@@ -35,6 +46,9 @@ DX12Context::DX12Context(const ContextDesc & i_Desc)
 
 	// create command list
 	DX12_ASSERT(m_Device->CreateCommandList(0, i_Desc.CommandListType, m_CommandAllocator[m_FrameIndex], NULL, IID_PPV_ARGS(&m_CommandList)));
+
+	std::wstring listName = i_Desc.Name;
+	m_CommandList->SetName((i_Desc.Name + L" Command List").c_str());
 }
 
 DX12Context::~DX12Context()

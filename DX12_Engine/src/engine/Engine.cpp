@@ -216,7 +216,7 @@ void Engine::Run()
 			Camera * cam = m_CurrentWorld->GetCurrentCamera();
 
 			// dx12 related
-			setup.CommandList = commandList;
+			setup.CommandList = m_RenderEngine->GetContext(DX12RenderEngine::eDeferred)->GetCommandList();
 			// camera related
 			setup.ProjectionMatrix	= XMLoadFloat4x4(&cam->GetProjMatrix());
 			setup.ViewMatrix		= XMLoadFloat4x4(&cam->GetViewMatrix());

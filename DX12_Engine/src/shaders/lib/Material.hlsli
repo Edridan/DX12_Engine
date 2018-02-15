@@ -71,7 +71,7 @@ float4 ComputeColor(float4 pos, float3 normal, float3 cam_pos, float2 uv, float4
 	float4 ambient = GetAmbient(uv) * GetDiffuse(uv);
 
 	// diffuse
-	float3 lightDir = normalize(sunPosition - pos.xyz);
+	float3 lightDir = normalize(sunPosition.xyz - pos.xyz);
 	float diff = max(dot(normal, lightDir), 0.f);
 	float4 diffuse = SunLightCol * (diff * GetDiffuse(uv));
 

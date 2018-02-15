@@ -4,6 +4,7 @@
 #include "dx12/DX12ConstantBuffer.h"
 #include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RootSignature.h"
+#include "dx12/DX12RenderTarget.h"
 #include "dx12/DX12Texture.h"
 #include "engine/Utils.h"
 
@@ -84,8 +85,11 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 
 
 	// create shaders
-	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/forward/NormalTexPixel.hlsl");
-	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/forward/NormalTexVertex.hlsl");
+	//DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/forward/NormalTexPixel.hlsl");
+	//DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/forward/NormalTexVertex.hlsl");
+
+	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/deferred/GBufferPixel.hlsl");
+	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/deferred/GBufferVertex.hlsl");
 
 	// create pipeline state object
 	D3D12_INPUT_LAYOUT_DESC inputLayout;
@@ -98,15 +102,20 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	desc.VertexShader = VShader;
 	desc.PixelShader = PShader;
 	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	desc.RenderTargetCount = 1;
-	desc.RenderTargetFormat[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	
+	//desc.RenderTargetCount = 1;
+	//desc.RenderTargetFormat[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	desc.RenderTargetCount = DX12RenderEngine::ERenderTargetId::eRenderTargetCount;
+	desc.RenderTargetFormat[0] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eNormal)->GetFormat();
+	desc.RenderTargetFormat[1] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eDiffuse)->GetFormat();
+	desc.RenderTargetFormat[2] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eSpecular)->GetFormat();
+
 	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
 	desc.DepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
 	desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 
 	m_PipelineState = new DX12PipelineState(desc);
-	
-	
 }
 
 DX12Material::~DX12Material()

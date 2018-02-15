@@ -6,6 +6,9 @@
 // - Specular	(float4)
 // - Depth		(int64)
 
+// include render light lib
+#include "../lib/Material.hlsli"
+#include "../lib/GlobalBuffer.hlsli"
 
 struct VS_OUTPUT
 {
@@ -17,7 +20,7 @@ struct VS_OUTPUT
 struct PS_OUTPUT
 {
 	float4 normal :			SV_Target0;
-	float4 color :			SV_Target1;
+	float4 diffuse :		SV_Target1;
 	float4 specular :		SV_Target2;
 	//float depth :			SV_Target4;	// To do : use a render target to fill depth buffer
 };
@@ -30,19 +33,13 @@ PS_OUTPUT main(const VS_OUTPUT input)
 	// update the normal buffer
 	output.normal = float4(input.normal, 1.f);
 	
-
-
 	/////////////////////////////////////////////
-	// update the color buffer
-	output.color = float4(1.f, 0.f, 0.f, 1.f);
-
-
+	// update the diffuse buffer
+	output.diffuse = float4(1.f, 0.f, 0.f, 1.f);
 
 	/////////////////////////////////////////////
 	// update the specular buffer
 	output.specular = float4(0.f, 1.f, 0.f, 1.f);
-
-
 
 	/////////////////////////////////////////////
 	// update the depth buffer

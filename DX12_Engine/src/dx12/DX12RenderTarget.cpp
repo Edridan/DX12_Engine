@@ -76,8 +76,11 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 				& clearValue, // used for render targets and depth/stencil buffers
 				IID_PPV_ARGS(&m_RenderTarget[i]));
 
-			std::wstring renderTargetName = m_Name;
-			renderTargetName.append(L" Resources");
+			// Add name to the command buffer
+			wchar_t buffer[8u];
+			_itow_s(i, buffer, 10);
+
+			std::wstring renderTargetName = m_Name + L" Render Target Resources " + buffer;
 			m_RenderTarget[i]->SetName(renderTargetName.c_str());
 		}
 	}

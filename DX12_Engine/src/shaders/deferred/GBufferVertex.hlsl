@@ -12,7 +12,7 @@ struct VS_INPUT
 {
 	float3 pos		: POSITION;
 	float3 normal	: NORMAL;
-	float3 color	: COLOR;
+	float2 uv		: TEXCOORD;
 };
 
 struct VS_OUTPUT
