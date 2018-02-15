@@ -4,8 +4,10 @@
 #include "dx12/d3dx12.h"
 #include "dx12/DX12Mesh.h"
 #include "dx12/DX12Context.h"
+#include "dx12/DX12RootSignature.h"
 #include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RenderTarget.h"
+#include "dx12/DX12MeshBuffer.h"
 #include "engine/Engine.h"
 
 
@@ -506,7 +508,7 @@ ID3D12CommandQueue * DX12RenderEngine::GetCommandQueue() const
 
 D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderEngine::GetBackBufferDesc() const
 {
-	return m_BackBuffer->GetRenderTargetDescriptor(m_FrameIndex);
+	return m_BackBuffer->GetRenderTargetCPUDescriptorHandle(m_FrameIndex);
 }
 
 bool DX12RenderEngine::IsDX12DebugEnabled() const
@@ -667,9 +669,88 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 
 HRESULT DX12RenderEngine::GenerateImmediateContext()
 {
+	// create a rectangle mesh for final rendering of buffers
+	const float VRect[] =
+	{
+		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,
+		1.0f, 0.0f, 0.0f,		1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,		1.0f, 1.0f
+	};
+
+	const DWORD IRect[] =
+	{
+		0, 1, 2,
+		1, 0, 3
+	};
+
+	// create input layout for the rectangle mesh
+	D3D12_INPUT_LAYOUT_DESC inputLayout;
+	DX12PipelineState::CreateInputLayoutFromFlags(inputLayout, DX12PipelineState::eHaveTexcoord);
+
+	m_RectMesh = new DX12MeshBuffer(inputLayout, (BYTE*)VRect, 4u, IRect, 6u, L"Rect");
+
+	m_ImmediateRootSignature = new DX12RootSignature;
 
 
-	return E_NOTIMPL;
+	// add static sampler for textures
+	D3D12_STATIC_SAMPLER_DESC sampler = {};
+
+	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.MipLODBias = 0;
+	sampler.MaxAnisotropy = 0;
+	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+	sampler.MinLOD = 0.0f;
+	sampler.MaxLOD = D3D12_FLOAT32_MAX;
+	sampler.ShaderRegister = 0;
+	sampler.RegisterSpace = 0;
+	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	m_ImmediateRootSignature->AddStaticSampler(sampler);	// add static sampler
+
+	// add textures
+	D3D12_DESCRIPTOR_RANGE descriptorTableRanges[eRenderTargetCount];
+
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		descriptorTableRanges[i].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // this is a range of shader resource views (descriptors)
+		descriptorTableRanges[i].NumDescriptors = 1; // we only have one texture right now, so the range is only 1
+		descriptorTableRanges[i].BaseShaderRegister = i; // start index of the shader registers in the range
+		descriptorTableRanges[i].RegisterSpace = 0; // space 0. can usually be zero
+		descriptorTableRanges[i].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
+	}
+
+	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[0], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// normal texture
+	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[1], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// diffuse
+	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[2], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// specular
+
+	m_ImmediateRootSignature->Create(m_Device);
+
+	m_ImmediateRootSignature->IsRegisterFilled("s1:space3");
+
+	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/deferred/FrameCompositorPS.hlsl");
+	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/deferred/FrameCompositorVS.hlsl");
+
+	DX12PipelineState::PipelineStateDesc desc;
+
+	desc.InputLayout = inputLayout;
+	desc.RootSignature = m_ImmediateRootSignature;
+	desc.VertexShader = VShader;
+	desc.PixelShader = PShader;
+	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	desc.RenderTargetCount = 1;
+	desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
+	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
+	desc.DepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
+	desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+
+	m_ImmediatePipelineState = new DX12PipelineState(desc);
+
+	return S_OK;
 }
 
 FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
@@ -684,9 +765,15 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
 	context->GetCommandList()->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		// transition the render target to the pixel shader resources
+		context->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+	}
+
 	// here we again get the handle to our current render target view so we can set it as the render target in the output merger stage of the pipeline
 	//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_FrameIndex, m_RtvDescriptorSize);
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_BackBuffer->GetRenderTargetDescriptor();
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_BackBuffer->GetRenderTargetCPUDescriptorHandle();
 
 	// get a handle to the depth/stencil buffer
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
@@ -703,10 +790,34 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	context->GetCommandList()->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
 	context->GetCommandList()->RSSetScissorRects(1, &DX12RenderEngine::GetInstance().GetScissor());
 
-	context->GetCommandList()->ClearDepthStencilView(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
 	// setup primitive topology
 	context->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
+
+	// render immediate context here
+	context->GetCommandList()->SetGraphicsRootSignature(m_ImmediateRootSignature->GetRootSignature());
+	context->GetCommandList()->SetPipelineState(m_ImmediatePipelineState->GetPipelineState());
+
+	// bind textures
+	ID3D12DescriptorHeap ** descriptors = nullptr;
+	
+	DX12RenderTarget * rt[eRenderTargetCount]
+	{
+		m_RenderTargets[eNormal],
+		m_RenderTargets[eDiffuse],
+		m_RenderTargets[eSpecular],
+	};
+
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		// bind render targets as textures
+		
+		// update the descriptor for the resources
+		context->GetCommandList()->SetDescriptorHeaps(1, descriptors);
+		context->GetCommandList()->SetGraphicsRootDescriptorTable(i, rt[i]->GetShaderResourceDescriptorHeap()->GetGPUDescriptorHandle(m_FrameIndex));
+	}
+
+	// render the mesh
+	m_RectMesh->PushOnCommandList(context->GetCommandList());
 
 	return S_OK;
 }
@@ -716,9 +827,9 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 	// create deferred handle for render targets
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[ERenderTargetId::eRenderTargetCount] =
 	{
-		m_RenderTargets[ERenderTargetId::eDiffuse]->GetRenderTargetDescriptor(),
-		m_RenderTargets[ERenderTargetId::eNormal]->GetRenderTargetDescriptor(),
-		m_RenderTargets[ERenderTargetId::eSpecular]->GetRenderTargetDescriptor(),
+		m_RenderTargets[ERenderTargetId::eNormal]->GetRenderTargetCPUDescriptorHandle(),
+		m_RenderTargets[ERenderTargetId::eDiffuse]->GetRenderTargetCPUDescriptorHandle(),
+		m_RenderTargets[ERenderTargetId::eSpecular]->GetRenderTargetCPUDescriptorHandle(),
 	};
 
 	DX12Context * context = GetContext(eDeferred);
@@ -727,7 +838,7 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 	for (UINT i = 0; i < eRenderTargetCount; ++i)
 	{
 		// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
-		context->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+		context->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET));
 	}
 
 	// get a handle to the depth/stencil buffer

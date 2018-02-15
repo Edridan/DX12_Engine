@@ -22,6 +22,7 @@ class DX12ConstantBuffer;
 class DX12RenderTarget;
 class DX12RootSignature;
 class DX12PipelineState;
+class DX12MeshBuffer;
 class DX12Context;
 
 // define
@@ -182,6 +183,7 @@ private:
 	// Immediate context pipeline state
 	DX12RootSignature *		m_ImmediateRootSignature;
 	DX12PipelineState *		m_ImmediatePipelineState;
+	DX12MeshBuffer *		m_RectMesh;
 
 	// Depth buffer
 	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial

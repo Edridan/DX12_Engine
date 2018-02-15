@@ -51,6 +51,7 @@ public:
 	UINT		GetRegisterParamIndex(const char * i_Register) const;
 	UINT		GetRegisterParamIndex(D3D12_ROOT_PARAMETER_TYPE  i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace);
 	UINT		GetRegisterParamIndex(D3D12_DESCRIPTOR_RANGE_TYPE  i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace);
+	
 
 private:
 	// internal helper

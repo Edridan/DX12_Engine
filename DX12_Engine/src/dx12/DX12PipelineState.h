@@ -52,7 +52,7 @@ public:
 	const D3D12_INPUT_LAYOUT_DESC	&	GetLayoutDesc() const;
 	UINT								GetRenderTargetCount() const;
 	ID3D12PipelineState *				GetPipelineState() const;
-	const DX12RootSignature *			GetRootSignature() const;
+	const DX12RootSignature *			GetDX12RootSignature() const;
 
 private:
 	// helpers

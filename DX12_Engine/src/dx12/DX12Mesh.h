@@ -35,8 +35,8 @@ public:
 	static DX12Mesh *	LoadMeshObj(const char * i_Filename, const char * i_MaterialFolder = nullptr, const char * i_TextureFolder = nullptr);
 
 	// one shape procedural mesh generation
-	DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount);
-	DX12Mesh(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount);
+	DX12Mesh(const D3D12_INPUT_LAYOUT_DESC & i_InputLayout, const BYTE * i_VerticesBuffer, UINT i_VerticesCount);
+	DX12Mesh(const D3D12_INPUT_LAYOUT_DESC & i_InputLayout, const BYTE * i_VerticesBuffer, UINT i_VerticesCount, const DWORD * i_IndexBuffer, UINT i_IndexCount);
 	~DX12Mesh();
 
 	// submeshes

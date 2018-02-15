@@ -444,5 +444,11 @@
     <FxCompile Include="src\shaders\deferred\GBufferVertex.hlsl">
       <Filter>Shaders\Deferred</Filter>
     </FxCompile>
+    <FxCompile Include="src\shaders\deferred\FrameCompositorPS.hlsl">
+      <Filter>Shaders\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\deferred\FrameCompositorVS.hlsl">
+      <Filter>Shaders\Deferred</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

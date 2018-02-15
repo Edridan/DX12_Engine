@@ -12,7 +12,7 @@
 UINT DX12MeshBuffer::s_MeshInstanciated = 0;
 #endif
 
-DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name)
+DX12MeshBuffer::DX12MeshBuffer(const D3D12_INPUT_LAYOUT_DESC & i_InputLayout, const BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name)
 	:m_Count(i_VerticesCount)
 	,m_IndexBuffer(nullptr)
 	,m_IndexBufferView()
@@ -42,7 +42,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	m_VertexBufferView.SizeInBytes = vBufferSize;
 }
 
-DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_VerticesBuffer, UINT i_VerticesCount, DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name)
+DX12MeshBuffer::DX12MeshBuffer(const D3D12_INPUT_LAYOUT_DESC & i_InputLayout, const BYTE * i_VerticesBuffer, UINT i_VerticesCount, const DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name)
 	:m_Count(i_IndexCount)
 	,m_HaveIndex(true)
 	,m_Name(i_Name.c_str())
@@ -67,7 +67,7 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 	UpdateData(commandList, m_VertexBuffer, vBufferSize, (i_VerticesBuffer));
 
 	CreateBuffer(&m_IndexBuffer, iBufferSize, i_Name.c_str());
-	UpdateData(commandList, m_IndexBuffer, iBufferSize, reinterpret_cast<BYTE*>(i_IndexBuffer));
+	UpdateData(commandList, m_IndexBuffer, iBufferSize, reinterpret_cast<const BYTE*>(i_IndexBuffer));
 
 	// create a vertex buffer view for the triangle. We get the GPU memory address to the pointer using the GetGPUVirtualAddress() method
 	m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
@@ -83,14 +83,13 @@ DX12MeshBuffer::DX12MeshBuffer(D3D12_INPUT_LAYOUT_DESC i_InputLayout, BYTE * i_V
 DX12MeshBuffer::~DX12MeshBuffer()
 {
 	// cleanup resources
-	// To do : fix the crash when releasing the resources
 	//SAFE_RELEASE(m_VertexBuffer);
 
-	//// release if needed the index buffer
-	//if (m_HaveIndex)
-	//{
-	//	SAFE_RELEASE(m_IndexBuffer);
-	//}
+	// release if needed the index buffer
+	if (m_HaveIndex)
+	{
+		/*SAFE_RELEASE(m_IndexBuffer);*/
+	}
 }
 
 const D3D12_INPUT_LAYOUT_DESC & DX12MeshBuffer::GetInputLayout() const
@@ -167,7 +166,7 @@ inline HRESULT DX12MeshBuffer::CreateBuffer(ID3D12Resource ** i_Buffer, UINT i_B
 	return hr;
 }
 
-inline HRESULT DX12MeshBuffer::UpdateData(ID3D12GraphicsCommandList* i_CommandList, ID3D12Resource * i_Buffer, UINT i_BufferSize, BYTE * i_Data)
+inline HRESULT DX12MeshBuffer::UpdateData(ID3D12GraphicsCommandList* i_CommandList, ID3D12Resource * i_Buffer, UINT i_BufferSize, const BYTE * i_Data)
 {
 	HRESULT hr;
 	ID3D12Device * device						= DX12RenderEngine::GetInstance().GetDevice();

@@ -156,7 +156,7 @@ ID3D12PipelineState * DX12PipelineState::GetPipelineState() const
 	return m_PipelineState;
 }
 
-const DX12RootSignature * DX12PipelineState::GetRootSignature() const
+const DX12RootSignature * DX12PipelineState::GetDX12RootSignature() const
 {
 	return m_RootSignature;
 }

@@ -185,7 +185,35 @@ UINT DX12RootSignature::GetStaticSamplerCount() const
 
 bool DX12RootSignature::IsRegisterFilled(const char * i_Register) const
 {
-	return GetRegisterParamIndex(i_Register) != (UINT(-1));
+	if (i_Register[0] == 's')
+	{
+		std::string reg = i_Register;
+		size_t sp = reg.find(":space");
+
+		UINT shaderSpace = 0;
+		UINT shaderReg = 0;
+
+		if (sp != std::string::npos)
+		{
+			reg = reg.substr(0, sp);
+			shaderSpace = atoi(i_Register + (sp + 6));
+		}
+
+		shaderReg = atoi(&reg[1]);
+
+		for (UINT i = 0; i < m_StaticSampler.size(); ++i)
+		{
+			if (m_StaticSampler[i].ShaderRegister == shaderReg 
+				&& m_StaticSampler[i].RegisterSpace == shaderSpace)	
+				return true;
+		}
+	}
+	else
+	{
+		return GetRegisterParamIndex(i_Register) != (UINT(-1));
+	}
+
+	return false;
 }
 
 bool DX12RootSignature::IsRegisterFilled(D3D12_DESCRIPTOR_RANGE_TYPE i_Type, UINT32 i_ShaderRegister, UINT32 i_ShaderSpace)

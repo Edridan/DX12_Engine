@@ -20,7 +20,7 @@ DX12DescriptorHeap::DX12DescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC & i_Desc
 	// retreive data
 	m_Size = device->GetDescriptorHandleIncrementSize(i_Desc.Type);
 	m_Count = i_Desc.NumDescriptors;
-	// set name for debug purpose
+
 	m_DescriptorHeap->SetName(i_Name);
 }
 
@@ -37,7 +37,7 @@ ID3D12DescriptorHeap * DX12DescriptorHeap::GetDescriptorHeap() const
 
 CD3DX12_CPU_DESCRIPTOR_HANDLE DX12DescriptorHeap::GetCPUDescriptorHandle(UINT i_Index) const
 {
-	ASSERT((int)i_Index < m_Size);
+	ASSERT((int)i_Index < m_Count);
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart(), i_Index, m_Size);
 }
 

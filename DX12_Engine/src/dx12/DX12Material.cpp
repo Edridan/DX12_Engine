@@ -83,11 +83,6 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS);
 
-
-	// create shaders
-	//DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/forward/NormalTexPixel.hlsl");
-	//DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/forward/NormalTexVertex.hlsl");
-
 	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/deferred/GBufferPixel.hlsl");
 	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/deferred/GBufferVertex.hlsl");
 
@@ -294,7 +289,7 @@ void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) 
 		if (HaveTexture((ETextureType)i))
 		{
 			// update the descriptor for the resources
-			i_CommandList->SetDescriptorHeaps(1, descriptors);
+			//i_CommandList->SetDescriptorHeaps(1, descriptors);
 			i_CommandList->SetGraphicsRootDescriptorTable(3 + i, m_Textures[i]->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 		}
 	}

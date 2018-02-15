@@ -78,7 +78,7 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 
 			// Add name to the command buffer
 			wchar_t buffer[8u];
-			_itow_s(i, buffer, 10);
+			_itow_s((int)i, buffer, 10);
 
 			std::wstring renderTargetName = m_Name + L" Render Target Resources " + buffer;
 			m_RenderTarget[i]->SetName(renderTargetName.c_str());
@@ -106,18 +106,18 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 	if (m_IsResourceView)
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-		srvHeapDesc.NumDescriptors = m_FrameCount; // number of descriptors for this heap.
-		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; // this heap is a shader resource view
-		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;		// To do : make the possibily to add flags on some pipeline state
+		srvHeapDesc.NumDescriptors		= m_FrameCount; // number of descriptors for this heap.
+		srvHeapDesc.Type				= D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; // this heap is a shader resource view
+		srvHeapDesc.Flags				= D3D12_DESCRIPTOR_HEAP_FLAG_NONE;		// To do : make the possibily to add flags on some pipeline state
 
 		m_ShaderResourceDesc = new DX12DescriptorHeap(srvHeapDesc);
 
 		// now we create a shader resource view (descriptor that points to the texture and describes it)
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.Format = i_Desc.Format;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = 1;
+		srvDesc.Shader4ComponentMapping		= D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.Format						= i_Desc.Format;
+		srvDesc.ViewDimension				= D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels			= 1;
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandle = m_ShaderResourceDesc->GetCPUDescriptorHandle();
 
@@ -156,24 +156,22 @@ DX12DescriptorHeap * DX12RenderTarget::GetShaderResourceDescriptorHeap() const
 	return m_ShaderResourceDesc;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderTarget::GetRenderTargetDescriptor(UINT i_Index /* = ((UINT)-1) */) const
+void DX12RenderTarget::ResourceBarrier(ID3D12GraphicsCommandList * i_CommandList, D3D12_RESOURCE_STATES i_From, D3D12_RESOURCE_STATES i_To, UINT i_Index /* = ((UINT)-1)*/) const
+{
+	i_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTarget[GetIndex(i_Index)], i_From, i_To));
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderTarget::GetRenderTargetCPUDescriptorHandle(UINT i_Index /* = ((UINT)-1) */) const
 {
 	// default return
 	return m_RenderTargetDesc->GetCPUDescriptorHandle(GetIndex(i_Index));
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderTarget::GetTextureDescriptor(UINT i_Index /* = 0 */) const
+D3D12_CPU_DESCRIPTOR_HANDLE DX12RenderTarget::GetShaderResourceCPUDescriptorHandle(UINT i_Index) const
 {
 	// assert if it's not a resource view
 	ASSERT(m_IsResourceView);
 	return m_ShaderResourceDesc->GetCPUDescriptorHandle(GetIndex(i_Index));
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE DX12RenderTarget::GetTextureGPUDescriptor(UINT i_Index) const
-{
-	// assert if it's not a resource view
-	ASSERT(m_IsResourceView);
-	return m_ShaderResourceDesc->GetGPUDescriptorHandle(GetIndex(i_Index));
 }
 
 HRESULT DX12RenderTarget::ResizeBuffer(const IntVec2 & i_Size)

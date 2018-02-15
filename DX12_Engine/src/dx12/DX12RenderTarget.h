@@ -27,11 +27,16 @@ public:
 	// dx12
 	DX12DescriptorHeap *			GetRenderTargetDescriptorHeap() const;
 	DX12DescriptorHeap *			GetShaderResourceDescriptorHeap() const;
+	// transition between 2 resources types
+	void			ResourceBarrier(ID3D12GraphicsCommandList * i_CommandList, D3D12_RESOURCE_STATES i_From, D3D12_RESOURCE_STATES i_To, UINT i_Index = ((UINT)-1)) const;
 
-	// handle
-	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTargetDescriptor(UINT i_Index = ((UINT)-1)) const;	// get the descriptor as render target (used for drawing in buffer)
-	D3D12_CPU_DESCRIPTOR_HANDLE		GetTextureDescriptor(UINT i_Index = ((UINT)-1)) const;		// get the descriptor as texture (used for reading buffer)
-	D3D12_GPU_DESCRIPTOR_HANDLE		GetTextureGPUDescriptor(UINT i_Index = ((UINT)-1)) const;
+	// handle (render target)
+	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTargetCPUDescriptorHandle(UINT i_Index = ((UINT)-1)) const;	// get the descriptor as render target (used for drawing in buffer)
+	
+																											// handle (shader resource)
+	D3D12_CPU_DESCRIPTOR_HANDLE		GetShaderResourceCPUDescriptorHandle(UINT i_Index = ((UINT)-1)) const;		// get the descriptor as texture (used for reading buffer)
+
+	// buffer management
 	HRESULT							ResizeBuffer(const IntVec2 & i_Size);
 	// barrier management
 	CD3DX12_RESOURCE_BARRIER		GetResourceBarrier(D3D12_RESOURCE_STATES i_StateBefore, D3D12_RESOURCE_STATES i_StateAfter, UINT i_Index = ((UINT)-1)) const;
