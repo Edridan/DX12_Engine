@@ -82,9 +82,6 @@
     <Filter Include="Shaders\Lib">
       <UniqueIdentifier>{1c518152-6443-44ef-a000-d238e535251a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\Forward">
-      <UniqueIdentifier>{1a4984f3-a49e-4418-8a54-fb3c4516ce4a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shaders\UI">
       <UniqueIdentifier>{1d97e091-60a8-4cd0-809b-d69bd5d442a4}</UniqueIdentifier>
     </Filter>
@@ -416,21 +413,6 @@
     </FxCompile>
     <FxCompile Include="src\shaders\ui\ImGuiVertex.hlsl">
       <Filter>Shaders\UI</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\forward\NormalVertex.hlsl">
-      <Filter>Shaders\Forward</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\forward\DefaultPixel.hlsl">
-      <Filter>Shaders\Forward</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\forward\NormalColorVertex.hlsl">
-      <Filter>Shaders\Forward</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\forward\NormalTexPixel.hlsl">
-      <Filter>Shaders\Forward</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\forward\NormalTexVertex.hlsl">
-      <Filter>Shaders\Forward</Filter>
     </FxCompile>
     <FxCompile Include="src\shaders\deferred\GBufferPixel.hlsl">
       <Filter>Shaders\Deferred</Filter>
