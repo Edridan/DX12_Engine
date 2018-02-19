@@ -33,7 +33,7 @@ public:
 	// handle (render target)
 	D3D12_CPU_DESCRIPTOR_HANDLE		GetRenderTargetCPUDescriptorHandle(UINT i_Index = ((UINT)-1)) const;	// get the descriptor as render target (used for drawing in buffer)
 	
-																											// handle (shader resource)
+	// handle (shader resource)
 	D3D12_CPU_DESCRIPTOR_HANDLE		GetShaderResourceCPUDescriptorHandle(UINT i_Index = ((UINT)-1)) const;		// get the descriptor as texture (used for reading buffer)
 
 	// buffer management

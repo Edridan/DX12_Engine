@@ -432,12 +432,6 @@
     <FxCompile Include="src\shaders\forward\NormalTexVertex.hlsl">
       <Filter>Shaders\Forward</Filter>
     </FxCompile>
-    <FxCompile Include="src\shaders\ui\UITexturePS.hlsl">
-      <Filter>Shaders\UI</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\ui\UITextureVS.hlsl">
-      <Filter>Shaders\UI</Filter>
-    </FxCompile>
     <FxCompile Include="src\shaders\deferred\GBufferPixel.hlsl">
       <Filter>Shaders\Deferred</Filter>
     </FxCompile>

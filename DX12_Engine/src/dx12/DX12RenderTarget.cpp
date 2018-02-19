@@ -72,7 +72,7 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), // a default heap (used for render target too)
 				D3D12_HEAP_FLAG_NONE, // no flags
 				&resourceDesc, // the description of our texture
-				D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_RENDER_TARGET, // We will copy the texture from the upload heap to here, so we start it out in a copy dest state
+				D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_RENDER_TARGET,
 				& clearValue, // used for render targets and depth/stencil buffers
 				IID_PPV_ARGS(&m_RenderTarget[i]));
 
@@ -85,7 +85,6 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 		}
 	}
 
-
 	// get the size of a descriptor in this heap (this is a rtv heap, so only rtv descriptors should be stored in it.
 	// descriptor sizes may vary from m_Device to m_Device, which is why there is no set size and we must ask the 
 	// m_Device to give us the size. we will use this size to increment a descriptor handle offset
@@ -97,6 +96,8 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 
 	for (size_t i = 0; i < m_FrameCount; ++i)
 	{
+		D3D12_RENDER_TARGET_VIEW_DESC desc;
+
 		device->CreateRenderTargetView(m_RenderTarget[i], nullptr, rtvHandle);
 		// we increment the rtv handle by the rtv descriptor size we got above
 		rtvHandle.Offset(1, m_RenderTargetDesc->GetDescriptorSize());
@@ -108,7 +109,7 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 		srvHeapDesc.NumDescriptors		= m_FrameCount; // number of descriptors for this heap.
 		srvHeapDesc.Type				= D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; // this heap is a shader resource view
-		srvHeapDesc.Flags				= D3D12_DESCRIPTOR_HEAP_FLAG_NONE;		// To do : make the possibily to add flags on some pipeline state
+		srvHeapDesc.Flags				= D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;		// To do : make the possibily to add flags on some pipeline state
 
 		m_ShaderResourceDesc = new DX12DescriptorHeap(srvHeapDesc);
 

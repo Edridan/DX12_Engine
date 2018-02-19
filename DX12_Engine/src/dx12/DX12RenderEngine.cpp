@@ -252,6 +252,9 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	{
 		rtDesc.Name = rtName[i];
 		m_RenderTargets[i] = new DX12RenderTarget(rtDesc);
+
+		// transition the render target to the pixel shader resources
+		GetContext(eImmediate)->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 	}
 
 	// -- Create constant buffer -- //
@@ -333,7 +336,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 HRESULT DX12RenderEngine::PrepareForRender()
 {
-	
 	// We have to wait for the gpu to finish with the command allocator before we reset it
 	WaitForPreviousFrame();
 	
@@ -672,9 +674,9 @@ HRESULT DX12RenderEngine::GenerateImmediateContext()
 	// create a rectangle mesh for final rendering of buffers
 	const float VRect[] =
 	{
-		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f,		1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,
+		-1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
+		1.0f, -1.0f, 0.0f,		1.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f,		0.0f, 0.0f,
 		1.0f, 1.0f, 0.0f,		1.0f, 1.0f
 	};
 
@@ -782,7 +784,6 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	context->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
 	// Clear the render target by using the ClearRenderTargetView command
-	//const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	static const float clearColor[] = { 0.4f, 0.4f, 0.4f, 1.0f };
 	context->GetCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
@@ -798,7 +799,7 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	context->GetCommandList()->SetPipelineState(m_ImmediatePipelineState->GetPipelineState());
 
 	// bind textures
-	ID3D12DescriptorHeap ** descriptors = nullptr;
+	ID3D12DescriptorHeap * descriptors = nullptr;
 	
 	DX12RenderTarget * rt[eRenderTargetCount]
 	{
@@ -810,9 +811,9 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	for (UINT i = 0; i < eRenderTargetCount; ++i)
 	{
 		// bind render targets as textures
-		
+		descriptors = rt[i]->GetShaderResourceDescriptorHeap()->GetDescriptorHeap();
 		// update the descriptor for the resources
-		context->GetCommandList()->SetDescriptorHeaps(1, descriptors);
+		context->GetCommandList()->SetDescriptorHeaps(1, &descriptors);
 		context->GetCommandList()->SetGraphicsRootDescriptorTable(i, rt[i]->GetShaderResourceDescriptorHeap()->GetGPUDescriptorHandle(m_FrameIndex));
 	}
 

@@ -3,6 +3,12 @@
 
 // GBuffer frame management
 
+// texture sampler for material
+Texture2D tex_ambient		: register(t0);
+Texture2D tex_specular		: register(t1);
+Texture2D tex_diffuse		: register(t2);
+SamplerState tex_sample		: register(s0);
+
 
 struct VS_OUTPUT
 {

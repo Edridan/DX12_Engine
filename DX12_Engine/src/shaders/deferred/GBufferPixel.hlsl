@@ -31,15 +31,15 @@ PS_OUTPUT main(const VS_OUTPUT input)
 
 	/////////////////////////////////////////////
 	// update the normal buffer
-	output.normal = float4(input.normal, 1.f);
+	output.normal = float4(input.normal.xyz, 1.f);
 	
 	/////////////////////////////////////////////
 	// update the diffuse buffer
-	output.diffuse = float4(1.f, 0.f, 0.f, 1.f);
+	output.diffuse = float4(0.f, 1.f, 0.f, 1.f);
 
 	/////////////////////////////////////////////
 	// update the specular buffer
-	output.specular = float4(0.f, 1.f, 0.f, 1.f);
+	output.specular = float4(0.f, 0.f, 1.f, 1.f);
 
 	/////////////////////////////////////////////
 	// update the depth buffer
