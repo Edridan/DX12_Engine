@@ -774,18 +774,13 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	}
 
 	// here we again get the handle to our current render target view so we can set it as the render target in the output merger stage of the pipeline
-	//CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_RtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_FrameIndex, m_RtvDescriptorSize);
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_BackBuffer->GetRenderTargetCPUDescriptorHandle();
 
-	// get a handle to the depth/stencil buffer
-	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
 	// set the render target for the output merger stage (the output of the pipeline)
-	context->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+	context->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 	// Clear the render target by using the ClearRenderTargetView command
 	static const float clearColor[] = { 0.4f, 0.4f, 0.4f, 1.0f };
-	context->GetCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
 	// Setting up the command list
 	context->GetCommandList()->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
@@ -852,6 +847,9 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 	{
 		context->GetCommandList()->ClearRenderTargetView(rtvHandle[i], m_RenderTargets[i]->GetClearValue(), 0, nullptr);
 	}
+
+	// clear depth buffer
+	context->GetCommandList()->ClearDepthStencilView(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	// Setting up the command list
 	context->GetCommandList()->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
