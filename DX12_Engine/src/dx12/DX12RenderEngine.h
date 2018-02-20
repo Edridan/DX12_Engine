@@ -14,6 +14,7 @@
 #include "dx12/DX12Shader.h"
 
 #ifdef _DEBUG
+#include "DX12Debug.h"
 #include <D3d12sdklayers.h>
 #endif
 
@@ -22,16 +23,9 @@ class DX12ConstantBuffer;
 class DX12RenderTarget;
 class DX12RootSignature;
 class DX12PipelineState;
+class DX12DepthBuffer;
 class DX12MeshBuffer;
 class DX12Context;
-
-// define
-#define DEBUG_DX12_ENABLE		1
-
-// debug management
-#if (DEBUG_DX12_ENABLE) && defined(_DEBUG)
-#define DX12_DEBUG
-#endif
 
 // Render engine implementation
 class DX12RenderEngine
@@ -117,9 +111,18 @@ public:
 	};
 
 	static const HeapProperty s_HeapProperties[];
-	// create comitted resource
+	// create comitted resource To do : use this to create different resources and manage the creation and deletion of the resources in the dx12 render engine
 	ID3D12Resource *			CreateComittedResource(HeapProperty::Enum i_HeapProperty, uint64_t i_Size, D3D12_RESOURCE_FLAGS i_Flags = D3D12_RESOURCE_FLAG_NONE) const;
 	ID3D12Resource *			CreateComittedResource(HeapProperty::Enum i_HeapProperty, D3D12_RESOURCE_DESC * i_ResourceDesc, D3D12_CLEAR_VALUE * i_ClearValue) const;
+	// free create comitted resources
+	void						CreateComittedResource(
+		const D3D12_HEAP_PROPERTIES *pHeapProperties,
+		D3D12_HEAP_FLAGS HeapFlags,
+		const D3D12_RESOURCE_DESC *pResourceDesc,
+		D3D12_RESOURCE_STATES InitialResourceState,
+		const D3D12_CLEAR_VALUE *pOptimizedClearValue,
+		REFIID riidResource,
+		_COM_Outptr_opt_  void **ppvResource);
 
 	// Get/Set
 	int								GetFrameIndex() const;
@@ -186,8 +189,10 @@ private:
 	DX12MeshBuffer *		m_RectMesh;
 
 	// Depth buffer
-	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial
-	ID3D12DescriptorHeap*		m_DepthStencilDescriptorHeap; // This is a heap for our depth/stencil buffer descriptor
+	//ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial
+	//ID3D12DescriptorHeap*		m_DepthStencilDescriptorHeap; // This is a heap for our depth/stencil buffer descriptor
+	DX12DepthBuffer *		m_DepthBuffer;	// Depth buffer handler
+
 
 	// Constant buffer
 	struct ConstantBufferDef

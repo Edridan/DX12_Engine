@@ -37,6 +37,7 @@ VS_OUTPUT main( const VS_INPUT input )
 	// Return 
 	output.position = pos;
 	output.normal = float3(norm.xyz);
+	output.depth = 0.1f;		// dummy
 
 	return output;
 }

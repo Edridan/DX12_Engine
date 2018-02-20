@@ -94,6 +94,8 @@
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc" />
     <ClCompile Include="src\dx12\DX12ConstantBuffer.cpp" />
     <ClCompile Include="src\dx12\DX12Context.cpp" />
+    <ClCompile Include="src\dx12\DX12Debug.cpp" />
+    <ClCompile Include="src\dx12\DX12DepthBuffer.cpp" />
     <ClCompile Include="src\dx12\DX12DescriptorHeap.cpp" />
     <ClCompile Include="src\dx12\DX12ImGui.cpp" />
     <ClCompile Include="src\dx12\DX12Material.cpp" />
@@ -140,6 +142,8 @@
     <ClInclude Include="src\dx12\d3dx12.h" />
     <ClInclude Include="src\dx12\DX12ConstantBuffer.h" />
     <ClInclude Include="src\dx12\DX12Context.h" />
+    <ClInclude Include="src\dx12\DX12Debug.h" />
+    <ClInclude Include="src\dx12\DX12DepthBuffer.h" />
     <ClInclude Include="src\dx12\DX12DescriptorHeap.h" />
     <ClInclude Include="src\dx12\DX12ImGui.h" />
     <ClInclude Include="src\dx12\DX12Material.h" />
@@ -199,12 +203,22 @@
     <None Include="src\shaders\lib\EffectLib.hlsli" />
     <None Include="src\shaders\lib\GlobalBuffer.hlsli" />
     <None Include="src\shaders\lib\Material.hlsli" />
+    <None Include="src\shaders\lib\Math.hlsli" />
     <None Include="src\shaders\lib\TransformBuffer.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX12_Engine.rc" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="src\shaders\debug\DebugGBufferPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\shaders\debug\DebugGBufferVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="src\shaders\deferred\FrameCompositorPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>

@@ -96,8 +96,6 @@ DX12RenderTarget::DX12RenderTarget(const RenderTargetDesc & i_Desc)
 
 	for (size_t i = 0; i < m_FrameCount; ++i)
 	{
-		D3D12_RENDER_TARGET_VIEW_DESC desc;
-
 		device->CreateRenderTargetView(m_RenderTarget[i], nullptr, rtvHandle);
 		// we increment the rtv handle by the rtv descriptor size we got above
 		rtvHandle.Offset(1, m_RenderTargetDesc->GetDescriptorSize());

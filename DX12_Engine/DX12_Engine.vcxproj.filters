@@ -91,6 +91,9 @@
     <Filter Include="Shaders\Markup">
       <UniqueIdentifier>{85225fdb-0ab0-4f1f-be0d-7a72a8343e3b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Debug">
+      <UniqueIdentifier>{71bf94fd-dd8f-4aab-a540-c8b120df704a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
@@ -209,6 +212,12 @@
     </ClCompile>
     <ClCompile Include="src\ui\UITexture.cpp">
       <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dx12\DX12Debug.cpp">
+      <Filter>Source Files\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dx12\DX12DepthBuffer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -353,6 +362,12 @@
     <ClInclude Include="src\editor\Editor.h">
       <Filter>Header Files\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="src\dx12\DX12Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dx12\DX12DepthBuffer.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\fonts\Arial-font.png">
@@ -401,6 +416,9 @@
     <None Include="src\shaders\markup\MaterialMarkupVS.hlsl">
       <Filter>Shaders\Markup</Filter>
     </None>
+    <None Include="src\shaders\lib\Math.hlsli">
+      <Filter>Shaders\Lib</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX12_Engine.rc">
@@ -425,6 +443,12 @@
     </FxCompile>
     <FxCompile Include="src\shaders\deferred\FrameCompositorVS.hlsl">
       <Filter>Shaders\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\debug\DebugGBufferPS.hlsl">
+      <Filter>Shaders\Debug</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\debug\DebugGBufferVS.hlsl">
+      <Filter>Shaders\Debug</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

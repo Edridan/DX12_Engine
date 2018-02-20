@@ -8,9 +8,8 @@
 #include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RenderTarget.h"
 #include "dx12/DX12MeshBuffer.h"
+#include "dx12/DX12DepthBuffer.h"
 #include "engine/Engine.h"
-
-
 
 // Static definition implementation
 DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
@@ -278,43 +277,62 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	// -- Create depth/stencil buffer -- //
 
 	// create a depth stencil descriptor heap so we can get a pointer to the depth stencil buffer
-	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-	dsvHeapDesc.NumDescriptors = 1;
-	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	hr = m_Device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DepthStencilDescriptorHeap));
+	//D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+	//dsvHeapDesc.NumDescriptors = 1;
+	//dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	//dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	//hr = m_Device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DepthStencilDescriptorHeap));
 
-	if (FAILED(hr))
-	{
-		ASSERT_ERROR("Error during CreateDescriptorHeap Depth/Stencil creation");
-		return hr;
-	}
+	//if (FAILED(hr))
+	//{
+	//	ASSERT_ERROR("Error during CreateDescriptorHeap Depth/Stencil creation");
+	//	return hr;
+	//}
 
-	D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-	depthStencilViewDesc.Format			= DXGI_FORMAT_D32_FLOAT;
-	depthStencilViewDesc.ViewDimension	= D3D12_DSV_DIMENSION_TEXTURE2D;
-	depthStencilViewDesc.Flags			= D3D12_DSV_FLAG_NONE;
+	//D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
+	//depthStencilViewDesc.Format			= DXGI_FORMAT_D32_FLOAT;
+	//depthStencilViewDesc.ViewDimension	= D3D12_DSV_DIMENSION_TEXTURE2D;
+	//depthStencilViewDesc.Flags			= D3D12_DSV_FLAG_NONE;
+
+
+
+	//m_Device->CreateCommittedResource(
+	//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+	//	D3D12_HEAP_FLAG_NONE,
+	//	&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_WindowSize.x, m_WindowSize.y, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+	//	D3D12_RESOURCE_STATE_DEPTH_WRITE,
+	//	&depthOptimizedClearValue,
+	//	IID_PPV_ARGS(&m_DepthStencilBuffer)
+	//);
+
+	//m_DepthStencilDescriptorHeap->SetName(L"Depth/Stencil Resource Heap");
+
+	//// create view
+	//m_Device->CreateDepthStencilView(m_DepthStencilBuffer, &depthStencilViewDesc, m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	//m_DepthStencilBuffer->SetName(L"Depth Stencil buffer");
+
 
 	D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
 	depthOptimizedClearValue.Format					= DXGI_FORMAT_D32_FLOAT;
 	depthOptimizedClearValue.DepthStencil.Depth		= 1.0f;
 	depthOptimizedClearValue.DepthStencil.Stencil	= 0;
 
-	m_Device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_WindowSize.x, m_WindowSize.y, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
-		D3D12_RESOURCE_STATE_DEPTH_WRITE,
-		&depthOptimizedClearValue,
-		IID_PPV_ARGS(&m_DepthStencilBuffer)
-	);
+	DX12DepthBuffer::DepthBufferDesc depthBufferDesc;
 
-	m_DepthStencilDescriptorHeap->SetName(L"Depth/Stencil Resource Heap");
+	depthBufferDesc.Name = L"Depth buffer";
+	depthBufferDesc.BufferSize		= IntVec2(m_WindowSize.x, m_WindowSize.y);
+	depthBufferDesc.Format			= DXGI_FORMAT_D32_FLOAT;
+	depthBufferDesc.Flags			= D3D12_DSV_FLAG_NONE;
+	depthBufferDesc.DepthOptimizedClearValue = depthOptimizedClearValue;
 
-	// create view
-	m_Device->CreateDepthStencilView(m_DepthStencilBuffer, &depthStencilViewDesc, m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	m_DepthBuffer = new DX12DepthBuffer(depthBufferDesc);
 
-	m_DepthStencilBuffer->SetName(L"Depth Stencil buffer");
+#ifdef DX12_DEBUG
+	DX12Debug::DX12DebugDesc debugDesc;
+
+	DX12Debug::Create(debugDesc);
+#endif
 
 
 	// -- Setup viewport and scissor -- //
@@ -473,6 +491,11 @@ ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_H
 	return resource;
 }
 
+void DX12RenderEngine::CreateComittedResource(const D3D12_HEAP_PROPERTIES * pHeapProperties, D3D12_HEAP_FLAGS HeapFlags, const D3D12_RESOURCE_DESC * pResourceDesc, D3D12_RESOURCE_STATES InitialResourceState, const D3D12_CLEAR_VALUE * pOptimizedClearValue, REFIID riidResource, void ** ppvResource)
+{
+	m_Device->CreateCommittedResource(pHeapProperties, HeapFlags, pResourceDesc, InitialResourceState, pOptimizedClearValue, riidResource, ppvResource);
+}
+
 int DX12RenderEngine::GetFrameIndex() const
 {
 	return m_FrameIndex;
@@ -575,8 +598,7 @@ void DX12RenderEngine::CleanUp()
 	SAFE_RELEASE(m_SwapChain);
 	SAFE_RELEASE(m_CommandQueue);
 
-	SAFE_RELEASE(m_DepthStencilBuffer);
-	SAFE_RELEASE(m_DepthStencilDescriptorHeap);
+	delete m_DepthBuffer;
 
 	// delete resources
 	for (int i = 0; i < EConstantBufferId::eConstantBufferCount; ++i)
@@ -838,7 +860,7 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 	}
 
 	// get a handle to the depth/stencil buffer
-	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_DepthBuffer->GetDepthStencilDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
 	// set the render target for the output merger stage (the output of the pipeline)
 	context->GetCommandList()->OMSetRenderTargets(eRenderTargetCount, rtvHandle, FALSE, &dsvHandle);
@@ -849,7 +871,7 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 	}
 
 	// clear depth buffer
-	context->GetCommandList()->ClearDepthStencilView(m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	context->GetCommandList()->ClearDepthStencilView(m_DepthBuffer->GetDepthStencilDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	// Setting up the command list
 	context->GetCommandList()->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());

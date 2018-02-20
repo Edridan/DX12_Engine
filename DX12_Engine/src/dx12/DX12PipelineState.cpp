@@ -110,10 +110,10 @@ DX12PipelineState::DX12PipelineState(const PipelineStateDesc & i_Desc)
 	// Create default pso
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineDesc = {};
 
-	pipelineDesc.InputLayout = m_InputLayout; // the structure describing our input layout
-	pipelineDesc.pRootSignature = m_RootSignature->GetRootSignature(); // the root signature that describes the input data this pso needs
-	pipelineDesc.VS = m_VertexShader->GetByteCode(); // structure describing where to find the vertex shader bytecode and how large it is	(thx ZELDARCK)
-	pipelineDesc.PS = m_PixelShader->GetByteCode(); // same as VS but for pixel shader
+	pipelineDesc.InputLayout = m_InputLayout;
+	pipelineDesc.pRootSignature = m_RootSignature->GetRootSignature(); 
+	pipelineDesc.VS = m_VertexShader->GetByteCode(); // Special thanks to Zeldarck
+	pipelineDesc.PS = m_PixelShader->GetByteCode();
 	pipelineDesc.PrimitiveTopologyType = i_Desc.PrimitiveTopologyType;
 	pipelineDesc.SampleDesc = sampleDesc;
 	pipelineDesc.SampleMask = 0xffffffff;
@@ -121,7 +121,7 @@ DX12PipelineState::DX12PipelineState(const PipelineStateDesc & i_Desc)
 	pipelineDesc.BlendState = i_Desc.BlendState;
 	pipelineDesc.NumRenderTargets = i_Desc.RenderTargetCount;
 	pipelineDesc.DSVFormat = i_Desc.DepthStencilFormat;
-	pipelineDesc.DepthStencilState = i_Desc.DepthStencilDesc; // a default depth stencil state
+	pipelineDesc.DepthStencilState = i_Desc.DepthStencilDesc;
 	
 	for (UINT i = 0; i < i_Desc.RenderTargetCount; ++i)
 	{
@@ -138,7 +138,6 @@ DX12PipelineState::~DX12PipelineState()
 
 	// clear allocated resources
 	delete [] m_InputLayout.pInputElementDescs;
-
 }
 
 const D3D12_INPUT_LAYOUT_DESC & DX12PipelineState::GetLayoutDesc() const
