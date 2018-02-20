@@ -40,6 +40,8 @@ public:
 		DXGI_FORMAT						RenderTargetFormat[8];	// 8 render target maximum
 		UINT							RenderTargetCount = 1;	// render target count
 		CD3DX12_DEPTH_STENCIL_DESC		DepthStencilDesc;
+		// depth
+		bool							DepthEnabled;
 		DXGI_FORMAT						DepthStencilFormat;
 		D3D12_BLEND_DESC				BlendState;
 	};
@@ -54,9 +56,11 @@ public:
 	ID3D12PipelineState *				GetPipelineState() const;
 	const DX12RootSignature *			GetDX12RootSignature() const;
 
-private:
 	// helpers
-	void			CopyInputLayout(D3D12_INPUT_LAYOUT_DESC & o_Buffer, const D3D12_INPUT_LAYOUT_DESC & i_InputLayout);
+	static void			CopyInputLayout(D3D12_INPUT_LAYOUT_DESC & o_Buffer, const D3D12_INPUT_LAYOUT_DESC & i_InputLayout);
+
+private:
+
 
 	// dx12
 	D3D12_INPUT_LAYOUT_DESC		m_InputLayout;	// saved input layout

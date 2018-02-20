@@ -100,6 +100,7 @@ private:
 #if  defined(_DEBUG) || defined(WITH_EDITOR)
 	void	OnF1Down(void * i_Void);
 	void	OnF2Down(void * i_Void);
+	void	OnF5Down(void * i_Void);
 
 	// debug UI management
 	// ui windows for debug, editor and other

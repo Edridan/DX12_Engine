@@ -1,5 +1,6 @@
 #include "dx12/DX12Shader.h"
 
+#include "engine/Debug.h"
 #include <d3dcompiler.h>
 #include <string> 
 #include <string.h>
@@ -45,7 +46,7 @@ DX12Shader::DX12Shader(EShaderType i_Type, const wchar_t * i_Filename, const D3D
 		// Draw debug in display and messagebox
 		MessageBoxA(NULL, (char*)errorBuff->GetBufferPointer(),
 			"Shader compilation error", MB_OK | MB_ICONERROR);
-
+		DEBUG_BREAK;
 		return;
 	}
 

@@ -2,8 +2,6 @@
 Texture2D tex			: register(t0);
 SamplerState tex_sample	: register(s0);
 
-#include "../Lib/Math.hlsli"
-
 struct VS_OUTPUT
 {
 	float4 pos		: SV_POSITION;

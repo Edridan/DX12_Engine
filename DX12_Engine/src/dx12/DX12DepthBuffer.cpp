@@ -5,6 +5,7 @@
 DX12DepthBuffer::DX12DepthBuffer(const DepthBufferDesc & i_Desc)
 	:m_DepthStencilBuffer(nullptr)
 	,m_DepthStencilDescriptorHeap(nullptr)
+	,m_Format(i_Desc.Format)
 {
 	// retreive the device to create resource
 	ID3D12Device * device = DX12RenderEngine::GetInstance().GetDevice();
@@ -44,6 +45,11 @@ DX12DepthBuffer::~DX12DepthBuffer()
 {
 	SAFE_RELEASE(m_DepthStencilBuffer);
 	SAFE_RELEASE(m_DepthStencilDescriptorHeap);
+}
+
+DXGI_FORMAT DX12DepthBuffer::GetFormat() const
+{
+	return m_Format;
 }
 
 ID3D12DescriptorHeap * DX12DepthBuffer::GetDepthStencilDescriptorHeap() const

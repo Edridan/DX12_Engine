@@ -17,7 +17,7 @@ public:
 	struct WorldDesc
 	{
 		UINT		MaxActors = 0;
-		Padding		Bounds = { 0.f, 0.f, 0.f, 0.f };	// unlimited bounds by default
+		Rect		Bounds = { 0.f, 0.f, 0.f, 0.f };	// unlimited bounds by default
 
 		// initial camera position
 		XMFLOAT4	CameraPosition = XMFLOAT4(0.f, 0.f, -1.f, 1.f);

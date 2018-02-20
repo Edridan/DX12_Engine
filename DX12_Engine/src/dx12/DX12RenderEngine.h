@@ -13,6 +13,8 @@
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12Shader.h"
 
+#include "engine/Utils.h"
+
 #ifdef _DEBUG
 #include "DX12Debug.h"
 #include <D3d12sdklayers.h>
@@ -79,6 +81,7 @@ public:
 	};
 
 	DX12RenderTarget *			GetRenderTarget(ERenderTargetId i_Id) const;
+	DX12DepthBuffer *			GetDepthBuffer() const;
 
 	// deferred contexts
 	enum EContextId
@@ -128,6 +131,17 @@ public:
 	int								GetFrameIndex() const;
 	int								GetFrameBufferCount() const;
 
+#ifdef DX12_DEBUG
+	void			EnableDebug(bool i_Enable) const;
+	bool			DebugIsEnabled() const;
+#endif
+
+	// render primitive 2D
+	void							PushRectPrimitive2D(ID3D12GraphicsCommandList * i_CommandList) const;
+	D3D12_INPUT_LAYOUT_DESC			GetPrimitiveInputLayout() const;
+
+	// viewport management
+	D3D12_VIEWPORT					GetViewportOnRect(const Rect & i_ViewPort) const;	// coordinates are in : 0 to 1 ranges
 	D3D12_RECT &					GetScissor();
 	D3D12_VIEWPORT &				GetViewport();
 	IntVec2							GetRenderSize() const;
@@ -155,6 +169,7 @@ private:
 	HRESULT				UpdatePipeline();				// called in Render()
 	HRESULT				WaitForPreviousFrame();			// called in PrepareForRender()
 	HRESULT				GenerateImmediateContext();		// create immediate context, final rendering pipelines(later : post process management)
+	void				GeneratePrimitiveShapes();		// create primitive 2D shapes
 	// Initialize contexts to prepare for render
 	HRESULT				InitializeImmediateContext();
 	HRESULT				InitializeDeferredContext();
@@ -174,6 +189,7 @@ private:
 
 #ifdef DX12_DEBUG
 	ID3D12Debug *				m_DebugController;
+	DX12Debug *					m_Debug;
 #endif
 
 	// Render target
@@ -186,6 +202,9 @@ private:
 	// Immediate context pipeline state
 	DX12RootSignature *		m_ImmediateRootSignature;
 	DX12PipelineState *		m_ImmediatePipelineState;
+	
+
+	// primitive rectangle mesh
 	DX12MeshBuffer *		m_RectMesh;
 
 	// Depth buffer

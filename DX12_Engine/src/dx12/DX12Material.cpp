@@ -5,6 +5,7 @@
 #include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RootSignature.h"
 #include "dx12/DX12RenderTarget.h"
+#include "dx12/DX12DepthBuffer.h"
 #include "dx12/DX12Texture.h"
 #include "engine/Utils.h"
 
@@ -108,7 +109,7 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 
 	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
 	desc.DepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
-	desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+	desc.DepthStencilFormat = render.GetDepthBuffer()->GetFormat();
 
 	m_PipelineState = new DX12PipelineState(desc);
 }

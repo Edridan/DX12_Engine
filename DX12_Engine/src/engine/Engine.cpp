@@ -117,8 +117,9 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_UILayer->PushUIWindowOnLayer(m_UIConsole);
 	m_UILayer->PushUIWindowOnLayer(m_UIDebug);
 
-	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F2, "F2Debug", Input::eCtrlDown, this, &Engine::OnF2Down, nullptr);
 	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F1, "F1Debug", this, &Engine::OnF1Down, nullptr);
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F2, "F2Debug", this, &Engine::OnF2Down, nullptr);
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F5, "F5Debug", this, &Engine::OnF5Down, nullptr);
 #endif
 
 	// initialize console
@@ -353,6 +354,11 @@ void Engine::OnF1Down(void * i_Void)
 void Engine::OnF2Down(void * i_Void)
 {
 	m_UIDebug->SetActive(!m_UIDebug->IsActive());
+}
+
+void Engine::OnF5Down(void * i_Void)
+{
+	m_RenderEngine->EnableDebug(!m_RenderEngine->DebugIsEnabled());
 }
 
 #endif

@@ -24,6 +24,7 @@ class DX12Mesh;
 class DX12RenderTarget;
 class DX12PipelineState;
 class DX12RootSignature;
+class DX12DepthBuffer;
 // engine
 class Transform;
 
@@ -40,10 +41,10 @@ public:
 		DX12RenderTarget *		BackBuffer = nullptr;
 		DX12RenderTarget		* NormalRT = nullptr, * DiffuseRT = nullptr, * SpecularRT = nullptr, * PositionRT = nullptr;
 		// depth buffer descriptor
-		ID3D12DescriptorHeap *	DepthDesc = nullptr;
+		DX12DepthBuffer *		DepthBuffer = nullptr;
 
 		// 3D render debug
-		UINT32				LineCount;	// line count for 3D debug
+		UINT32		LineCount;	// line count for 3D debug
 	};
 
 	// Singleton
@@ -58,6 +59,9 @@ public:
 	// debug management
 	void			SetEnabled(bool i_Enabled);
 	bool			IsEnabled() const;
+
+	// friend class
+	friend class DX12RenderEngine;
 
 private:
 	// singleton management
@@ -81,7 +85,8 @@ private:
 	DX12RenderTarget *			m_SpecularRT;
 	DX12RenderTarget *			m_PositionRT;
 	// Depth
-	ID3D12DescriptorHeap *		m_DepthDesc;
+	DX12DepthBuffer *			m_DepthDesc;
+	DX12Mesh *					m_Rect;
 
 	// DX12 GBuffer debug
 	DX12PipelineState *			m_GBufferDebugPSO;

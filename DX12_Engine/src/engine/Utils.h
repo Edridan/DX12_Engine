@@ -71,10 +71,30 @@ namespace color
 	const Color Pink(1.f, 0.13f, 0.41f);
 }
 
-// padding definition
-struct Padding
+// rect definition
+struct Rect
 {
-	float top, right, bottom, left;
+	float Top, Right, Bottom, Left;
+
+	Rect(float i_Left, float i_Right, float i_Top, float i_Bottom)
+		:Top(i_Top)
+		,Right(i_Right)
+		,Bottom(i_Bottom)
+		,Left(i_Left)
+	{}
+
+	Rect & operator=(const Rect & i_Other)
+	{
+		Top = i_Other.Top;
+		Right = i_Other.Right;
+		Bottom = i_Other.Bottom;
+		Left = i_Other.Left;
+
+		return *this;
+	}
+
+	inline float Width() const	{ return Right - Left; };
+	inline float Height() const { return Top - Bottom; };
 };
 
 

@@ -24,6 +24,7 @@ public:
 	DX12DepthBuffer(const DepthBufferDesc & i_Desc);
 	~DX12DepthBuffer();
 
+	DXGI_FORMAT			GetFormat() const;
 
 	ID3D12DescriptorHeap *		GetDepthStencilDescriptorHeap() const;
 
@@ -31,4 +32,7 @@ private:
 	// dx12
 	ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial
 	ID3D12DescriptorHeap*		m_DepthStencilDescriptorHeap; // This is a heap for our depth/stencil buffer descriptor
+
+	// informations
+	DXGI_FORMAT			m_Format;
 };

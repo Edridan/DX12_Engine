@@ -120,9 +120,14 @@ DX12PipelineState::DX12PipelineState(const PipelineStateDesc & i_Desc)
 	pipelineDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	pipelineDesc.BlendState = i_Desc.BlendState;
 	pipelineDesc.NumRenderTargets = i_Desc.RenderTargetCount;
-	pipelineDesc.DSVFormat = i_Desc.DepthStencilFormat;
-	pipelineDesc.DepthStencilState = i_Desc.DepthStencilDesc;
-	
+
+	// Depth buffer management
+	if (i_Desc.DepthEnabled)
+	{
+		pipelineDesc.DSVFormat = i_Desc.DepthStencilFormat;
+		pipelineDesc.DepthStencilState = i_Desc.DepthStencilDesc;
+	}
+
 	for (UINT i = 0; i < i_Desc.RenderTargetCount; ++i)
 	{
 		pipelineDesc.RTVFormats[i] = i_Desc.RenderTargetFormat[i]; // format of the render target

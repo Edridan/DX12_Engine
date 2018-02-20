@@ -233,6 +233,9 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		return E_FAIL;
 	}
 
+	// -- Generate primitive meshes -- //
+	GeneratePrimitiveShapes();
+
 	// -- Create different render targets for the deferred rendering -- //
 
 	const std::wstring rtName[eRenderTargetCount] =
@@ -267,6 +270,22 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		);
 	}
 
+	// -- Create depth/stencil buffer -- //
+	D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
+	depthOptimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	depthOptimizedClearValue.DepthStencil.Depth = 1.0f;
+	depthOptimizedClearValue.DepthStencil.Stencil = 0;
+
+	DX12DepthBuffer::DepthBufferDesc depthBufferDesc;
+
+	depthBufferDesc.Name = L"Depth buffer";
+	depthBufferDesc.BufferSize = IntVec2(m_WindowSize.x, m_WindowSize.y);
+	depthBufferDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthBufferDesc.Flags = D3D12_DSV_FLAG_NONE;
+	depthBufferDesc.DepthOptimizedClearValue = depthOptimizedClearValue;
+
+	m_DepthBuffer = new DX12DepthBuffer(depthBufferDesc);
+
 	// -- Create multiple default Pipeline State and Root Signature for predifined -- //
 
 	// generate default pipeline states objects
@@ -274,69 +293,22 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	// this features : vertex coloring, one texture handling
 	GenerateImmediateContext();
 
-	// -- Create depth/stencil buffer -- //
-
-	// create a depth stencil descriptor heap so we can get a pointer to the depth stencil buffer
-	//D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-	//dsvHeapDesc.NumDescriptors = 1;
-	//dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-	//dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	//hr = m_Device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DepthStencilDescriptorHeap));
-
-	//if (FAILED(hr))
-	//{
-	//	ASSERT_ERROR("Error during CreateDescriptorHeap Depth/Stencil creation");
-	//	return hr;
-	//}
-
-	//D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-	//depthStencilViewDesc.Format			= DXGI_FORMAT_D32_FLOAT;
-	//depthStencilViewDesc.ViewDimension	= D3D12_DSV_DIMENSION_TEXTURE2D;
-	//depthStencilViewDesc.Flags			= D3D12_DSV_FLAG_NONE;
-
-
-
-	//m_Device->CreateCommittedResource(
-	//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-	//	D3D12_HEAP_FLAG_NONE,
-	//	&CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_WindowSize.x, m_WindowSize.y, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
-	//	D3D12_RESOURCE_STATE_DEPTH_WRITE,
-	//	&depthOptimizedClearValue,
-	//	IID_PPV_ARGS(&m_DepthStencilBuffer)
-	//);
-
-	//m_DepthStencilDescriptorHeap->SetName(L"Depth/Stencil Resource Heap");
-
-	//// create view
-	//m_Device->CreateDepthStencilView(m_DepthStencilBuffer, &depthStencilViewDesc, m_DepthStencilDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
-	//m_DepthStencilBuffer->SetName(L"Depth Stencil buffer");
-
-
-	D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
-	depthOptimizedClearValue.Format					= DXGI_FORMAT_D32_FLOAT;
-	depthOptimizedClearValue.DepthStencil.Depth		= 1.0f;
-	depthOptimizedClearValue.DepthStencil.Stencil	= 0;
-
-	DX12DepthBuffer::DepthBufferDesc depthBufferDesc;
-
-	depthBufferDesc.Name = L"Depth buffer";
-	depthBufferDesc.BufferSize		= IntVec2(m_WindowSize.x, m_WindowSize.y);
-	depthBufferDesc.Format			= DXGI_FORMAT_D32_FLOAT;
-	depthBufferDesc.Flags			= D3D12_DSV_FLAG_NONE;
-	depthBufferDesc.DepthOptimizedClearValue = depthOptimizedClearValue;
-
-	m_DepthBuffer = new DX12DepthBuffer(depthBufferDesc);
-
 #ifdef DX12_DEBUG
 	DX12Debug::DX12DebugDesc debugDesc;
 
+	debugDesc.EnabledByDefault = false;
+	debugDesc.BackBuffer = m_BackBuffer;
+	debugDesc.DepthBuffer = m_DepthBuffer;
+	debugDesc.DiffuseRT = m_RenderTargets[eDiffuse];
+	debugDesc.NormalRT = m_RenderTargets[eNormal];
+	debugDesc.SpecularRT = m_RenderTargets[eSpecular];
+
 	DX12Debug::Create(debugDesc);
+	m_Debug = &DX12Debug::GetInstance();
 #endif
 
 
 	// -- Setup viewport and scissor -- //
-
 	m_Viewport.TopLeftX = 0;
 	m_Viewport.TopLeftY = 0;
 	m_Viewport.Width = (FLOAT)m_WindowSize.x;
@@ -447,6 +419,11 @@ DX12RenderTarget * DX12RenderEngine::GetRenderTarget(ERenderTargetId i_Id) const
 	return m_RenderTargets[i_Id];
 }
 
+DX12DepthBuffer * DX12RenderEngine::GetDepthBuffer() const
+{
+	return m_DepthBuffer;
+}
+
 DX12Context * DX12RenderEngine::GetContext(EContextId i_Id) const
 {
 	ASSERT(i_Id < eContextCount);
@@ -504,6 +481,43 @@ int DX12RenderEngine::GetFrameIndex() const
 int DX12RenderEngine::GetFrameBufferCount() const
 {
 	return m_FrameBufferCount;
+}
+
+#ifdef DX12_DEBUG
+void DX12RenderEngine::EnableDebug(bool i_Enable) const
+{
+	m_Debug->SetEnabled(i_Enable);
+}
+
+bool DX12RenderEngine::DebugIsEnabled() const
+{
+	return m_Debug->IsEnabled();
+}
+#endif /* DX12_DEBUG */
+
+void DX12RenderEngine::PushRectPrimitive2D(ID3D12GraphicsCommandList * i_CommandList) const
+{
+	m_RectMesh->PushOnCommandList(i_CommandList);
+}
+
+D3D12_INPUT_LAYOUT_DESC DX12RenderEngine::GetPrimitiveInputLayout() const
+{
+	return m_RectMesh->GetInputLayout();
+}
+
+D3D12_VIEWPORT DX12RenderEngine::GetViewportOnRect(const Rect & i_ViewPort) const
+{
+	D3D12_VIEWPORT viewport;
+
+	// create the primitive 2D
+	viewport.TopLeftX = i_ViewPort.Left * m_WindowSize.x;
+	viewport.TopLeftY = i_ViewPort.Top * m_WindowSize.y;
+	viewport.Width = i_ViewPort.Height() * m_WindowSize.y;
+	viewport.Height = i_ViewPort.Width() * m_WindowSize.y;
+	viewport.MinDepth = 0;
+	viewport.MaxDepth = 1;
+
+	return viewport;
 }
 
 D3D12_RECT & DX12RenderEngine::GetScissor()
@@ -612,6 +626,8 @@ void DX12RenderEngine::CleanUp()
 	SAFE_RELEASE(m_DebugController);
 #endif
 
+	DX12Debug::Delete();
+
 	SAFE_RELEASE(m_Device);
 }
 
@@ -693,29 +709,7 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 
 HRESULT DX12RenderEngine::GenerateImmediateContext()
 {
-	// create a rectangle mesh for final rendering of buffers
-	const float VRect[] =
-	{
-		-1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
-		1.0f, -1.0f, 0.0f,		1.0f, 0.0f,
-		-1.0f, -1.0f, 0.0f,		0.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,		1.0f, 1.0f
-	};
-
-	const DWORD IRect[] =
-	{
-		0, 1, 2,
-		1, 0, 3
-	};
-
-	// create input layout for the rectangle mesh
-	D3D12_INPUT_LAYOUT_DESC inputLayout;
-	DX12PipelineState::CreateInputLayoutFromFlags(inputLayout, DX12PipelineState::eHaveTexcoord);
-
-	m_RectMesh = new DX12MeshBuffer(inputLayout, (BYTE*)VRect, 4u, IRect, 6u, L"Rect");
-
 	m_ImmediateRootSignature = new DX12RootSignature;
-
 
 	// add static sampler for textures
 	D3D12_STATIC_SAMPLER_DESC sampler = {};
@@ -754,14 +748,12 @@ HRESULT DX12RenderEngine::GenerateImmediateContext()
 
 	m_ImmediateRootSignature->Create(m_Device);
 
-	m_ImmediateRootSignature->IsRegisterFilled("s1:space3");
-
 	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/deferred/FrameCompositorPS.hlsl");
 	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/deferred/FrameCompositorVS.hlsl");
 
 	DX12PipelineState::PipelineStateDesc desc;
 
-	desc.InputLayout = inputLayout;
+	desc.InputLayout = m_RectMesh->GetInputLayout();
 	desc.RootSignature = m_ImmediateRootSignature;
 	desc.VertexShader = VShader;
 	desc.PixelShader = PShader;
@@ -769,12 +761,37 @@ HRESULT DX12RenderEngine::GenerateImmediateContext()
 	desc.RenderTargetCount = 1;
 	desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
 	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
-	desc.DepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
-	desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+	desc.DepthEnabled = false;
+	//desc.DepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
+	//desc.DepthStencilFormat = m_DepthBuffer->GetFormat();
 
 	m_ImmediatePipelineState = new DX12PipelineState(desc);
 
 	return S_OK;
+}
+
+void DX12RenderEngine::GeneratePrimitiveShapes()
+{
+	// create a rectangle mesh for final rendering of buffers
+	const float VRect[] =
+	{
+		-1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
+		1.0f, -1.0f, 0.0f,		1.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f,		0.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,		1.0f, 1.0f
+	};
+
+	const DWORD IRect[] =
+	{
+		0, 1, 2,
+		1, 0, 3
+	};
+
+	// create input layout for the rectangle mesh
+	D3D12_INPUT_LAYOUT_DESC inputLayout;
+	DX12PipelineState::CreateInputLayoutFromFlags(inputLayout, DX12PipelineState::eHaveTexcoord);
+
+	m_RectMesh = new DX12MeshBuffer(inputLayout, (BYTE*)VRect, 4u, IRect, 6u, L"Rect");
 }
 
 FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
@@ -784,9 +801,8 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	// reset the immediate context
 	context->ResetContext();
 
-	// here we start recording commands into the m_CommandList (which all the commands will be stored in the m_CommandAllocator)
-
-	// transition the "m_FrameIndex" render target from the present state to the render target state so the command list draws to it starting from here
+	// setup render targets
+	// now render targets for deferred contexts are bound as shader resources to be used for lighting rendering
 	context->GetCommandList()->ResourceBarrier(1, &m_BackBuffer->GetResourceBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 	for (UINT i = 0; i < eRenderTargetCount; ++i)
@@ -811,13 +827,47 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	// setup primitive topology
 	context->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
 
+#ifdef DX12_DEBUG
+	if (!DebugIsEnabled())
+	{
+		// render immediate context here
+		context->GetCommandList()->SetGraphicsRootSignature(m_ImmediateRootSignature->GetRootSignature());
+		context->GetCommandList()->SetPipelineState(m_ImmediatePipelineState->GetPipelineState());
+
+		// bind textures
+		ID3D12DescriptorHeap * descriptors = nullptr;
+
+		DX12RenderTarget * rt[eRenderTargetCount]
+		{
+			m_RenderTargets[eNormal],
+			m_RenderTargets[eDiffuse],
+			m_RenderTargets[eSpecular],
+		};
+
+		for (UINT i = 0; i < eRenderTargetCount; ++i)
+		{
+			// bind render targets as textures
+			descriptors = rt[i]->GetShaderResourceDescriptorHeap()->GetDescriptorHeap();
+			// update the descriptor for the resources
+			context->GetCommandList()->SetDescriptorHeaps(1, &descriptors);
+			context->GetCommandList()->SetGraphicsRootDescriptorTable(i, rt[i]->GetShaderResourceDescriptorHeap()->GetGPUDescriptorHandle(m_FrameIndex));
+		}
+
+		// render the mesh
+		m_RectMesh->PushOnCommandList(context->GetCommandList());
+	}
+	else
+	{
+		m_Debug->DrawDebugGBuffer(context->GetCommandList());
+	}
+#else
 	// render immediate context here
 	context->GetCommandList()->SetGraphicsRootSignature(m_ImmediateRootSignature->GetRootSignature());
 	context->GetCommandList()->SetPipelineState(m_ImmediatePipelineState->GetPipelineState());
 
 	// bind textures
 	ID3D12DescriptorHeap * descriptors = nullptr;
-	
+
 	DX12RenderTarget * rt[eRenderTargetCount]
 	{
 		m_RenderTargets[eNormal],
@@ -836,6 +886,7 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 
 	// render the mesh
 	m_RectMesh->PushOnCommandList(context->GetCommandList());
+#endif
 
 	return S_OK;
 }

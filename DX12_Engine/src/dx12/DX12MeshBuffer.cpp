@@ -52,6 +52,9 @@ DX12MeshBuffer::DX12MeshBuffer(const D3D12_INPUT_LAYOUT_DESC & i_InputLayout, co
 	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
 	i_InputLayout.NumElements;
 
+	// copy input layout
+	DX12PipelineState::CopyInputLayout(m_InputLayoutDesc, i_InputLayout);
+
 	// retreive informations
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
