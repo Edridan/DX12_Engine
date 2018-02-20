@@ -512,8 +512,8 @@ D3D12_VIEWPORT DX12RenderEngine::GetViewportOnRect(const Rect & i_ViewPort) cons
 	// create the primitive 2D
 	viewport.TopLeftX = i_ViewPort.Left * m_WindowSize.x;
 	viewport.TopLeftY = i_ViewPort.Top * m_WindowSize.y;
-	viewport.Width = i_ViewPort.Height() * m_WindowSize.y;
-	viewport.Height = i_ViewPort.Width() * m_WindowSize.y;
+	viewport.Width = i_ViewPort.Width() * m_WindowSize.x;
+	viewport.Height = i_ViewPort.Height() * m_WindowSize.y;
 	viewport.MinDepth = 0;
 	viewport.MaxDepth = 1;
 

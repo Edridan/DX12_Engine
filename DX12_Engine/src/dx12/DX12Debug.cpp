@@ -117,8 +117,7 @@ DX12Debug::DX12Debug(const DX12DebugDesc & i_Setup)
 	desc.RenderTargetCount = 1;
 	desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
 	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
-	desc.DepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
-	desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+	desc.DepthEnabled = false;
 
 	m_GBufferDebugPSO = new DX12PipelineState(desc);
 }
@@ -171,7 +170,7 @@ void DX12Debug::DrawDebugGBuffer(ID3D12GraphicsCommandList * i_CommandList) cons
 		descriptors = rt[i]->GetShaderResourceDescriptorHeap()->GetDescriptorHeap();
 		// update the descriptor for the resources
 		i_CommandList->SetDescriptorHeaps(1, &descriptors);
-		i_CommandList->SetGraphicsRootDescriptorTable(1, rt[i]->GetShaderResourceDescriptorHeap()->GetGPUDescriptorHandle(frameIndex));
+		i_CommandList->SetGraphicsRootDescriptorTable(0, rt[i]->GetShaderResourceDescriptorHeap()->GetGPUDescriptorHandle(frameIndex));
 
 		// draw 2D rect
 		render.PushRectPrimitive2D(i_CommandList);
