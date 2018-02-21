@@ -21,6 +21,10 @@ public:
 	void		SetScale(const XMFLOAT3 & i_Scale);
 	XMFLOAT3	GetScale() const;
 
+	// rotation
+	void		SetRotation(const XMFLOAT3 & i_Rotation);
+	XMFLOAT3	GetRotation() const;
+
 	// Retreive the matrix of transform
 	XMFLOAT4X4		GetMatrix();
 	XMFLOAT4X4		GetTransposed();

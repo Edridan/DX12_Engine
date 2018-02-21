@@ -53,6 +53,17 @@ bool Actor::NeedRendering() const
 	return (m_RenderComponent != nullptr) && (!m_Hidden);
 }
 
+UINT Actor::ChildCount() const
+{
+	return (UINT)m_Children.size();
+}
+
+Actor * Actor::GetChild(UINT i_Index) const
+{
+	ASSERT(i_Index < m_Children.size());
+	return m_Children[i_Index];
+}
+
 UINT64 Actor::GetId() const
 {
 	return m_Id;
@@ -82,6 +93,13 @@ RenderComponent * Actor::GetRenderComponent() const
 {
 	return m_RenderComponent;
 }
+
+#ifdef WITH_EDITOR
+void Actor::SetName(const std::wstring & i_NewName)
+{
+	m_Name = i_NewName;
+}
+#endif
 
 Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 	:m_Children()

@@ -9,6 +9,7 @@
 #include <string>
 
 #include "engine/Transform.h"
+#include "engine/Defines.h"
 #include "RenderComponent.h"
 
 // class predef
@@ -43,6 +44,10 @@ public:
 	bool	NeedTick() const;
 	bool	IsHidden() const;
 	bool	NeedRendering() const;
+
+	UINT	ChildCount() const;
+	Actor *	GetChild(UINT i_Index) const;
+
 	// actor specs
 	UINT64					GetId() const;
 	const std::wstring &	GetName() const;
@@ -52,6 +57,12 @@ public:
 	void				AttachRenderComponent(const RenderComponent::RenderComponentDesc & i_ComponentDesc);	// Take the render component and make a copy for the game object
 	bool				DetachRenderComponent();
 	RenderComponent *	GetRenderComponent() const;
+
+
+	// editor purpose
+#ifdef WITH_EDITOR
+	void	SetName(const std::wstring & i_NewName);
+#endif
 
 	// friend class
 	friend class World;

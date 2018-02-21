@@ -3,10 +3,12 @@
 
 #pragma once
 
-#include "engine/Engine.h"
-#include "ui/UIWindow.h"
+#include "engine/Defines.h"
+
 
 #ifdef WITH_EDITOR
+
+#include "ui/UIWindow.h"
 
 class UIMaterialBuilder : public UIWindow
 {
@@ -14,8 +16,9 @@ public:
 	UIMaterialBuilder();
 	~UIMaterialBuilder();
 
-private:
+	// window management
 
+private:
 
 	// Inherited via UIWindow
 	virtual void DrawWindow() override;

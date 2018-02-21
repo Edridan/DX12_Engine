@@ -1,6 +1,6 @@
 // this include scene graph and object viewer
 
-#include "engine/Engine.h"
+#include "engine/Defines.h"
 
 #ifdef WITH_EDITOR
 
@@ -10,32 +10,34 @@
 class World;
 class Actor;
 class Transform;
+// other linked windows
+class UIActorBuilder;
 
 class UISceneBuilder : public UIWindow
 {
 public:
-	UISceneBuilder();
+	UISceneBuilder(UIActorBuilder * i_ActorBuilder = nullptr);
 	~UISceneBuilder();
 
 	// management
 	void SetWorld(World * i_World);
+
 	World * GetWorld() const;
 
-
-
 private:
+	// world
 	World *			m_World;
 
-	std::vector<Actor *>	m_RootActors;
-	std::vector<Actor *>	m_Actors;
+	// internal call
+	void			AddEmptyActor(const Transform & i_Transform, const char * i_Name);	// add empty actor to the world
+	
+	// internal render
+	void			DrawActor(Actor * i_Actor);
 
 	// Inherited via UIWindow
 	virtual void DrawWindow() override;
-	
-	// internal callbacks
-	void		DrawActorObject(Actor * i_Actor);
-	void		DrawTransform(Transform * i_Transform);
-	void		DrawVector(DirectX::XMFLOAT3 & i_Vector, const char * i_Name, DirectX::XMFLOAT3 * o_Save = nullptr);
+
+	UIActorBuilder *		m_ActorBuilder;
 };
 
 #endif

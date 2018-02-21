@@ -223,10 +223,13 @@
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
     <ClCompile Include="src\editor\Editor.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\editor\UIActorBuilder.cpp">
+      <Filter>Source Files\Editor</Filter>
     </ClCompile>
     <ClCompile Include="src\editor\UIMaterialBuilder.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -385,6 +388,12 @@
     </ClInclude>
     <ClInclude Include="src\dx12\DX12Debug.h">
       <Filter>Header Files\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\editor\UIActorBuilder.h">
+      <Filter>Header Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Defines.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

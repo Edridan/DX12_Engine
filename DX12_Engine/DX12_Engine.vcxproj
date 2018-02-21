@@ -109,6 +109,7 @@
     <ClCompile Include="src\dx12\DX12Texture.cpp" />
     <ClCompile Include="src\dx12\DX12Utils.cpp" />
     <ClCompile Include="src\editor\Editor.cpp" />
+    <ClCompile Include="src\editor\UIActorBuilder.cpp" />
     <ClCompile Include="src\editor\UIMaterialBuilder.cpp" />
     <ClCompile Include="src\editor\UISceneBuilder.cpp" />
     <ClCompile Include="src\engine\Clock.cpp" />
@@ -161,11 +162,13 @@
     <ClInclude Include="src\dx12\DX12Texture.h" />
     <ClInclude Include="src\dx12\DX12Utils.h" />
     <ClInclude Include="src\editor\Editor.h" />
+    <ClInclude Include="src\editor\UIActorBuilder.h" />
     <ClInclude Include="src\editor\UIMaterialBuilder.h" />
     <ClInclude Include="src\editor\UISceneBuilder.h" />
     <ClInclude Include="src\engine\Clock.h" />
     <ClInclude Include="src\engine\Console.h" />
     <ClInclude Include="src\engine\Debug.h" />
+    <ClInclude Include="src\engine\Defines.h" />
     <ClInclude Include="src\engine\Engine.h" />
     <ClInclude Include="src\engine\Input.h" />
     <ClInclude Include="src\engine\RenderList.h" />

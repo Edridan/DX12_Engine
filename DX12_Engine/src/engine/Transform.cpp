@@ -23,10 +23,12 @@ Transform::~Transform()
 void Transform::SetPosition(const XMFLOAT3 & i_Position)
 {
 	m_Position = DirectX::XMLoadFloat3(&i_Position);
+	m_NeedToRecompute = true;
 }
 
 void Transform::Translate(const XMFLOAT3 & i_Translation)
 {
+	m_NeedToRecompute = true;
 	XMVECTOR translation = DirectX::XMLoadFloat3(&i_Translation);
 	m_Position += translation;
 }
@@ -40,6 +42,7 @@ XMFLOAT3 Transform::GetPosition() const
 
 void Transform::SetScale(const XMFLOAT3 & i_Scale)
 {
+	m_NeedToRecompute = true;
 	m_Scale = DirectX::XMLoadFloat3(&i_Scale);
 }
 
@@ -47,6 +50,19 @@ XMFLOAT3 Transform::GetScale() const
 {
 	XMFLOAT3 vRet;
 	DirectX::XMStoreFloat3(&vRet, m_Scale);
+	return vRet;
+}
+
+void Transform::SetRotation(const XMFLOAT3 & i_Rotation)
+{
+	m_NeedToRecompute = true;
+	m_Rotation = DirectX::XMLoadFloat3(&i_Rotation);
+}
+
+XMFLOAT3 Transform::GetRotation() const
+{
+	XMFLOAT3 vRet;
+	DirectX::XMStoreFloat3(&vRet, m_Rotation);
 	return vRet;
 }
 

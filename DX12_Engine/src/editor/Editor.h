@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "engine/Engine.h"
-#include <WinUser.h>
+#include "engine/Defines.h"
 
 #ifdef WITH_EDITOR
 
 // Editor differents windows
 class UIMaterialBuilder;
 class UISceneBuilder;
+class UIActorBuilder;
 class UILayer;
 
 #include "engine/Input.h"
@@ -26,22 +26,22 @@ public:
 
 private:
 
-	
-
 	struct EditorDesc
 	{
 		UILayer *		Layer;
 		bool			EnabledByDefault = false;
 		// shortcuts
-		Input::ShortCut		InputShowMaterial	= Input::ShortCut(0x4D);
-		Input::ShortCut		InputShowScene		= Input::ShortCut(0x57);
+		Input::ShortCut		InputShowMaterial	= Input::ShortCut(0x4D);	// M
+		Input::ShortCut		InputShowScene		= Input::ShortCut(0x57);	// W
+		Input::ShortCut		InputActorBuilder	= Input::ShortCut(0x4C);	// L
 	};
 
 	struct EditorShortCuts
 	{
 		// shortcuts
-		Input::ShortCut		InputShowMaterial = Input::ShortCut(0x4D);
-		Input::ShortCut		InputShowScene = Input::ShortCut(0x57);
+		Input::ShortCut		InputShowMaterial	= Input::ShortCut(0x4D);
+		Input::ShortCut		InputShowScene		= Input::ShortCut(0x57);
+		Input::ShortCut		InputActorBuilder	= Input::ShortCut(0x4C);
 	};
 
 	Editor(const EditorDesc & i_Desc);
@@ -61,6 +61,7 @@ private:
 	// editor management
 	UIMaterialBuilder *		m_MaterialBuilder;
 	UISceneBuilder *		m_SceneBuilder;
+	UIActorBuilder *		m_ActorBuilder;
 	bool					m_IsEnabled;
 
 	// engine

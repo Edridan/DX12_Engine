@@ -49,7 +49,7 @@ UINT World::GetActorCount() const
 
 UINT World::GetRootActorCount() const
 {
-	return m_RootActors.size();
+	return (UINT)m_RootActors.size();
 }
 
 
