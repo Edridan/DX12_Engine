@@ -141,10 +141,10 @@ void DX12Debug::DrawDebugGBuffer(ID3D12GraphicsCommandList * i_CommandList) cons
 	*/
 	static const Rect rect[4] =
 	{
-		Rect(0.0f, 0.5f, 0.5f, 0.0f),
-		Rect(0.0f, 0.5f, 1.0f, 0.5f),
-		Rect(0.5f, 1.0f, 0.5f, 0.0f),
-		Rect(0.5f, 1.0f, 1.0f, 0.5f)
+		Rect(0.0f, 0.5f, 0.0f, 0.5f),
+		Rect(0.0f, 0.5f, 0.5f, 1.0f),
+		Rect(0.5f, 1.0f, 0.0f, 0.5f),
+		Rect(0.5f, 1.0f, 0.5f, 1.0f)
 	};
 
 	static const DX12RenderTarget * rt[4]

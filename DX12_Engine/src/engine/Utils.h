@@ -76,6 +76,14 @@ struct Rect
 {
 	float Top, Right, Bottom, Left;
 
+	// create unitary rect
+	Rect()
+		:Top(0.f)
+		,Right(0.f)
+		,Bottom(1.f)
+		,Left(1.f)
+	{}
+
 	Rect(float i_Left, float i_Right, float i_Top, float i_Bottom)
 		:Top(i_Top)
 		,Right(i_Right)
@@ -94,7 +102,7 @@ struct Rect
 	}
 
 	inline float Width() const	{ return Right - Left; };
-	inline float Height() const { return Top - Bottom; };
+	inline float Height() const { return Bottom - Top; };
 };
 
 

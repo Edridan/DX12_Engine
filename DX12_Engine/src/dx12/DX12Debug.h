@@ -18,6 +18,7 @@
 #include "engine/Utils.h"
 
 #include <DirectXMath.h>
+#include <vector>
 
 // class predef
 class DX12Mesh;
@@ -86,7 +87,8 @@ private:
 	DX12RenderTarget *			m_PositionRT;
 	// Depth
 	DX12DepthBuffer *			m_DepthDesc;
-	DX12Mesh *					m_Rect;
+
+	std::vector<Rect>			m_Rect;
 
 	// DX12 GBuffer debug
 	DX12PipelineState *			m_GBufferDebugPSO;
