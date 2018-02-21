@@ -120,6 +120,8 @@ DX12Debug::DX12Debug(const DX12DebugDesc & i_Setup)
 	desc.DepthEnabled = false;
 
 	m_GBufferDebugPSO = new DX12PipelineState(desc);
+
+	GenerateViewportGrid(m_Rect, 2, 2);
 }
 
 DX12Debug::~DX12Debug()
@@ -133,19 +135,6 @@ void DX12Debug::DrawDebugGBuffer(ID3D12GraphicsCommandList * i_CommandList) cons
 
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 	const UINT frameIndex = render.GetFrameIndex();
-	/*
-	LONG    left;
-	LONG    top;
-	LONG    right;
-	LONG    bottom;
-	*/
-	static const Rect rect[4] =
-	{
-		Rect(0.0f, 0.5f, 0.0f, 0.5f),
-		Rect(0.0f, 0.5f, 0.5f, 1.0f),
-		Rect(0.5f, 1.0f, 0.0f, 0.5f),
-		Rect(0.5f, 1.0f, 0.5f, 1.0f)
-	};
 
 	static const DX12RenderTarget * rt[4]
 	{
@@ -162,7 +151,7 @@ void DX12Debug::DrawDebugGBuffer(ID3D12GraphicsCommandList * i_CommandList) cons
 
 	for (UINT i = 0; i < 4; ++i)
 	{
-		D3D12_VIEWPORT viewport = render.GetViewportOnRect(rect[i]);
+		D3D12_VIEWPORT viewport = render.GetViewportOnRect(m_Rect[i]);
 
 		i_CommandList->RSSetViewports(1, &viewport);
 
@@ -178,6 +167,22 @@ void DX12Debug::DrawDebugGBuffer(ID3D12GraphicsCommandList * i_CommandList) cons
 
 	// reset the viewport for the next draws
 	i_CommandList->RSSetViewports(1, &render.GetViewport());
+}
+
+void DX12Debug::GenerateViewportGrid(std::vector<Rect>& o_Vec, UINT i_XCount, UINT i_YCount)
+{
+	float XStep = 1.f / (float)i_XCount;
+	float YStep = 1.f / (float)i_YCount;
+
+	for (UINT x = 0; x < i_XCount; ++x)
+	{
+		for (UINT y = 0; y < i_YCount; ++y)
+		{
+			const float left = x * XStep;
+			const float top = y * YStep;
+			m_Rect.push_back(Rect(left, left + XStep, top, top + YStep));
+		}
+	}
 }
 
 #endif /* DX12_DEBUG */

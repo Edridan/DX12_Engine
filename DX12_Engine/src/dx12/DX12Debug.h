@@ -70,7 +70,7 @@ private:
 
 	// internal debug management (managed by RenderEngine)
 	void			DrawDebugGBuffer(ID3D12GraphicsCommandList * i_CommandList) const;	// draw GBuffer on the immediate context
-
+	void			GenerateViewportGrid(std::vector<Rect> & o_Vec, UINT i_XCount, UINT i_YCount);
 
 	DX12Debug(const DX12DebugDesc & i_Setup);
 	~DX12Debug();
