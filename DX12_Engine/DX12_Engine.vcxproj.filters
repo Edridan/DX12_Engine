@@ -217,7 +217,7 @@
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="src\dx12\DX12DepthBuffer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\DX12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
