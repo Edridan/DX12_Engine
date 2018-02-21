@@ -188,24 +188,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_FrameIndex = m_SwapChain->GetCurrentBackBufferIndex();
 
 
-	// -- Create Context -- //
-
-	const std::wstring contextNames[eContextCount] = {
-		L"Deferred",			// the GBuffer update context
-		L"Immediate",			// the Immediate (final rendering)
-		L"Copy",				// copy commandlist for resources
-	};
-
-	DX12Context::ContextDesc desc[eContextCount];
-
-	// setup for somes context
-	desc[EContextId::eUpload].CommandListType = D3D12_COMMAND_LIST_TYPE_COPY;
-
-	for (UINT i = 0; i < eContextCount; ++i)
-	{
-		desc[i].Name = contextNames[i];
-		m_Context[i] = new DX12Context(desc[i]);
-	}
+	GenerateDeferredContext();
 
 	// -- Create the Back Buffers (render target views) Descriptor Heap -- //
 
@@ -697,7 +680,7 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 	return S_OK;
 }
 
-HRESULT DX12RenderEngine::GenerateImmediateContext()
+FORCEINLINE HRESULT DX12RenderEngine::GenerateImmediateContext()
 {
 	m_ImmediateRootSignature = new DX12RootSignature;
 
@@ -737,7 +720,14 @@ HRESULT DX12RenderEngine::GenerateImmediateContext()
 	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[2], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// specular
 	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[3], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// position
 
+	m_ImmediateRootSignature->AddConstantBuffer(0, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+
 	m_ImmediateRootSignature->Create(m_Device);
+
+	// reserve a constant buffer
+	m_ImmediateContextBuffer = GetConstantBuffer(eGlobal)->ReserveVirtualAddress();
+	float clearColor[4] = { 0.4f, 0.4f, 0.4f, 1.0f };
+	GetConstantBuffer(eGlobal)->UpdateConstantBuffer(m_ImmediateContextBuffer, clearColor, 4 * sizeof(float));
 
 	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/deferred/FrameCompositorPS.hlsl");
 	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/deferred/FrameCompositorVS.hlsl");
@@ -757,6 +747,30 @@ HRESULT DX12RenderEngine::GenerateImmediateContext()
 	//desc.DepthStencilFormat = m_DepthBuffer->GetFormat();
 
 	m_ImmediatePipelineState = new DX12PipelineState(desc);
+
+	return S_OK;
+}
+
+FORCEINLINE HRESULT DX12RenderEngine::GenerateDeferredContext()
+{
+	// -- Create Context -- //
+
+	const std::wstring contextNames[eContextCount] = {
+		L"Deferred",			// the GBuffer update context
+		L"Immediate",			// the Immediate (final rendering)
+		L"Copy",				// copy commandlist for resources
+	};
+
+	DX12Context::ContextDesc desc[eContextCount];
+
+	// setup for somes context
+	desc[EContextId::eUpload].CommandListType = D3D12_COMMAND_LIST_TYPE_COPY;
+
+	for (UINT i = 0; i < eContextCount; ++i)
+	{
+		desc[i].Name = contextNames[i];
+		m_Context[i] = new DX12Context(desc[i]);
+	}
 
 	return S_OK;
 }
@@ -850,6 +864,8 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 		// render immediate context here
 		context->GetCommandList()->SetGraphicsRootSignature(m_ImmediateRootSignature->GetRootSignature());
 		context->GetCommandList()->SetPipelineState(m_ImmediatePipelineState->GetPipelineState());
+
+		//context->GetCommandList()->SetComputeRootConstantBufferView(eRenderTargetCount, GetConstantBuffer(eGlobal)->GetUploadVirtualAddress(m_ImmediateContextBuffer));
 
 		// bind textures
 		ID3D12DescriptorHeap * descriptors = nullptr;

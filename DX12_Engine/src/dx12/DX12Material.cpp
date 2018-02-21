@@ -9,8 +9,6 @@
 #include "dx12/DX12Texture.h"
 #include "engine/Utils.h"
 
-
-
 DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	:m_ColorAmbient(i_Desc.Ka)
 	, m_ColorDiffuse(i_Desc.Kd)
@@ -99,9 +97,7 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	desc.PixelShader = PShader;
 	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	
-	//desc.RenderTargetCount = 1;
-	//desc.RenderTargetFormat[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-
+	// setup render target
 	desc.RenderTargetCount = DX12RenderEngine::ERenderTargetId::eRenderTargetCount;
 	desc.RenderTargetFormat[0] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eNormal)->GetFormat();
 	desc.RenderTargetFormat[1] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eDiffuse)->GetFormat();

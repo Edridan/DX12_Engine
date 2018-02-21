@@ -38,11 +38,11 @@ PS_OUTPUT main(const VS_OUTPUT input)
 	
 	/////////////////////////////////////////////
 	// update the diffuse buffer
-	output.diffuse = float4(0.f, 1.f, 0.f, 1.f);
+	output.diffuse = kd;
 
 	/////////////////////////////////////////////
 	// update the specular buffer
-	output.specular = float4(0.f, 0.f, 1.f, 1.f);
+	output.specular = ks;
 
 	/////////////////////////////////////////////
 	// update the position buffer

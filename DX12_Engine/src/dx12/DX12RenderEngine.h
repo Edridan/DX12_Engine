@@ -170,6 +170,7 @@ private:
 	HRESULT				UpdatePipeline();				// called in Render()
 	HRESULT				WaitForPreviousFrame();			// called in PrepareForRender()
 	HRESULT				GenerateImmediateContext();		// create immediate context, final rendering pipelines(later : post process management)
+	HRESULT				GenerateDeferredContext();		// create different deferred context
 	void				GeneratePrimitiveShapes();		// create primitive 2D shapes
 	void				GenerateRenderTargets();		// create all render target instead of Back Buffer
 	// Initialize contexts to prepare for render
@@ -204,14 +205,12 @@ private:
 	// Immediate context pipeline state
 	DX12RootSignature *		m_ImmediateRootSignature;
 	DX12PipelineState *		m_ImmediatePipelineState;
-	
+	ADDRESS_ID				m_ImmediateContextBuffer;
 
 	// primitive rectangle mesh
 	DX12MeshBuffer *		m_RectMesh;
 
 	// Depth buffer
-	//ID3D12Resource*				m_DepthStencilBuffer; // This is the memory for our depth buffer. it will also be used for a stencil buffer in a later tutorial
-	//ID3D12DescriptorHeap*		m_DepthStencilDescriptorHeap; // This is a heap for our depth/stencil buffer descriptor
 	DX12DepthBuffer *		m_DepthBuffer;	// Depth buffer handler
 
 
