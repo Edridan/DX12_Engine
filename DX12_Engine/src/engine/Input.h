@@ -27,6 +27,19 @@ public:
 		eShiftDown	= 1 << 2,
 	};
 
+	// struct for helping
+	struct ShortCut
+	{
+		EKeySetupFlags	KeyFlags;
+		UINT			KeyCode;
+
+		// default constructor
+		ShortCut(UINT i_Key = 0, EKeySetupFlags i_Flags = eNone)
+			:KeyFlags(i_Flags)
+			,KeyCode(i_Key)
+		{};
+	};
+
 #define KEY_INDEX_MAX		64
 
 	// define events

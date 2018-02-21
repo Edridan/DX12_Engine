@@ -105,7 +105,13 @@ struct Rect
 	inline float Height() const { return Bottom - Top; };
 };
 
-
+////////////////////////////////////////////////
+// std string helper
+namespace String
+{
+	void		Utf16ToUtf8(std::string & o_Out, const std::wstring & i_String);
+	void		Utf8ToUtf16(std::wstring & o_Out, const std::string & i_String);
+}
 
 ///////////////////////////////////////////////
 // Math

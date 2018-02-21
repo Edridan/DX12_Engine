@@ -58,6 +58,12 @@ inline DirectX::XMFLOAT4 ColorToVec4(const Color & i_Color)
 	return DirectX::XMFLOAT4(i_Color.r, i_Color.g, i_Color.b, 1.f);
 }
 
+// math
+inline bool	Float3Eq(const DirectX::XMFLOAT3 & i_First, const DirectX::XMFLOAT3 & i_Second)
+{
+	return (i_First.x == i_Second.x && i_First.y == i_Second.y && i_First.z == i_Second.z);
+}
+
 #ifdef _DEBUG
 // assert on DX12 error
 #define DX12_ASSERT(i_Hres)											\

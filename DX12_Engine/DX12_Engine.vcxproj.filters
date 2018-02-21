@@ -219,6 +219,15 @@
     <ClCompile Include="src\dx12\DX12DepthBuffer.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
+    <ClCompile Include="src\editor\UISceneBuilder.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\editor\Editor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\editor\UIMaterialBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
@@ -362,10 +371,19 @@
     <ClInclude Include="src\editor\Editor.h">
       <Filter>Header Files\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="src\dx12\DX12Debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\dx12\DX12DepthBuffer.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dx12\DX12Light.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\editor\UISceneBuilder.h">
+      <Filter>Header Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\editor\UIMaterialBuilder.h">
+      <Filter>Header Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dx12\DX12Debug.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
   </ItemGroup>
@@ -417,6 +435,9 @@
       <Filter>Shaders\Markup</Filter>
     </None>
     <None Include="src\shaders\lib\Math.hlsli">
+      <Filter>Shaders\Lib</Filter>
+    </None>
+    <None Include="src\shaders\lib\Lib.hlsli">
       <Filter>Shaders\Lib</Filter>
     </None>
   </ItemGroup>

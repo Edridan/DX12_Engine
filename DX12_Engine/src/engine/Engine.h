@@ -37,6 +37,8 @@ class DX12RenderEngine;
 class UILayer;	// layer for UI
 class UIConsole;
 class UIDebug;
+// editor
+class Editor;
 
 // class def
 class Engine
@@ -100,12 +102,15 @@ private:
 #if  defined(_DEBUG) || defined(WITH_EDITOR)
 	void	OnF1Down(void * i_Void);
 	void	OnF2Down(void * i_Void);
+	void	OnF3Down(void * i_Void);
 	void	OnF5Down(void * i_Void);
 
 	// debug UI management
 	// ui windows for debug, editor and other
 	UIConsole *			m_UIConsole;
 	UIDebug *			m_UIDebug;
+
+	Editor *			m_Editor;
 #endif
 	// window
 	Window *		m_Window;

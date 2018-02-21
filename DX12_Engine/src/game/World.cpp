@@ -47,6 +47,11 @@ UINT World::GetActorCount() const
 	return (UINT)m_Actors.size();
 }
 
+UINT World::GetRootActorCount() const
+{
+	return m_RootActors.size();
+}
+
 
 Actor * World::SpawnActor(const Actor::ActorDesc & i_Desc, Actor * i_Parent)
 {
@@ -297,6 +302,18 @@ UINT World::GetRootActorsByName(std::vector<Actor*> o_Array, std::wstring i_Name
 	}
 	// return number of actors founded in the world
 	return actorsFounded;
+}
+
+Actor * World::GetRootActorByIndex(size_t i_Index) const
+{
+	ASSERT(i_Index < m_RootActors.size());
+	return m_RootActors[i_Index];
+}
+
+Actor * World::GetActorByIndex(size_t i_Index) const
+{
+	ASSERT(i_Index < m_Actors.size());
+	return m_Actors[i_Index];
 }
 
 void World::Clear()

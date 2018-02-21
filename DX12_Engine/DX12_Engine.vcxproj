@@ -108,6 +108,9 @@
     <ClCompile Include="src\dx12\DX12Shader.cpp" />
     <ClCompile Include="src\dx12\DX12Texture.cpp" />
     <ClCompile Include="src\dx12\DX12Utils.cpp" />
+    <ClCompile Include="src\editor\Editor.cpp" />
+    <ClCompile Include="src\editor\UIMaterialBuilder.cpp" />
+    <ClCompile Include="src\editor\UISceneBuilder.cpp" />
     <ClCompile Include="src\engine\Clock.cpp" />
     <ClCompile Include="src\engine\Console.cpp" />
     <ClCompile Include="src\engine\Debug.cpp" />
@@ -146,6 +149,7 @@
     <ClInclude Include="src\dx12\DX12DepthBuffer.h" />
     <ClInclude Include="src\dx12\DX12DescriptorHeap.h" />
     <ClInclude Include="src\dx12\DX12ImGui.h" />
+    <ClInclude Include="src\dx12\DX12Light.h" />
     <ClInclude Include="src\dx12\DX12Material.h" />
     <ClInclude Include="src\dx12\DX12Mesh.h" />
     <ClInclude Include="src\dx12\DX12MeshBuffer.h" />
@@ -157,6 +161,8 @@
     <ClInclude Include="src\dx12\DX12Texture.h" />
     <ClInclude Include="src\dx12\DX12Utils.h" />
     <ClInclude Include="src\editor\Editor.h" />
+    <ClInclude Include="src\editor\UIMaterialBuilder.h" />
+    <ClInclude Include="src\editor\UISceneBuilder.h" />
     <ClInclude Include="src\engine\Clock.h" />
     <ClInclude Include="src\engine\Console.h" />
     <ClInclude Include="src\engine\Debug.h" />
@@ -202,6 +208,7 @@
     <None Include="resources\fonts\Arial.fnt" />
     <None Include="src\shaders\lib\EffectLib.hlsli" />
     <None Include="src\shaders\lib\GlobalBuffer.hlsli" />
+    <None Include="src\shaders\lib\Lib.hlsli" />
     <None Include="src\shaders\lib\Material.hlsli" />
     <None Include="src\shaders\lib\Math.hlsli" />
     <None Include="src\shaders\lib\TransformBuffer.hlsli" />

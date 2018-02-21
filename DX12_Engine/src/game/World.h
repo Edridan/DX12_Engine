@@ -31,7 +31,8 @@ public:
 
 	// world public functions can be called by actors
 	float	GetFrameTime() const;	// get the last elapsed time
-	UINT	GetActorCount() const;
+	UINT	GetActorCount() const;	// all actor count
+	UINT	GetRootActorCount() const;
 
 	// actor management
 	// spawn specific overriden actors
@@ -53,11 +54,15 @@ public:
 	Actor *		GetRootActorById(UINT64 i_Id) const;
 	UINT		GetActorsByName(std::vector<Actor*> o_Array, std::wstring i_Name) const;
 	UINT		GetRootActorsByName(std::vector<Actor *> o_Array, std::wstring i_Name) const;
+	Actor *		GetRootActorByIndex(size_t i_Index) const;
+	Actor *		GetActorByIndex(size_t i_Index) const;
+
 
 	// clear world
 	void		Clear();
 
 	friend class Engine;
+
 private:
 
 	// call by engine class (this tick each actor that need a tick)

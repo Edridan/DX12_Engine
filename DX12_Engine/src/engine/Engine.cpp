@@ -20,6 +20,8 @@
 #include "ui/UILayer.h"
 #include "ui/UIConsole.h"
 #include "ui/UIDebug.h"
+// editor
+#include "editor/Editor.h"
 
 
 Engine *		Engine::s_Instance = nullptr;
@@ -113,15 +115,6 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_UIConsole = new UIConsole;
 	m_UIDebug	= new UIDebug;
 
-	// push windows on layer
-	m_UILayer->PushUIWindowOnLayer(m_UIConsole);
-	m_UILayer->PushUIWindowOnLayer(m_UIDebug);
-
-	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F1, "F1Debug", this, &Engine::OnF1Down, nullptr);
-	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F2, "F2Debug", this, &Engine::OnF2Down, nullptr);
-	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F5, "F5Debug", this, &Engine::OnF5Down, nullptr);
-#endif
-
 	// initialize console
 	m_Console = new Console;
 	m_Console->RegisterPrintCallback(UIConsole::StaticPrint, m_UIConsole);
@@ -132,7 +125,26 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_Console->RegisterFunction(new CFPrintParam);
 	m_Console->RegisterFunction(new CFSetFrameTarget);
 
+	// push windows on layer
+	m_UILayer->PushUIWindowOnLayer(m_UIConsole);
+	m_UILayer->PushUIWindowOnLayer(m_UIDebug);
 
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F1, "F1Debug", this, &Engine::OnF1Down, nullptr);
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F2, "F2Debug", this, &Engine::OnF2Down, nullptr);
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F3, "F5Debug", this, &Engine::OnF3Down, nullptr);
+
+#ifdef WITH_EDITOR
+	Editor::EditorDesc editorDesc;
+
+	editorDesc.Layer = m_UILayer;
+	editorDesc.EnabledByDefault = false;
+
+	// editor creation
+	m_Editor = new Editor(editorDesc);
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F5, "F10Editor", this, &Engine::OnF5Down, nullptr);
+#endif
+
+#endif
 
 #ifdef _DEBUG
 	PRINT_DEBUG("DX12 engine [version 0.1]");
@@ -356,9 +368,18 @@ void Engine::OnF2Down(void * i_Void)
 	m_UIDebug->SetActive(!m_UIDebug->IsActive());
 }
 
-void Engine::OnF5Down(void * i_Void)
+void Engine::OnF3Down(void * i_Void)
 {
 	m_RenderEngine->EnableDebug(!m_RenderEngine->DebugIsEnabled());
 }
+
+#ifdef WITH_EDITOR
+
+void Engine::OnF5Down(void * i_Void)
+{
+	m_Editor->SetActive(!m_Editor->IsActive());
+}
+
+#endif
 
 #endif
