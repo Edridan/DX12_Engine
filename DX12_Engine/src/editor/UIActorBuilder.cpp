@@ -26,7 +26,7 @@ FORCEINLINE void UIActorBuilder::DrawTransform(Transform * i_Transform)
 	if (!Float3Eq(i_Transform->GetPosition(), saved))	i_Transform->SetPosition(saved);
 	DrawVector(i_Transform->GetRotation(), "Rotation", &saved);
 	if (!Float3Eq(i_Transform->GetRotation(), saved))	i_Transform->SetRotation(saved);
-	DrawVector(i_Transform->GetScale(), "Scale", &saved);
+	DrawVector(i_Transform->GetScale(), "Scale   ", &saved);
 	if (!Float3Eq(i_Transform->GetScale(), saved))		i_Transform->SetScale(saved);
 
 }
@@ -40,7 +40,9 @@ FORCEINLINE void UIActorBuilder::DrawVector(DirectX::XMFLOAT3 & i_Vector, const 
 	transPos[2] = i_Vector.z;
 
 	// draw the window
-	ImGui::InputFloat3(i_Name, transPos, 2);
+	ImGui::Text(i_Name);
+	ImGui::SameLine();
+	ImGui::InputFloat3("", transPos, 2);
 
 	// output saved vector
 	if (o_Save != nullptr)
@@ -60,20 +62,26 @@ void UIActorBuilder::DrawWindow()
 	}
 
 	// draw name of the actor
-	static char * name = new char[128];
+	static char name[128];
 
 	std::string actorName;
 	std::wstring WActorName = m_Actor->GetName(), WNewActorName;
 
 	String::Utf16ToUtf8(actorName, WActorName);
-	ImGui::InputText("Actor Name", name, 128);
-	/*String::Utf8ToUtf16(WNewActorName, name);
-	m_Actor->SetName(WNewActorName);*/
+	strcpy_s(name, actorName.c_str());
+	ImGui::Text("Actor Name");
+	ImGui::SameLine();
+	ImGui::InputText("", name, 128);
+	String::Utf8ToUtf16(WNewActorName, name);
+	m_Actor->SetName(WNewActorName);
 
-
-	Transform * trans = &m_Actor->m_Transform;
+	ImGui::Separator();
 
 	// draw the transform of the object
+	Transform * trans = &m_Actor->m_Transform;
 	DrawTransform(trans);
+
+	ImGui::Separator();
+
 }
 
