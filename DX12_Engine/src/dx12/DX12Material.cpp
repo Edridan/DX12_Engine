@@ -106,6 +106,7 @@ DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
 	desc.RenderTargetFormat[0] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eNormal)->GetFormat();
 	desc.RenderTargetFormat[1] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eDiffuse)->GetFormat();
 	desc.RenderTargetFormat[2] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eSpecular)->GetFormat();
+	desc.RenderTargetFormat[3] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::ePosition)->GetFormat();
 
 	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
 	desc.DepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state

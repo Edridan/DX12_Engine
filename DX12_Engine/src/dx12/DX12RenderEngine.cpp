@@ -11,6 +11,11 @@
 #include "dx12/DX12DepthBuffer.h"
 #include "engine/Engine.h"
 
+#ifdef DX12_DEBUG
+#include "DX12Debug.h"
+#endif // DX12_DEBUG
+
+
 // Static definition implementation
 DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
 
@@ -235,29 +240,7 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	// -- Generate primitive meshes -- //
 	GeneratePrimitiveShapes();
-
-	// -- Create different render targets for the deferred rendering -- //
-
-	const std::wstring rtName[eRenderTargetCount] =
-	{
-		L"Normal",
-		L"Specular",
-		L"Diffuse",
-	};
-
-	// same description for each render target
-	DX12RenderTarget::RenderTargetDesc rtDesc;
-	rtDesc.BufferSize = m_WindowSize;
-	rtDesc.IsShaderResource = true;
-
-	for (UINT i = 0; i < eRenderTargetCount; ++i)
-	{
-		rtDesc.Name = rtName[i];
-		m_RenderTargets[i] = new DX12RenderTarget(rtDesc);
-
-		// transition the render target to the pixel shader resources
-		GetContext(eImmediate)->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
-	}
+	GenerateRenderTargets();
 
 	// -- Create constant buffer -- //
 
@@ -299,9 +282,11 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	debugDesc.EnabledByDefault = false;
 	debugDesc.BackBuffer = m_BackBuffer;
 	debugDesc.DepthBuffer = m_DepthBuffer;
-	debugDesc.DiffuseRT = m_RenderTargets[eDiffuse];
-	debugDesc.NormalRT = m_RenderTargets[eNormal];
-	debugDesc.SpecularRT = m_RenderTargets[eSpecular];
+
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		debugDesc.RenderTarget[i] = m_RenderTargets[i];
+	}
 
 	DX12Debug::Create(debugDesc);
 	m_Debug = &DX12Debug::GetInstance();
@@ -750,6 +735,7 @@ HRESULT DX12RenderEngine::GenerateImmediateContext()
 	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[0], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// normal texture
 	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[1], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// diffuse
 	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[2], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// specular
+	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[3], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// position
 
 	m_ImmediateRootSignature->Create(m_Device);
 
@@ -797,6 +783,33 @@ void DX12RenderEngine::GeneratePrimitiveShapes()
 	DX12PipelineState::CreateInputLayoutFromFlags(inputLayout, DX12PipelineState::eHaveTexcoord);
 
 	m_RectMesh = new DX12MeshBuffer(inputLayout, (BYTE*)VRect, 4u, IRect, 6u, L"Rect");
+}
+
+FORCEINLINE void DX12RenderEngine::GenerateRenderTargets()
+{
+	// -- Create different render targets for the deferred rendering -- //
+
+	const std::wstring rtName[eRenderTargetCount] =
+	{
+		L"Normal",
+		L"Specular",
+		L"Diffuse",
+		L"Position"
+	};
+
+	// same description for each render target
+	DX12RenderTarget::RenderTargetDesc rtDesc;
+	rtDesc.BufferSize = m_WindowSize;
+	rtDesc.IsShaderResource = true;
+
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		rtDesc.Name = rtName[i];
+		m_RenderTargets[i] = new DX12RenderTarget(rtDesc);
+
+		// transition the render target to the pixel shader resources
+		GetContext(eImmediate)->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+	}
 }
 
 FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
@@ -847,6 +860,7 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 			m_RenderTargets[eNormal],
 			m_RenderTargets[eDiffuse],
 			m_RenderTargets[eSpecular],
+			m_RenderTargets[ePosition]
 		};
 
 		for (UINT i = 0; i < eRenderTargetCount; ++i)
@@ -904,6 +918,7 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeDeferredContext()
 		m_RenderTargets[ERenderTargetId::eNormal]->GetRenderTargetCPUDescriptorHandle(),
 		m_RenderTargets[ERenderTargetId::eDiffuse]->GetRenderTargetCPUDescriptorHandle(),
 		m_RenderTargets[ERenderTargetId::eSpecular]->GetRenderTargetCPUDescriptorHandle(),
+		m_RenderTargets[ERenderTargetId::ePosition]->GetRenderTargetCPUDescriptorHandle(),
 	};
 
 	DX12Context * context = GetContext(eDeferred);

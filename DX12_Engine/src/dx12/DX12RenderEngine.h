@@ -15,8 +15,8 @@
 
 #include "engine/Utils.h"
 
-#ifdef _DEBUG
-#include "DX12Debug.h"
+#ifdef DX12_DEBUG
+class DX12Debug;
 #include <D3d12sdklayers.h>
 #endif
 
@@ -73,8 +73,9 @@ public:
 	enum ERenderTargetId
 	{
 		eNormal,			// normal buffer for pixels
-		eSpecular,			// specular lighting buffer
-		eDiffuse,			// diffuse color buffer
+		eDiffuse,			// specular lighting buffer
+		eSpecular,			// diffuse color buffer
+		ePosition,			// position buffer
 
 		// count
 		eRenderTargetCount,
@@ -170,6 +171,7 @@ private:
 	HRESULT				WaitForPreviousFrame();			// called in PrepareForRender()
 	HRESULT				GenerateImmediateContext();		// create immediate context, final rendering pipelines(later : post process management)
 	void				GeneratePrimitiveShapes();		// create primitive 2D shapes
+	void				GenerateRenderTargets();		// create all render target instead of Back Buffer
 	// Initialize contexts to prepare for render
 	HRESULT				InitializeImmediateContext();
 	HRESULT				InitializeDeferredContext();

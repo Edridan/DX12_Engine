@@ -20,7 +20,7 @@ struct PS_OUTPUT
 	float4 normal :			SV_Target0;
 	float4 color :			SV_Target1;
 	float4 specular :		SV_Target2;
-	//float depth :			SV_Target4;	// To do : use a render target to fill depth buffer
+	float4 position :		SV_Target3;
 };
 
 PS_OUTPUT main(const VS_OUTPUT input)
@@ -50,6 +50,10 @@ PS_OUTPUT main(const VS_OUTPUT input)
 	output.specular = specular;
 
 
+
+	/////////////////////////////////////////////
+	// update the position buffer
+	output.position = input.position;
 
 	/////////////////////////////////////////////
 	// update the depth buffer

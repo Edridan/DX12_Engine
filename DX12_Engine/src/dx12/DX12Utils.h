@@ -8,6 +8,14 @@
 #include <DirectXMath.h>
 #include <wincodec.h>
 
+// macros definition
+#define DEBUG_DX12_ENABLE		1
+
+// debug management
+#if (DEBUG_DX12_ENABLE) && defined(_DEBUG)
+#define DX12_DEBUG
+#endif
+
 
 // release and delete macros
 #define SAFE_RELEASE(p) { if ( (p) ) { (p)->Release(); (p) = nullptr; } }

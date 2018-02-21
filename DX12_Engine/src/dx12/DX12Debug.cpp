@@ -53,16 +53,13 @@ bool DX12Debug::IsEnabled() const
 DX12Debug::DX12Debug(const DX12DebugDesc & i_Setup)
 	// debug options
 	:m_Enabled(i_Setup.EnabledByDefault)
-	// render targets
-	,m_BackBuffer(i_Setup.BackBuffer)
-	,m_SpecularRT(i_Setup.SpecularRT)
-	,m_PositionRT(i_Setup.PositionRT)
-	,m_DiffuseRT(i_Setup.DiffuseRT)
-	,m_NormalRT(i_Setup.NormalRT)
-
 {
-	// generate all debug pipeline
-	ASSERT(m_BackBuffer != nullptr && m_NormalRT != nullptr && m_SpecularRT != nullptr /* && m_PositionRT != nullptr && m_DepthRT != nullptr */);
+	// retreive render targets
+	for (UINT i = 0; i < DX12RenderEngine::eRenderTargetCount; ++i)
+	{
+		ASSERT(i_Setup.RenderTarget[i] != nullptr);
+		m_GBufferRT[i] = i_Setup.RenderTarget[i];
+	}
 
 	ID3D12Device * device = DX12RenderEngine::GetInstance().GetDevice();
 
@@ -115,7 +112,7 @@ DX12Debug::DX12Debug(const DX12DebugDesc & i_Setup)
 	desc.PixelShader = PShader;
 	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	desc.RenderTargetCount = 1;
-	desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
+	desc.RenderTargetFormat[0] = i_Setup.BackBuffer->GetFormat();
 	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
 	desc.DepthEnabled = false;
 
@@ -138,10 +135,10 @@ void DX12Debug::DrawDebugGBuffer(ID3D12GraphicsCommandList * i_CommandList) cons
 
 	static const DX12RenderTarget * rt[4]
 	{
-		m_NormalRT,
-		m_NormalRT,	// m_PositionRT,
-		m_SpecularRT,
-		m_DiffuseRT
+		m_GBufferRT[DX12RenderEngine::eDiffuse],
+		m_GBufferRT[DX12RenderEngine::eNormal],
+		m_GBufferRT[DX12RenderEngine::eSpecular],
+		m_GBufferRT[DX12RenderEngine::ePosition]
 	};
 	
 	ID3D12DescriptorHeap * descriptors = nullptr;

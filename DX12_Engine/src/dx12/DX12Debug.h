@@ -3,19 +3,14 @@
 
 #pragma once
 
-// define
-#define DEBUG_DX12_ENABLE		1
-
-// debug management
-#if (DEBUG_DX12_ENABLE) && defined(_DEBUG)
-#define DX12_DEBUG
-#endif
+#include "dx12/DX12Utils.h"
 
 #ifdef DX12_DEBUG
 
 
 #include "d3dx12.h"
 #include "engine/Utils.h"
+#include "dx12/DX12RenderEngine.h"
 
 #include <DirectXMath.h>
 #include <vector>
@@ -40,7 +35,7 @@ public:
 
 		// render target setups
 		DX12RenderTarget *		BackBuffer = nullptr;
-		DX12RenderTarget		* NormalRT = nullptr, * DiffuseRT = nullptr, * SpecularRT = nullptr, * PositionRT = nullptr;
+		DX12RenderTarget *		RenderTarget[DX12RenderEngine::eRenderTargetCount];	// Render targets
 		// depth buffer descriptor
 		DX12DepthBuffer *		DepthBuffer = nullptr;
 
@@ -78,15 +73,10 @@ private:
 	// debug management
 	bool		m_Enabled;
 
-	// render targets for debugging
-	DX12RenderTarget *			m_BackBuffer;
 	// GBuffer render targets
-	DX12RenderTarget *			m_NormalRT;
-	DX12RenderTarget *			m_DiffuseRT;
-	DX12RenderTarget *			m_SpecularRT;
-	DX12RenderTarget *			m_PositionRT;
+	DX12RenderTarget *			m_GBufferRT[DX12RenderEngine::eRenderTargetCount];
 	// Depth
-	DX12DepthBuffer *			m_DepthDesc;
+	DX12DepthBuffer *			m_DepthDesc;	// depth render (special render target)
 
 	std::vector<Rect>			m_Rect;
 
