@@ -789,14 +789,13 @@ FORCEINLINE void DX12RenderEngine::GenerateRenderTargets()
 {
 	// -- Create different render targets for the deferred rendering -- //
 
-	const std::wstring rtName[eRenderTargetCount] =
-	{
-		L"Normal",
-		L"Specular",
-		L"Diffuse",
-		L"Position"
-	};
+	std::wstring rtName[eRenderTargetCount];
 
+	rtName[eNormal]		= L"Normal";
+	rtName[eSpecular]	= L"Specular";
+	rtName[eDiffuse]	= L"Diffuse";
+	rtName[ePosition]	= L"Position";
+	
 	// same description for each render target
 	DX12RenderTarget::RenderTargetDesc rtDesc;
 	rtDesc.BufferSize = m_WindowSize;
