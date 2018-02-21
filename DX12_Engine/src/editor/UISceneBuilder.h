@@ -22,7 +22,9 @@ public:
 	// management
 	void SetWorld(World * i_World);
 
+	// informations
 	World * GetWorld() const;
+	Actor * GetSelectedActor() const;
 
 private:
 	// world
@@ -30,7 +32,8 @@ private:
 
 	// internal call
 	void			AddEmptyActor(const Transform & i_Transform, const char * i_Name);	// add empty actor to the world
-	
+	void			SelectActor(Actor * i_Actor);
+
 	// internal render
 	void			DrawActor(Actor * i_Actor);
 
@@ -38,6 +41,7 @@ private:
 	virtual void DrawWindow() override;
 
 	UIActorBuilder *		m_ActorBuilder;
+	Actor *					m_SelectedActor;
 };
 
 #endif

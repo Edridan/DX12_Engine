@@ -40,9 +40,7 @@ FORCEINLINE void UIActorBuilder::DrawVector(DirectX::XMFLOAT3 & i_Vector, const 
 	transPos[2] = i_Vector.z;
 
 	// draw the window
-	ImGui::Text(i_Name);
-	ImGui::SameLine();
-	ImGui::InputFloat3("", transPos, 2);
+	ImGui::InputFloat3(i_Name, transPos, 2);
 
 	// output saved vector
 	if (o_Save != nullptr)
@@ -75,13 +73,13 @@ void UIActorBuilder::DrawWindow()
 	String::Utf8ToUtf16(WNewActorName, name);
 	m_Actor->SetName(WNewActorName);
 
-	ImGui::Separator();
-
 	// draw the transform of the object
+	ImGui::Separator();
 	Transform * trans = &m_Actor->m_Transform;
 	DrawTransform(trans);
 
 	ImGui::Separator();
+
 
 }
 

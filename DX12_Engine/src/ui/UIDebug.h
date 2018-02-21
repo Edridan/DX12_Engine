@@ -20,8 +20,4 @@ private:
 	
 	// engine
 	Engine *		m_Engine;
-
-	// Updatable values
-	int 			m_FramePerSecs;
-	float 			m_AppTime;
 };

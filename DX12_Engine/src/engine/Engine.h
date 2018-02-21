@@ -60,6 +60,7 @@ public:
 
 	// informations
 	float		GetLifeTime() const;
+	float		GetFrameTime() const;
 	UINT		GetFramePerSecond() const;
 	UINT		GetFramePerSecondTarget() const;
 	void		SetFramePerSecondTarget(UINT i_Target);
@@ -108,6 +109,7 @@ private:
 
 	// engine management
 	bool			m_Exit;
+	float			m_ElapsedTime;
 	UINT			m_FramePerSecondsTargeted;
 	UINT			m_FramePerSecond;
 

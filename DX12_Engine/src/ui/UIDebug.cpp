@@ -20,10 +20,6 @@ UIDebug::~UIDebug()
 
 void UIDebug::DrawWindow()
 {
-	// update values
-	m_FramePerSecs = m_Engine->GetFramePerSecond();
-	m_AppTime = m_Engine->GetLifeTime();
-	
 	float camPos[3];
 
 	camPos[0] = m_CameraPos->x;
@@ -32,5 +28,5 @@ void UIDebug::DrawWindow()
 
 	// draw the window
 	ImGui::InputFloat3("Camera Position", camPos, 2);
-	ImGui::Text("FPS = %u [Time : %.2f]", m_FramePerSecs, m_AppTime);
+	ImGui::Text("FPS = %u [Frame Time : %.2f]", m_Engine->GetFramePerSecond(), m_Engine->GetFrameTime() * 1'000);
 }

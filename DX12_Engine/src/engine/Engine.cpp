@@ -50,6 +50,11 @@ float Engine::GetLifeTime() const
 	return m_EngineClock->GetElapsedFromStart().ToSeconds();
 }
 
+float Engine::GetFrameTime() const
+{
+	return m_ElapsedTime;
+}
+
 UINT Engine::GetFramePerSecond() const
 {
 	return m_FramePerSecond;
@@ -105,6 +110,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 	// setup settings
 	m_FramePerSecondsTargeted = i_Desc.FramePerSecondTargeted;
+	m_ElapsedTime = 0.f;
 
 	// initialize UI
 	m_UILayer = new UILayer(m_Window);
@@ -169,12 +175,12 @@ void Engine::Run()
 	while (!m_Exit)
 	{
 		// pre update management
-		float elapsed = m_EngineClock->Restart().ToSeconds();
+		m_ElapsedTime = m_EngineClock->Restart().ToSeconds();
 
 		// retreive performance data
-		if (elapsed != 0.f)
+		if (m_ElapsedTime != 0.f)
 		{ 
-			m_FramePerSecond = (UINT)(1.f / elapsed);
+			m_FramePerSecond = (UINT)(1.f / m_ElapsedTime);
 		}
 
 #ifdef WITH_EDITOR
@@ -190,7 +196,7 @@ void Engine::Run()
 
 		// tick the world (update all actors and components)
 		ASSERT(m_CurrentWorld != nullptr);
-		m_CurrentWorld->TickWorld(elapsed);
+		m_CurrentWorld->TickWorld(m_ElapsedTime);
 
 		// update and prepare the ui
 		{
@@ -215,7 +221,7 @@ void Engine::Run()
 			};
 
 			static GlobalBuffer buff = {};
-			buff.Elapsed = elapsed;
+			buff.Elapsed = m_ElapsedTime;
 			buff.Time = m_EngineClock->GetElapsedFromStart().ToSeconds();
 			buff.CamPos = m_CurrentWorld->GetCurrentCamera()->m_Position;
 
