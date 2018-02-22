@@ -139,6 +139,8 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F2, "F2Debug", this, &Engine::OnF2Down, nullptr);
 	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F3, "F5Debug", this, &Engine::OnF3Down, nullptr);
 
+	m_IsInGame = false;
+
 #ifdef WITH_EDITOR
 	Editor::EditorDesc editorDesc;
 
@@ -156,6 +158,9 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	PRINT_DEBUG("DX12 engine [version 0.1]");
 	PRINT_DEBUG("Initilization... OK");
 #endif
+
+	// enable input
+	Input::SetKeyEventEnabled(true);
 
 	// load error resources
 	ASSERT(m_ResourcesManager->LoadErrorTexture(L"resources/tex/engine/error.bmp"));
@@ -183,11 +188,18 @@ void Engine::Run()
 			m_FramePerSecond = (UINT)(1.f / m_ElapsedTime);
 		}
 
-#ifdef WITH_EDITOR
-		// camera management depending if the windows are selected or not
-		Camera * const freeCam = m_CurrentWorld->GetCurrentCamera();
-		// To do : disable input for the engine when a window is selected
-		freeCam->SetFreecamEnabled(!m_UILayer->IsOneWindowFocused());
+#if defined (_DEBUG) || defined(WITH_EDITOR)
+		if (!m_IsInGame)
+		{
+			// camera management depending if the windows are selected or not
+			Camera * const freeCam = m_CurrentWorld->GetCurrentCamera();
+			// To do : disable input for the engine when a window is selected
+			freeCam->SetFreecamEnabled(!m_UILayer->IsOneWindowFocused());
+
+			// Input management
+			Input::SetKeyEventEnabled(!m_UILayer->IsOneWindowFocused());
+		}
+
 #endif
 		/* -- Update -- */
 
@@ -384,6 +396,11 @@ void Engine::OnF3Down(void * i_Void)
 void Engine::OnF5Down(void * i_Void)
 {
 	m_Editor->SetActive(!m_Editor->IsActive());
+}
+
+bool Engine::IsInGame() const
+{
+	return false;
 }
 
 #endif

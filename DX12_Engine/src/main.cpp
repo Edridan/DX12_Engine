@@ -35,7 +35,7 @@ int WINAPI WinMain(
 
 	// create objects...
 	Actor::ActorDesc cubeActor;
-	cubeActor.Name = L"Box";
+	cubeActor.Name = L"Sphere";
 	cubeActor.Mesh = L"resources/obj/sphere.obj";
 	world->SpawnActor(cubeActor);
 

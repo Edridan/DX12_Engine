@@ -56,6 +56,10 @@ public:
 	static void	BindKeyEvent(EKeyEvent i_Status, UINT i_KeyCode, UINT i_KeySetupFlag, const std::string & i_NameId, const KeyEvent & i_Event, void * i_Data);
 	static void UnbindKeyEvent(EKeyEvent i_Status, UINT i_KeyCode, const std::string & i_NameId);
 
+	// management
+	static void		SetKeyEventEnabled(bool i_Enabled);
+	static bool		IsKeyEventEnabled();
+
 	// process all callbacks
 	static LRESULT ProcessInputCallbacks(HWND i_hWnd, UINT i_Param, WPARAM i_wParam, LPARAM i_lParam);
 private:
@@ -74,6 +78,9 @@ private:
 	// input callback management
 	static std::vector<KeyEventStruct>		m_DownKeyEvents[KEY_INDEX_MAX];
 	static std::vector<KeyEventStruct>		m_UpKeyEvents[KEY_INDEX_MAX];
+
+	// input management
+	static bool				m_KeyEventEnabled;
 };
 
 template<class _Type>

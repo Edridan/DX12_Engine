@@ -97,6 +97,8 @@ private:
 	void	OnF3Down(void * i_Void);
 	void	OnF5Down(void * i_Void);
 
+	bool	IsInGame() const;
+
 	// debug UI management
 	// ui windows for debug, editor and other
 	UIConsole *			m_UIConsole;
@@ -112,6 +114,10 @@ private:
 	float			m_ElapsedTime;
 	UINT			m_FramePerSecondsTargeted;
 	UINT			m_FramePerSecond;
+
+#ifdef _DEBUG
+	bool			m_IsInGame;
+#endif
 
 	// DX12 rendering
 	DX12RenderEngine *		m_RenderEngine;

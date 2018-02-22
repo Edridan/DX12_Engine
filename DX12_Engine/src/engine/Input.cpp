@@ -5,6 +5,8 @@
 // static definition
 std::vector<Input::KeyEventStruct>		Input::m_DownKeyEvents[KEY_INDEX_MAX];
 std::vector<Input::KeyEventStruct>		Input::m_UpKeyEvents[KEY_INDEX_MAX];
+// internal management
+bool									Input::m_KeyEventEnabled = true;
 
 
 void Input::BindKeyEvent(EKeyEvent i_Status, UINT i_KeyCode,const std::string & i_NameId, const KeyEvent & i_Event, void * i_Data)
@@ -107,8 +109,20 @@ void Input::UnbindKeyEvent(EKeyEvent i_Status, UINT i_KeyCode, const std::string
 	PRINT_DEBUG("Unable to unbind callback : %i (not found)", i_NameId.c_str());
 }
 
+void Input::SetKeyEventEnabled(bool i_Enabled)
+{
+	m_KeyEventEnabled = i_Enabled;
+}
+
+bool Input::IsKeyEventEnabled()
+{
+	return m_KeyEventEnabled;
+}
+
 LRESULT Input::ProcessInputCallbacks(HWND i_hWnd, UINT i_Param, WPARAM i_wParam, LPARAM i_lParam)
 {
+	if (!m_KeyEventEnabled)	return LRESULT(true);
+
 	// keyup callback
 	UINT key = GetKeyIndex(i_wParam);
 	UINT keyState = GetKeySetupFlags();

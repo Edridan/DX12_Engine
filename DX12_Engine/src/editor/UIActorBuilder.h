@@ -20,7 +20,6 @@ public:
 	// management
 	void	SetActor(Actor * i_Actor);
 
-
 private:
 	// internal callbacks
 	void		DrawTransform(Transform * i_Transform);
