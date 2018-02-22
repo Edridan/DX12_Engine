@@ -5,10 +5,10 @@
 #ifdef WITH_EDITOR
 
 #include "ui/UIWindow.h"
+#include "game/Actor.h"
 
 // class predef
 class World;
-class Actor;
 class Transform;
 // other linked windows
 class UIActorBuilder;
@@ -31,7 +31,8 @@ private:
 	World *			m_World;
 
 	// internal call
-	void			AddEmptyActor(const Transform & i_Transform, const char * i_Name);	// add empty actor to the world
+	void			AddActor(const Actor::ActorDesc & i_Desc, const Transform & i_Transform);
+	void			AttachToParent(Actor * i_Child, Actor * i_Parent);
 	void			SelectActor(Actor * i_Actor);
 
 	// internal render
@@ -40,8 +41,15 @@ private:
 	// Inherited via UIWindow
 	virtual void DrawWindow() override;
 
+	// other modules
 	UIActorBuilder *		m_ActorBuilder;
+
+	// management
 	Actor *					m_SelectedActor;
+
+	// internal data
+	static const char *			s_ActorSpawnType[];
+	static Actor::ActorDesc *	s_ActorDesc;
 };
 
 #endif

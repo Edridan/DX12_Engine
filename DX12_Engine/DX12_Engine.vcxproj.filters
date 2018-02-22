@@ -232,7 +232,7 @@
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
     <ClCompile Include="src\game\LightComponent.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Game\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -8,11 +8,28 @@
 #include "game/ActorComponent.h"
 #include "engine/Transform.h"
 
+// static definition
+const char *		UISceneBuilder::s_ActorSpawnType[] = { "Empty", "Cube", "Plane", "Light"};
+Actor::ActorDesc *	UISceneBuilder::s_ActorDesc = new Actor::ActorDesc[_countof(s_ActorSpawnType)];
+
 UISceneBuilder::UISceneBuilder(UIActorBuilder * i_ActorBuilder)
 	:UIWindow("Scene Editor", eNone)
-	,m_ActorBuilder(i_ActorBuilder)
-	,m_SelectedActor(nullptr)
+	, m_ActorBuilder(i_ActorBuilder)
+	, m_SelectedActor(nullptr)
 {
+	// empty actor
+	s_ActorDesc[0].Name = L"Empty";
+
+	// cube actor
+	s_ActorDesc[1].Name = L"Cube";
+	s_ActorDesc[1].Mesh = L"Cube";
+
+	// plane actor
+	s_ActorDesc[2].Name = L"Plane";
+	s_ActorDesc[2].Mesh = L"Plane";
+
+	// light actor
+	s_ActorDesc[3].Name = L"Light_Empty";	// To do
 }
 
 UISceneBuilder::~UISceneBuilder()
@@ -34,8 +51,19 @@ Actor * UISceneBuilder::GetSelectedActor() const
 	return m_SelectedActor;
 }
 
-void UISceneBuilder::AddEmptyActor(const Transform & i_Transform, const char * i_Name)
+void UISceneBuilder::AddActor(const Actor::ActorDesc & i_Desc, const Transform & i_Transform)
 {
+	if (m_World == nullptr)	return;
+
+	// spawn a new actor
+	m_World->SpawnActor(i_Desc, i_Transform);
+}
+
+void UISceneBuilder::AttachToParent(Actor * i_Child, Actor * i_Parent)
+{
+	if (m_World == nullptr)	return;
+
+	m_World->AttachActor(i_Parent, i_Child);
 }
 
 void UISceneBuilder::SelectActor(Actor * i_Actor)
@@ -82,6 +110,28 @@ FORCEINLINE void UISceneBuilder::DrawActor(Actor * i_Actor)
 
 		// finish rendering the actor
 		ImGui::TreePop();
+	}
+
+	if (IsFocused())
+	{
+		if (ImGui::IsMouseClicked(1))
+		{
+			ImGui::OpenPopup("add_actor");
+		}
+	}
+
+	if (ImGui::BeginPopup("add_actor"))
+	{
+		ImGui::Text("Actor Type");
+		ImGui::Separator();
+		for (int i = 0; i < _countof(s_ActorSpawnType); i++)
+		{
+			if (ImGui::Selectable(s_ActorSpawnType[i]))
+			{
+				AddActor(s_ActorDesc[i], Transform());
+			}
+		}
+		ImGui::EndPopup();
 	}
 }
 
