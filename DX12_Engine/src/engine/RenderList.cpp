@@ -77,6 +77,17 @@ void RenderList::PushOnCommandList() const
 		// retreive component data
 		const RenderComponent * component = m_Components[i];
 
+		// may some components are not renderable
+		if (!component->IsRenderable())	
+		{
+			// if editor : some objects are currently under edition
+#ifndef WITH_EDITOR
+			PRINT_DEBUG("The component is not renderable");
+			DEBUG_BREAK;
+#endif
+			continue;
+		}
+
 		// the component is not valid
 		if (!component->IsValid())
 		{

@@ -26,6 +26,12 @@ public:
 	// cleanup resources
 	void			CleanUpResources();
 
+	// iterators
+	std::map<const std::wstring, DX12Mesh*>::iterator		GetBeginMesh();
+	std::map<const std::wstring, DX12Mesh*>::iterator		GetEndMesh();
+	std::map<const std::wstring, DX12Texture*>::iterator	GetBeginTexture();
+	std::map<const std::wstring, DX12Texture*>::iterator	GetEndTexture();
+
 	// To do : release resources with count
 
 

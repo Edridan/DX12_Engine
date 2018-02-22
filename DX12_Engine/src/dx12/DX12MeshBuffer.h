@@ -46,7 +46,7 @@ private:
 	// Material
 	DX12Material::DX12MaterialDesc		m_DefaultMaterial;	// material default (unset if not managed)
 	// Other
-	const std::wstring 					m_Name;
+	std::wstring 						m_Name;
 	// element flags
 	UINT64								m_ElementFlags;
 

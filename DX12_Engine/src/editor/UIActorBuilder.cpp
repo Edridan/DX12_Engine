@@ -40,7 +40,7 @@ FORCEINLINE void UIActorBuilder::DrawVector(DirectX::XMFLOAT3 & i_Vector, const 
 	transPos[2] = i_Vector.z;
 
 	// draw the window
-	ImGui::InputFloat3(i_Name, transPos, 2);
+	ImGui::DragFloat3(i_Name, transPos, 0.05f);
 
 	// output saved vector
 	if (o_Save != nullptr)
@@ -78,8 +78,10 @@ void UIActorBuilder::DrawWindow()
 	Transform * trans = &m_Actor->m_Transform;
 	DrawTransform(trans);
 
-	ImGui::Separator();
-
-
+	// draw actor's components
+	for (UINT i = 0; i < m_Actor->GetComponentCount(); ++i)
+	{
+		m_Actor->GetComponent(i)->DrawUIComponent();
+	}
 }
 

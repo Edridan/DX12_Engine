@@ -188,6 +188,11 @@ UINT64 DX12Material::GetId() const
 	return m_Id;
 }
 
+const std::string & DX12Material::GetName() const
+{
+	return m_Name;
+}
+
 inline bool DX12Material::HaveTexture(ETextureType i_Type) const
 {
 	if (i_Type < eCount)

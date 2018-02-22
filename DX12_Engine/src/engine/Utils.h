@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 const float Zero = 0.f;
 const float One = 1.f;
@@ -109,15 +110,36 @@ struct Rect
 // std string helper
 namespace String
 {
+	// conversion
 	void		Utf16ToUtf8(std::string & o_Out, const std::wstring & i_String);
 	void		Utf8ToUtf16(std::wstring & o_Out, const std::string & i_String);
+
+	// replace
+	std::string		ReplaceAll(const std::string & i_String, const std::string & i_From, const std::string & i_To);
+	std::wstring	ReplaceAll(const std::wstring & i_String, const std::wstring & i_From, const std::wstring & i_To);
+
+	// specific operation
+	bool		EndWith(const std::string & i_String, const std::string & i_End);
+	bool		EndWith(const std::wstring & i_String, const std::wstring & i_End);
+	bool		StartWith(const std::string & i_String, const std::string & i_Start);
+	bool		StartWith(const std::wstring & i_String, const std::wstring & i_Start);
 }
 
 ///////////////////////////////////////////////
 // Math
 namespace Math
 {
+	template<typename _Type>
+	inline _Type		Min(_Type i_First, _Type i_Second)
+	{
+		return (i_First < i_Second) ? i_First : i_Second;
+	}
 
+	template<typename _Type>
+	inline _Type		Max(_Type i_First, _Type i_Second)
+	{
+		return (i_First > i_Second) ? i_First : i_Second;
+	}
 }
 
 ///////////////////////////////////////////////
@@ -125,4 +147,9 @@ namespace Math
 namespace Files
 {
 	void	FileToWStr(std::wstring & o_Out, const char * i_Filename);
+
+	std::string ConvertToWinPath(const std::string & i_Filepath);
+
+	void	GetFilesInFolder(std::vector<std::string> & o_Files, const std::string & i_Folder, const std::string & i_Filetype = "", bool i_ReturnFolderInFiles = false);
+	void	GetFilesInFolder(std::vector<std::wstring> & o_Files, const std::wstring & i_Folder, const std::wstring & i_Filetype = L"", bool i_ReturnFolderInFiles = false);
 }

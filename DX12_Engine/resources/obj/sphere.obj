@@ -8,13 +8,13 @@ mtllib sphere.mtl
 #
 #  Mesh
 #
-g  Mesh
+g  Sphere
 
 
 #
 #  Mesh_None
 #
-usemtl  Mesh_None
+usemtl  sphere
 
 v 0.000000 -1.000000 0.000000
 v 0.203181 -0.967950 0.147618

@@ -381,8 +381,12 @@ void World::RenderActor(const Actor * i_Actor, RenderList * i_RenderList) const
 	{
 		// then we need maybe to render the actor,
 		// this mean we push the render component to the render list
-		// To do : push the render component to the specific list
-		i_RenderList->PushRenderComponent(i_Actor->GetRenderComponent());
+		RenderComponent * component = i_Actor->GetRenderComponent();
+
+		if (component->IsEnabled())
+		{
+			i_RenderList->PushRenderComponent(component);
+		}
 	}
 
 	// render if needed the childs

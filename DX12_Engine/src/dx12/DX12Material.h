@@ -20,6 +20,7 @@ public:
 	// struct
 	struct DX12MaterialDesc
 	{
+		// base color
 		std::string Name;
 		Color Ka, Kd, Ks, Ke;
 		float Ns;
@@ -69,6 +70,7 @@ public:
 
 	// id
 	UINT64		GetId() const;
+	const std::string & GetName() const;
 
 	// dx12
 	bool		NeedUpdate() const;

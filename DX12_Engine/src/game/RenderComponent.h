@@ -42,6 +42,7 @@ public:
 	};
 
 	RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor);
+	RenderComponent(Actor * i_Actor);	// empty component
 	~RenderComponent();
 
 	// manage command list
@@ -53,8 +54,13 @@ public:
 	ADDRESS_ID		GetConstBufferAddress() const;
 
 	// manage render stuff
-	void			SetMaterial(const DX12Material::DX12MaterialDesc & i_Desc);
-	DX12Material *	GetMaterial();
+	void					SetMaterial(const DX12Material::DX12MaterialDesc & i_Desc);
+	DX12Material *			GetMaterial();
+	void					SetMeshBuffer(const DX12MeshBuffer * i_Mesh);
+	const DX12MeshBuffer *	GetMeshBuffer();
+
+	// render management
+	bool			IsRenderable() const;
 
 private:
 	// rendering
@@ -67,4 +73,15 @@ private:
 	// informations
 	RenderPass			m_RenderPass;
 	RenderFlags			m_RenderFlags;
+
+#ifdef WITH_EDITOR
+	friend class UIActorBuilder;
+
+private:
+	// With editor only : draw component throught ui
+	virtual void	DrawUIComponentInternal() override;
+	void			DrawUIMaterial();
+	void			DrawUIMesh();
+
+#endif
 };

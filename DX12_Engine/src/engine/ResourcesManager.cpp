@@ -95,6 +95,26 @@ void ResourcesManager::CleanUpResources()
 	CleanResourcesMap<DX12Texture*>(m_Textures);
 }
 
+std::map<const std::wstring, DX12Mesh*>::iterator ResourcesManager::GetBeginMesh()
+{
+	return m_Meshes.begin();
+}
+
+std::map<const std::wstring, DX12Mesh*>::iterator ResourcesManager::GetEndMesh()
+{
+	return m_Meshes.end();
+}
+
+std::map<const std::wstring, DX12Texture*>::iterator ResourcesManager::GetBeginTexture()
+{
+	return m_Textures.begin();
+}
+
+std::map<const std::wstring, DX12Texture*>::iterator ResourcesManager::GetEndTexture()
+{
+	return m_Textures.end();
+}
+
 bool ResourcesManager::LoadErrorTexture(const wchar_t * i_Filepath)
 {
 	DX12Texture * texture = m_Textures[ERROR_ID];

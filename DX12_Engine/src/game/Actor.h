@@ -52,16 +52,17 @@ public:
 	UINT64					GetId() const;
 	const std::wstring &	GetName() const;
 	World *					GetWorld() const;
+	UINT					GetComponentCount() const;
 
 	// rendering process (manage attach and detach render component)
 	void				AttachRenderComponent(const RenderComponent::RenderComponentDesc & i_ComponentDesc);	// Take the render component and make a copy for the game object
 	bool				DetachRenderComponent();
 	RenderComponent *	GetRenderComponent() const;
 
-
-	// editor purpose
 #ifdef WITH_EDITOR
-	void	SetName(const std::wstring & i_NewName);
+	// editor purpose
+	ActorComponent *	GetComponent(UINT i_Index) const;
+	void				SetName(const std::wstring & i_NewName);
 #endif
 
 	// friend class
@@ -97,7 +98,11 @@ private:
 	UINT64					m_Id;
 	
 	// components management
-	RenderComponent *		m_RenderComponent;
+	bool		AttachComponent(ActorComponent * i_Component);
+	bool		DetachComponent(ActorComponent * i_Component);
+
+	std::vector<ActorComponent *>	m_Components;
+	RenderComponent *				m_RenderComponent;
 
 	// world of the actor
 	World * const			m_World;

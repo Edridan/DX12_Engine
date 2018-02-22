@@ -9,7 +9,7 @@
 #include "dx12/DX12RenderEngine.h"
 
 RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor)
-	:ActorComponent(i_Actor)
+	:ActorComponent(i_Actor, "Render Component")
 	,m_Mesh(i_Desc.Mesh)
 	,m_ConstBuffer(UnavailableAdressId)
 	,m_Material(nullptr)
@@ -48,6 +48,17 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 	m_Material->UpdateConstantBufferView();
 }
 
+RenderComponent::RenderComponent(Actor * i_Actor)
+	:ActorComponent(i_Actor, "Render Component")
+	,m_Mesh(nullptr)
+	,m_ConstBuffer(UnavailableAdressId)
+	,m_Material(nullptr)
+	,m_RenderPass(RenderPass::eOpaqueGeometry)
+{
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+	m_ConstBuffer = render.GetConstantBuffer(DX12RenderEngine::eTransform)->ReserveVirtualAddress();
+}
+
 RenderComponent::~RenderComponent()
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
@@ -66,9 +77,6 @@ void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandLis
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
 		//// add pso and root signature to the commandlist
-		//i_CommandList->SetGraphicsRootSignature(m_RootSignature);
-		//// Setup the pipeline state
-		//i_CommandList->SetPipelineState(m_PipelineState);
 		m_Material->SetupPipeline(i_CommandList);
 
 		// push transform buffer
@@ -120,3 +128,123 @@ DX12Material * RenderComponent::GetMaterial()
 {
 	return m_Material;
 }
+
+void RenderComponent::SetMeshBuffer(const DX12MeshBuffer * i_Mesh)
+{
+	m_Mesh = i_Mesh;
+}
+
+const DX12MeshBuffer * RenderComponent::GetMeshBuffer()
+{
+	return m_Mesh;
+}
+
+bool RenderComponent::IsRenderable() const
+{
+	return (m_Mesh != nullptr && m_Material != nullptr);
+}
+
+///////////////////////////////////////
+// editor only
+#ifdef WITH_EDITOR
+#include "ui/UI.h"
+#include "engine/Engine.h"
+
+void RenderComponent::DrawUIComponentInternal()
+{
+	DrawUIMaterial();
+	DrawUIMesh();
+}
+
+FORCEINLINE void RenderComponent::DrawUIMaterial()
+{
+	if (ImGui::TreeNode("Material"))
+	{
+		// retreive materials
+		std::vector<std::string> files;
+		static const char * items[128];
+		static int selectedItem = -1;
+
+
+		if (m_Material != nullptr)
+		{
+			selectedItem = 0;
+			files.push_back(m_Material->GetName());
+		}
+
+		const int currentItem = selectedItem;
+
+
+		Files::GetFilesInFolder(files, "resources/obj", ".mtl", true);
+
+		for (size_t i = 0; (i < files.size() && i < 128); ++i)
+		{
+			items[i] = files[i].c_str();
+		}
+
+		ImGui::Combo("", &selectedItem, items, Math::Min((int)files.size(), 128));
+
+		if (selectedItem != currentItem)
+		{
+			// To do : load and change the material
+			
+		}
+
+
+		ImGui::TreePop();
+	}
+}
+
+FORCEINLINE void RenderComponent::DrawUIMesh()
+{
+	if (ImGui::TreeNode("Mesh"))
+	{
+		// retreive materials
+		std::vector<std::string> files;
+		static const char * items[128];
+		static int selectedItem = -1;
+
+
+		if (m_Mesh != nullptr)
+		{
+			selectedItem = 0;
+			files.push_back("");
+			String::Utf16ToUtf8(files[0], m_Mesh->GetName());
+		}
+
+		const int currentItem = selectedItem;
+
+
+		files.push_back("Primitive:Triangle");
+		files.push_back("Primitive:Plane");
+		files.push_back("Primitive:Cube");
+
+		Files::GetFilesInFolder(files, "resources/obj", ".obj", true);
+
+		for (size_t i = 0; (i < files.size() && i < 128); ++i)
+		{
+			items[i] = files[i].c_str();
+		}
+
+		ImGui::Combo("", &selectedItem, items, Math::Min((int)files.size(), 128));
+
+		if (selectedItem != currentItem)
+		{
+			std::string fileToLoad = files[selectedItem];
+			// change the mesh
+			if (String::StartWith(files[selectedItem], "Primitive:"))
+			{
+				fileToLoad = fileToLoad.substr(10);
+			}
+
+			std::wstring file;
+			String::Utf8ToUtf16(file, fileToLoad);
+
+			SetMeshBuffer(Engine::GetInstance().GetResourcesManager()->GetMesh(file.c_str())->GetRootMesh());
+		}
+
+
+		ImGui::TreePop();
+	}
+}
+#endif 

@@ -125,6 +125,7 @@
     <ClCompile Include="src\game\Actor.cpp" />
     <ClCompile Include="src\game\ActorComponent.cpp" />
     <ClCompile Include="src\game\Camera.cpp" />
+    <ClCompile Include="src\game\LightComponent.cpp" />
     <ClCompile Include="src\game\RenderComponent.cpp" />
     <ClCompile Include="src\game\World.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -150,7 +151,6 @@
     <ClInclude Include="src\dx12\DX12DepthBuffer.h" />
     <ClInclude Include="src\dx12\DX12DescriptorHeap.h" />
     <ClInclude Include="src\dx12\DX12ImGui.h" />
-    <ClInclude Include="src\dx12\DX12Light.h" />
     <ClInclude Include="src\dx12\DX12Material.h" />
     <ClInclude Include="src\dx12\DX12Mesh.h" />
     <ClInclude Include="src\dx12\DX12MeshBuffer.h" />
@@ -180,6 +180,7 @@
     <ClInclude Include="src\game\Actor.h" />
     <ClInclude Include="src\game\ActorComponent.h" />
     <ClInclude Include="src\game\Camera.h" />
+    <ClInclude Include="src\game\LightComponent.h" />
     <ClInclude Include="src\game\RenderComponent.h" />
     <ClInclude Include="src\game\World.h" />
     <ClInclude Include="src\ui\UIDebug.h" />

@@ -231,6 +231,9 @@
     <ClCompile Include="src\editor\UIMaterialBuilder.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="src\game\LightComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
@@ -377,9 +380,6 @@
     <ClInclude Include="src\dx12\DX12DepthBuffer.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="src\dx12\DX12Light.h">
-      <Filter>Header Files\DX12</Filter>
-    </ClInclude>
     <ClInclude Include="src\editor\UISceneBuilder.h">
       <Filter>Header Files\Editor</Filter>
     </ClInclude>
@@ -394,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="src\engine\Defines.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\LightComponent.h">
+      <Filter>Header Files\Game\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

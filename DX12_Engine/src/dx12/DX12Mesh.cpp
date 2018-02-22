@@ -109,14 +109,17 @@ DX12Mesh * DX12Mesh::GeneratePrimitiveMesh(EPrimitiveMesh i_Prim)
 	case ePlane:
 		returnMesh = new DX12Mesh(s_PrimitiveLayoutDesc,
 			reinterpret_cast<BYTE*>(vPlane), 4u, iPlane, 6u);
+		returnMesh->m_RootMeshBuffer->m_Name = L"Plane";
 		break;
 	case eTriangle:
 		returnMesh = new DX12Mesh(s_PrimitiveLayoutDesc,
 			reinterpret_cast<BYTE*>(vTriangle), 3u);
+		returnMesh->m_RootMeshBuffer->m_Name = L"Triangle";
 		break;
 	case eCube:
 		returnMesh = new DX12Mesh(s_PrimitiveLayoutDesc,
 			reinterpret_cast<BYTE*>(vCube), 24u, iCube, 36u);
+		returnMesh->m_RootMeshBuffer->m_Name = L"Cube";
 		break;
 	}
 

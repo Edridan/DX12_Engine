@@ -79,14 +79,32 @@ World * Actor::GetWorld() const
 	return m_World;
 }
 
+UINT Actor::GetComponentCount() const
+{
+	return (UINT)m_Components.size();
+}
+
 void Actor::AttachRenderComponent(const RenderComponent::RenderComponentDesc & i_ComponentDesc)
 {
-	m_RenderComponent = new RenderComponent(i_ComponentDesc, this);
+	ASSERT(m_RenderComponent == nullptr);
+	if (m_RenderComponent != nullptr)		return;
+
+	RenderComponent * component = new RenderComponent(i_ComponentDesc, this);
+
+	if (AttachComponent(component))
+	{
+		m_RenderComponent = component;
+	}
 }
 
 bool Actor::DetachRenderComponent()
 {
-	return false;
+	ASSERT(m_RenderComponent != nullptr);
+	if (m_RenderComponent == nullptr)	return false;
+
+	DetachComponent(m_RenderComponent);
+
+	return true;
 }
 
 RenderComponent * Actor::GetRenderComponent() const
@@ -95,6 +113,10 @@ RenderComponent * Actor::GetRenderComponent() const
 }
 
 #ifdef WITH_EDITOR
+ActorComponent * Actor::GetComponent(UINT i_Index) const
+{
+	return m_Components[i_Index];
+}
 void Actor::SetName(const std::wstring & i_NewName)
 {
 	m_Name = i_NewName;
@@ -169,7 +191,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 				//mesh->GetTextures(componentDesc.Textures, i_Desc.SubMeshId);
 			}
 
-			m_RenderComponent = new RenderComponent(componentDesc, this);
+			AttachRenderComponent(componentDesc);
 		}
 		else
 		{
@@ -214,4 +236,38 @@ void Actor::Render()
 {
 	// To do : 
 	// push the render component to the render list
+}
+
+bool Actor::AttachComponent(ActorComponent * i_Component)
+{
+	auto itr = m_Components.begin();
+
+	while (itr != m_Components.end())
+	{
+		if ((*itr) == i_Component)
+		{
+			ASSERT_ERROR("Component already added to the actor");
+			return false;
+		}
+	}
+
+	m_Components.push_back(i_Component);
+	return true;
+}
+
+bool Actor::DetachComponent(ActorComponent * i_Component)
+{
+	auto itr = m_Components.begin();
+
+	while (itr != m_Components.end())
+	{
+		if ((*itr) == i_Component)
+		{
+			m_Components.erase(itr);
+			return true;
+		}
+	}
+
+	ASSERT_ERROR("Component is not in the list");
+	return false;
 }
