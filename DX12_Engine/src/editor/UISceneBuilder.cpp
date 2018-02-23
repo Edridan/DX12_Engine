@@ -16,6 +16,7 @@ UISceneBuilder::UISceneBuilder(UIActorBuilder * i_ActorBuilder)
 	:UIWindow("Scene Editor", eNone)
 	, m_ActorBuilder(i_ActorBuilder)
 	, m_SelectedActor(nullptr)
+	, m_ActorToSetup(nullptr)
 {
 	// empty actor
 	s_ActorDesc[0].Name = L"Empty";
@@ -59,6 +60,13 @@ void UISceneBuilder::AddActor(const Actor::ActorDesc & i_Desc, const Transform &
 	m_World->SpawnActor(i_Desc, i_Transform);
 }
 
+void UISceneBuilder::DeleteActor(Actor * i_Actor, bool i_DeleteChild)
+{
+	if (m_World == nullptr)	return;
+
+	m_World->DeleteActor(i_Actor, i_DeleteChild);
+}
+
 void UISceneBuilder::AttachToParent(Actor * i_Child, Actor * i_Parent)
 {
 	if (m_World == nullptr)	return;
@@ -66,7 +74,7 @@ void UISceneBuilder::AttachToParent(Actor * i_Child, Actor * i_Parent)
 	m_World->AttachActor(i_Parent, i_Child);
 }
 
-void UISceneBuilder::SelectActor(Actor * i_Actor)
+FORCEINLINE void UISceneBuilder::SelectActor(Actor * i_Actor)
 {
 	m_SelectedActor = i_Actor;
 
@@ -83,13 +91,28 @@ FORCEINLINE void UISceneBuilder::DrawActor(Actor * i_Actor)
 
 	// select the actor needed
 	bool isOpen = ImGui::TreeNode(actorName.c_str());
-	if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
+
+	if (ImGui::IsItemHovered())
 	{
-		if (m_SelectedActor != i_Actor)
+		if (ImGui::IsMouseClicked(0))
 		{
-			SelectActor(i_Actor);
+			if (m_SelectedActor != i_Actor)
+			{
+				SelectActor(i_Actor);
+			}
 		}
-		
+		else if (ImGui::IsMouseClicked(1))
+		{
+			ImGui::OpenPopup("setup_actor");
+			m_ActorToSetup = i_Actor;	// actor to setup
+		}
+	}
+	else if (IsFocused())
+	{
+		if (ImGui::IsMouseClicked(1))
+		{
+			ImGui::OpenPopup("add_actor");
+		}
 	}
 
 	// draw children if needed
@@ -111,28 +134,6 @@ FORCEINLINE void UISceneBuilder::DrawActor(Actor * i_Actor)
 		// finish rendering the actor
 		ImGui::TreePop();
 	}
-
-	if (IsFocused())
-	{
-		if (ImGui::IsMouseClicked(1))
-		{
-			ImGui::OpenPopup("add_actor");
-		}
-	}
-
-	if (ImGui::BeginPopup("add_actor"))
-	{
-		ImGui::Text("Actor Type");
-		ImGui::Separator();
-		for (int i = 0; i < _countof(s_ActorSpawnType); i++)
-		{
-			if (ImGui::Selectable(s_ActorSpawnType[i]))
-			{
-				AddActor(s_ActorDesc[i], Transform());
-			}
-		}
-		ImGui::EndPopup();
-	}
 }
 
 void UISceneBuilder::DrawWindow()
@@ -144,10 +145,41 @@ void UISceneBuilder::DrawWindow()
 		return;
 	}
 
-	// for each root actors
+	// draw differents actors here
 	for (UINT i = 0; i < m_World->GetRootActorCount(); ++i)
 	{
 		Actor * actor = m_World->GetRootActorByIndex(i);
 		DrawActor(actor);
+	}
+
+	// popup and other messages management
+	// setup actor
+	if (ImGui::BeginPopup("setup_actor") && m_ActorToSetup != nullptr)
+	{
+		ImGui::Text("Setup");
+		ImGui::Separator();
+		if (ImGui::Selectable("Remove"))
+		{
+			DeleteActor(m_ActorToSetup, false);
+		}
+		if (ImGui::Selectable("Remove All"))
+		{
+			DeleteActor(m_ActorToSetup, true);
+		}
+		ImGui::EndPopup();
+	}
+	// add actor to the scene
+	else if (ImGui::BeginPopup("add_actor"))
+	{
+		ImGui::Text("Add Actor");
+		ImGui::Separator();
+		for (int i = 0; i < _countof(s_ActorSpawnType); i++)
+		{
+			if (ImGui::Selectable(s_ActorSpawnType[i]))
+			{
+				AddActor(s_ActorDesc[i], Transform());
+			}
+		}
+		ImGui::EndPopup();
 	}
 }

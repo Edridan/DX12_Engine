@@ -32,6 +32,7 @@ private:
 
 	// internal call
 	void			AddActor(const Actor::ActorDesc & i_Desc, const Transform & i_Transform);
+	void			DeleteActor(Actor * i_Actor, bool i_DeleteChild);
 	void			AttachToParent(Actor * i_Child, Actor * i_Parent);
 	void			SelectActor(Actor * i_Actor);
 
@@ -39,13 +40,15 @@ private:
 	void			DrawActor(Actor * i_Actor);
 
 	// Inherited via UIWindow
-	virtual void DrawWindow() override;
+	virtual void	DrawWindow() override;
 
 	// other modules
 	UIActorBuilder *		m_ActorBuilder;
 
 	// management
 	Actor *					m_SelectedActor;
+	Actor *					m_ActorToSetup;
+
 
 	// internal data
 	static const char *			s_ActorSpawnType[];

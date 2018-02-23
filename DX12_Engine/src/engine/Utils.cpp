@@ -43,7 +43,7 @@ void Files::GetFilesInFolder(std::vector<std::string>& o_Files, const std::strin
 			if (i_ReturnFolderInFiles)
 			{
 				String::Utf16ToUtf8(file, data.cFileName);
-				file = "/" + i_Folder + "/" + file;
+				file = i_Folder + "/" + file;
 			}
 			else
 				String::Utf16ToUtf8(file, data.cFileName);
