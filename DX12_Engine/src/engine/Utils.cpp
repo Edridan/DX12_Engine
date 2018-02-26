@@ -124,6 +124,22 @@ std::wstring String::ReplaceAll(const std::wstring & i_String, const std::wstrin
 	return str;
 }
 
+std::string String::IntToString(int i_Value)
+{
+	char buffer[32];
+	_itoa_s(i_Value, buffer, 10);
+
+	return std::string(buffer);
+}
+
+std::string String::Int64ToString(long int i_Value)
+{
+	char buffer[32];
+	_ltoa_s(i_Value, buffer, 10);
+
+	return std::string(buffer);
+}
+
 bool String::EndWith(const std::string & i_String, const std::string & i_End)
 {
 	if (i_End.size() > i_String.size()) return false;

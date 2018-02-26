@@ -118,6 +118,10 @@ namespace String
 	std::string		ReplaceAll(const std::string & i_String, const std::string & i_From, const std::string & i_To);
 	std::wstring	ReplaceAll(const std::wstring & i_String, const std::wstring & i_From, const std::wstring & i_To);
 
+	// itoa
+	std::string		IntToString(int i_Value);
+	std::string		Int64ToString(long int i_Value);
+
 	// specific operation
 	bool		EndWith(const std::string & i_String, const std::string & i_End);
 	bool		EndWith(const std::wstring & i_String, const std::wstring & i_End);

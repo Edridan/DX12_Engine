@@ -49,7 +49,6 @@ private:
 	Actor *					m_SelectedActor;
 	Actor *					m_ActorToSetup;
 
-
 	// internal data
 	static const char *			s_ActorSpawnType[];
 	static Actor::ActorDesc *	s_ActorDesc;

@@ -19,6 +19,7 @@ public:
 
 	// management
 	void	SetActor(Actor * i_Actor);
+	Actor *		GetActor() const;
 
 private:
 	// internal callbacks

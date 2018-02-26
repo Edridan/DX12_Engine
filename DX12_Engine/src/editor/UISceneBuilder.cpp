@@ -14,9 +14,9 @@ Actor::ActorDesc *	UISceneBuilder::s_ActorDesc = new Actor::ActorDesc[_countof(s
 
 UISceneBuilder::UISceneBuilder(UIActorBuilder * i_ActorBuilder)
 	:UIWindow("Scene Editor", eNone)
-	, m_ActorBuilder(i_ActorBuilder)
-	, m_SelectedActor(nullptr)
-	, m_ActorToSetup(nullptr)
+	,m_ActorBuilder(i_ActorBuilder)
+	,m_SelectedActor(nullptr)
+	,m_ActorToSetup(nullptr)
 {
 	// empty actor
 	s_ActorDesc[0].Name = L"Empty";
@@ -64,6 +64,7 @@ void UISceneBuilder::DeleteActor(Actor * i_Actor, bool i_DeleteChild)
 {
 	if (m_World == nullptr)	return;
 
+	if (m_ActorBuilder->GetActor() == i_Actor)	m_ActorBuilder->SetActor(nullptr);
 	m_World->DeleteActor(i_Actor, i_DeleteChild);
 }
 
@@ -86,11 +87,13 @@ FORCEINLINE void UISceneBuilder::SelectActor(Actor * i_Actor)
 
 FORCEINLINE void UISceneBuilder::DrawActor(Actor * i_Actor)
 {
-	std::string actorName;
+	std::string actorName, actorId = String::IntToString(i_Actor->GetId());
 	String::Utf16ToUtf8(actorName, i_Actor->GetName());
+	
 
 	// select the actor needed
-	bool isOpen = ImGui::TreeNode(actorName.c_str());
+
+	bool isOpen = ImGui::TreeNode(actorId.c_str(),actorName.c_str());
 
 	if (ImGui::IsItemHovered())
 	{
@@ -105,13 +108,6 @@ FORCEINLINE void UISceneBuilder::DrawActor(Actor * i_Actor)
 		{
 			ImGui::OpenPopup("setup_actor");
 			m_ActorToSetup = i_Actor;	// actor to setup
-		}
-	}
-	else if (IsFocused())
-	{
-		if (ImGui::IsMouseClicked(1))
-		{
-			ImGui::OpenPopup("add_actor");
 		}
 	}
 
@@ -168,12 +164,20 @@ void UISceneBuilder::DrawWindow()
 		}
 		ImGui::EndPopup();
 	}
+	else if (IsFocused())
+	{
+		if (ImGui::IsMouseClicked(1))
+		{
+			ImGui::OpenPopup("add_actor");
+		}
+	}
+
 	// add actor to the scene
-	else if (ImGui::BeginPopup("add_actor"))
+	if (ImGui::BeginPopup("add_actor"))
 	{
 		ImGui::Text("Add Actor");
 		ImGui::Separator();
-		for (int i = 0; i < _countof(s_ActorSpawnType); i++)
+		for (int i = 0; i < _countof(s_ActorSpawnType); ++i)
 		{
 			if (ImGui::Selectable(s_ActorSpawnType[i]))
 			{
@@ -182,4 +186,5 @@ void UISceneBuilder::DrawWindow()
 		}
 		ImGui::EndPopup();
 	}
+	
 }

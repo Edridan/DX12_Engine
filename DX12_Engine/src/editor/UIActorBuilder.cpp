@@ -19,6 +19,11 @@ void UIActorBuilder::SetActor(Actor * i_Actor)
 	m_Actor = i_Actor;
 }
 
+Actor * UIActorBuilder::GetActor() const
+{
+	return m_Actor;
+}
+
 FORCEINLINE void UIActorBuilder::DrawTransform(Transform * i_Transform)
 {
 	XMFLOAT3 saved;
