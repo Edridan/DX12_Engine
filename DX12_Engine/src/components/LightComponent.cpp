@@ -1,7 +1,7 @@
 #include "LightComponent.h"
 
 
-LightComponent::LightComponent(LightDesc & i_Desc, Actor * i_Actor)
+LightComponent::LightComponent(const LightDesc & i_Desc, Actor * i_Actor)
 	:ActorComponent(i_Actor, "Light Component")
 {
 	// generate light

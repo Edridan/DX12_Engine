@@ -84,6 +84,13 @@ UINT Actor::GetComponentCount() const
 	return (UINT)m_Components.size();
 }
 
+void Actor::DetachComponent(ActorComponent * i_Component)
+{
+	if (i_Component == m_LightComponent)		DetachLightComponent();
+	else if (i_Component == m_RenderComponent)	DetachRenderComponent();
+	else										DetachComponentInternal(i_Component);
+}
+
 void Actor::AttachRenderComponent(const RenderComponent::RenderComponentDesc & i_ComponentDesc)
 {
 	ASSERT(m_RenderComponent == nullptr);
@@ -91,7 +98,7 @@ void Actor::AttachRenderComponent(const RenderComponent::RenderComponentDesc & i
 
 	RenderComponent * component = new RenderComponent(i_ComponentDesc, this);
 
-	if (AttachComponent(component))
+	if (AttachComponentInternal(component))
 	{
 		m_RenderComponent = component;
 	}
@@ -102,7 +109,9 @@ bool Actor::DetachRenderComponent()
 	ASSERT(m_RenderComponent != nullptr);
 	if (m_RenderComponent == nullptr)	return false;
 
-	DetachComponent(m_RenderComponent);
+	DetachComponentInternal(m_RenderComponent);
+
+	m_RenderComponent = nullptr;
 
 	return true;
 }
@@ -110,6 +119,36 @@ bool Actor::DetachRenderComponent()
 RenderComponent * Actor::GetRenderComponent() const
 {
 	return m_RenderComponent;
+}
+
+void Actor::AttachLightComponent(const LightComponent::LightDesc & i_Desc)
+{
+	ASSERT(m_LightComponent == nullptr);
+	if (m_LightComponent != nullptr) return;
+
+	LightComponent * component = new LightComponent(i_Desc, this);
+
+	if (AttachComponentInternal(component))
+	{
+		m_LightComponent = component;
+	}
+}
+
+bool Actor::DetachLightComponent()
+{
+	ASSERT(m_LightComponent != nullptr);
+	if (m_LightComponent == nullptr)		return false;
+
+	DetachComponentInternal(m_LightComponent);
+
+	m_LightComponent = nullptr;
+
+	return true;
+}
+
+LightComponent * Actor::GetLightComponent() const
+{
+	return m_LightComponent;
 }
 
 #ifdef WITH_EDITOR
@@ -133,6 +172,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 	,m_NeedTick(false)
 	// components
 	,m_RenderComponent(nullptr)
+	,m_LightComponent(nullptr)
 {
 	// initialize the object from the desc
 	m_NeedTick		= i_Desc.NeedTick;
@@ -238,7 +278,7 @@ void Actor::Render()
 	// push the render component to the render list
 }
 
-bool Actor::AttachComponent(ActorComponent * i_Component)
+bool Actor::AttachComponentInternal(ActorComponent * i_Component)
 {
 	auto itr = m_Components.begin();
 
@@ -249,13 +289,14 @@ bool Actor::AttachComponent(ActorComponent * i_Component)
 			ASSERT_ERROR("Component already added to the actor");
 			return false;
 		}
+		++itr;
 	}
 
 	m_Components.push_back(i_Component);
 	return true;
 }
 
-bool Actor::DetachComponent(ActorComponent * i_Component)
+bool Actor::DetachComponentInternal(ActorComponent * i_Component)
 {
 	auto itr = m_Components.begin();
 
@@ -266,6 +307,7 @@ bool Actor::DetachComponent(ActorComponent * i_Component)
 			m_Components.erase(itr);
 			return true;
 		}
+		++itr;
 	}
 
 	ASSERT_ERROR("Component is not in the list");
