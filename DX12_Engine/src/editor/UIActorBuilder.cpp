@@ -88,5 +88,49 @@ void UIActorBuilder::DrawWindow()
 	{
 		m_Actor->GetComponent(i)->DrawUIComponent();
 	}
+
+	if (IsFocused() && ImGui::IsMouseClicked(1))
+	{
+		ImGui::OpenPopup("add_component");
+	}
+
+	if (ImGui::BeginPopup("add_component"))
+	{
+		ImGui::Text("Components");
+		ImGui::Separator();
+
+		static const char * componentType[] = {"Render Component", "Light Component"};
+
+		for (size_t i = 0; i < _countof(componentType); ++i)
+		{
+			if (ImGui::Selectable(componentType[i]))
+			{
+				switch (i)
+				{
+				case 0:	// render component
+					{
+						RenderComponent::RenderComponentDesc renderDesc;
+						renderDesc.Mesh = nullptr;
+						renderDesc.Material = nullptr;
+						m_Actor->AttachRenderComponent(renderDesc);
+					}
+					break;
+				case 1:	// Light component
+					{
+						LightComponent::LightDesc lightDesc;
+						lightDesc.Color[0] = 1.f;
+						lightDesc.Color[1] = 1.f;
+						lightDesc.Color[2] = 1.f;
+						lightDesc.Color[3] = 1.f;
+						lightDesc.Type = LightComponent::ePointLight;
+						m_Actor->AttachLightComponent(lightDesc);
+					}
+					break;
+				}
+			}
+		}
+
+		ImGui::EndPopup();
+	}
 }
 

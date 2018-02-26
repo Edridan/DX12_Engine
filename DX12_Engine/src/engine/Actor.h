@@ -10,6 +10,8 @@
 
 #include "engine/Transform.h"
 #include "engine/Defines.h"
+// components
+#include "components/LightComponent.h"
 #include "components/RenderComponent.h"
 
 // class predef
@@ -54,10 +56,17 @@ public:
 	World *					GetWorld() const;
 	UINT					GetComponentCount() const;
 
+	// automatic remove component
+	void				DetachComponent(ActorComponent * i_Component);
 	// rendering process (manage attach and detach render component)
 	void				AttachRenderComponent(const RenderComponent::RenderComponentDesc & i_ComponentDesc);	// Take the render component and make a copy for the game object
 	bool				DetachRenderComponent();
 	RenderComponent *	GetRenderComponent() const;
+
+	// light management
+	void				AttachLightComponent(const LightComponent::LightDesc & i_Desc);
+	bool				DetachLightComponent();
+	LightComponent *	GetLightComponent() const;
 
 #ifdef WITH_EDITOR
 	// editor purpose
@@ -98,11 +107,14 @@ private:
 	UINT64					m_Id;
 	
 	// components management
-	bool		AttachComponent(ActorComponent * i_Component);
-	bool		DetachComponent(ActorComponent * i_Component);
+	bool		AttachComponentInternal(ActorComponent * i_Component);
+	bool		DetachComponentInternal(ActorComponent * i_Component);
 
+	// components
 	std::vector<ActorComponent *>	m_Components;
+	// specific unique
 	RenderComponent *				m_RenderComponent;
+	LightComponent *				m_LightComponent;
 
 	// world of the actor
 	World * const			m_World;

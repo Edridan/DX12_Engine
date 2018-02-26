@@ -25,7 +25,7 @@ public:
 		float			Color[4];
 	};
 
-	LightComponent(LightDesc & i_Desc, Actor * i_Actor);
+	LightComponent(const LightDesc & i_Desc, Actor * i_Actor);
 	LightComponent(Actor * i_Actor);
 	~LightComponent();
 
