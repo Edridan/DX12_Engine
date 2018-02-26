@@ -2,8 +2,8 @@
 // create the engine and run it
 #include "engine/Engine.h"
 // engine game class
-#include "game/World.h"
-#include "game/Actor.h"
+#include "engine/World.h"
+#include "engine/Actor.h"
 // WinMain
 #include <Windows.h>
 

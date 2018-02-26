@@ -1,9 +1,9 @@
 #include "Actor.h"
 
 // components
-#include "game/RenderComponent.h"
+#include "components/RenderComponent.h"
 // game
-#include "game/World.h"
+#include "engine/World.h"
 // engine
 #include "engine/Engine.h"
 #include "engine/ResourcesManager.h"

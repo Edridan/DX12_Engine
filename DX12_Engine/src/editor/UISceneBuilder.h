@@ -5,7 +5,7 @@
 #ifdef WITH_EDITOR
 
 #include "ui/UIWindow.h"
-#include "game/Actor.h"
+#include "engine/Actor.h"
 
 // class predef
 class World;

@@ -19,12 +19,6 @@
     <Filter Include="Source Files\DX12">
       <UniqueIdentifier>{29c0a7d2-0808-453c-8be3-0df79ef55327}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game">
-      <UniqueIdentifier>{014da348-18ff-498d-9a0e-b08e1e4a6f24}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Game">
-      <UniqueIdentifier>{a372c1ad-bd63-4c6c-8d80-d13987fbd013}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Icon">
       <UniqueIdentifier>{d718eeac-b874-4504-8c31-94cf00d632ef}</UniqueIdentifier>
     </Filter>
@@ -51,12 +45,6 @@
     </Filter>
     <Filter Include="Source Files\Engine">
       <UniqueIdentifier>{96c11660-ad29-42ab-a63e-d770b1e0f985}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Game\Components">
-      <UniqueIdentifier>{fd896e92-c245-4da9-9264-5012d4a39039}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Game\Components">
-      <UniqueIdentifier>{215b6c0b-d412-4b2f-9015-44d94e15579c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{08251dc1-fd5c-46a7-8df2-63de7402484f}</UniqueIdentifier>
@@ -93,6 +81,12 @@
     </Filter>
     <Filter Include="Shaders\Debug">
       <UniqueIdentifier>{71bf94fd-dd8f-4aab-a540-c8b120df704a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Components">
+      <UniqueIdentifier>{087a8027-497b-4f17-8ad8-10834a46ae5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Components">
+      <UniqueIdentifier>{298efdb5-fad3-4b82-926c-2297ee068e05}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -132,26 +126,11 @@
     <ClCompile Include="src\engine\Clock.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\World.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game\Actor.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game\Camera.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="src\engine\ResourcesManager.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game\ActorComponent.cpp">
-      <Filter>Source Files\Game\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game\RenderComponent.cpp">
-      <Filter>Source Files\Game\Components</Filter>
     </ClCompile>
     <ClCompile Include="src\engine\Window.cpp">
       <Filter>Source Files\Engine</Filter>
@@ -231,8 +210,23 @@
     <ClCompile Include="src\editor\UIMaterialBuilder.cpp">
       <Filter>Source Files\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="src\game\LightComponent.cpp">
-      <Filter>Source Files\Game\Components</Filter>
+    <ClCompile Include="src\components\LightComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\RenderComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\ActorComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\Actor.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\World.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\Camera.cpp">
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -275,26 +269,11 @@
     <ClInclude Include="src\engine\Transform.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\World.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="src\game\Actor.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resource Files\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\Camera.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="src\engine\ResourcesManager.h">
       <Filter>Header Files\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\game\ActorComponent.h">
-      <Filter>Header Files\Game\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\game\RenderComponent.h">
-      <Filter>Header Files\Game\Components</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Window.h">
       <Filter>Header Files\Engine</Filter>
@@ -356,9 +335,6 @@
     <ClInclude Include="src\ui\UIDebug.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
-    <ClInclude Include="src\engine\StackDebugger.h">
-      <Filter>Header Files\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\engine\Input.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
@@ -395,8 +371,23 @@
     <ClInclude Include="src\engine\Defines.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\game\LightComponent.h">
-      <Filter>Header Files\Game\Components</Filter>
+    <ClInclude Include="src\engine\Actor.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\World.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\ActorComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\LightComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\RenderComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Camera.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

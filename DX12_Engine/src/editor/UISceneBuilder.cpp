@@ -3,9 +3,9 @@
 #include "editor/UIActorBuilder.h"
 
 #include "ui/UI.h"
-#include "game/World.h"
-#include "game/Actor.h"
-#include "game/ActorComponent.h"
+#include "engine/World.h"
+#include "engine/Actor.h"
+#include "components/ActorComponent.h"
 #include "engine/Transform.h"
 
 // static definition

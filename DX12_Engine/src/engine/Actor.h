@@ -10,7 +10,7 @@
 
 #include "engine/Transform.h"
 #include "engine/Defines.h"
-#include "RenderComponent.h"
+#include "components/RenderComponent.h"
 
 // class predef
 class World;	// world of the actor

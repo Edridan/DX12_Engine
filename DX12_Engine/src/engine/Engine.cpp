@@ -7,9 +7,9 @@
 #include "dx12/DX12ConstantBuffer.h"
 #include "dx12/DX12ImGui.h"
 // game include
-#include "game/World.h"
-#include "game/Camera.h"
-#include "game/RenderComponent.h"
+#include "engine/World.h"
+#include "engine/Camera.h"
+#include "components/RenderComponent.h"
 // engine
 #include "engine/Clock.h"
 #include "engine/Window.h"

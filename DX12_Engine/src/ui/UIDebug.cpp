@@ -2,8 +2,8 @@
 
 #include "ui/UI.h"
 #include "engine/Engine.h"
-#include "game/World.h"
-#include "game/Camera.h"
+#include "engine/World.h"
+#include "engine/Camera.h"
 
 UIDebug::UIDebug()
 	:UIWindow("Debug")

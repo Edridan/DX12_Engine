@@ -7,7 +7,7 @@
 
 #include "engine/Debug.h"
 #include "engine/Engine.h"
-#include "game/World.h"
+#include "engine/World.h"
 #include "ui/UILayer.h"
 #include "ui/UIConsole.h"
 

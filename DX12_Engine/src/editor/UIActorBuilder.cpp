@@ -2,7 +2,7 @@
 
 #include "ui/UI.h"
 
-#include "game/Actor.h"
+#include "engine/Actor.h"
 
 UIActorBuilder::UIActorBuilder()
 	:UIWindow("Actor Builder", eNone)

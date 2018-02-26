@@ -3,8 +3,8 @@
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12RenderEngine.h"
 #include "dx12/DX12ConstantBuffer.h"
-#include "game/RenderComponent.h"
-#include "game/Actor.h"
+#include "components/RenderComponent.h"
+#include "engine/Actor.h"
 
 RenderList::RenderList()
 {
