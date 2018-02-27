@@ -26,20 +26,11 @@ RenderList::~RenderList()
 
 void RenderList::SetupRenderList(const RenderListSetup & i_Setup)
 {
-	// setup is call before reset
-	if (m_CommandList != nullptr)
-	{
-		PRINT_DEBUG("[RenderList] call a setup before a reset");
-		DEBUG_BREAK;
-		return;
-	}
-
 	// setup the render list for this frame
-	m_CommandList	= i_Setup.CommandList;
-	m_Projection	= i_Setup.ProjectionMatrix;
-	m_View			= i_Setup.ViewMatrix;
-
-	ASSERT(m_CommandList != nullptr);
+	m_ImmediateCommandList	= i_Setup.ImmediateCommandList;
+	m_DeferredCommandList	= i_Setup.DeferredCommandList;
+	m_Projection			= i_Setup.ProjectionMatrix;
+	m_View					= i_Setup.ViewMatrix;
 }
 
 size_t RenderList::RenderComponentCount() const
@@ -47,16 +38,25 @@ size_t RenderList::RenderComponentCount() const
 	return m_Components.size();
 }
 
-void RenderList::PushRenderComponent(const RenderComponent * i_RenderComponent)
+void RenderList::RenderGBuffer() const
 {
-	m_Components.push_back(i_RenderComponent);
 }
 
-void RenderList::PushOnCommandList() const
+void RenderList::RenderLight() const
 {
-	if (m_CommandList == nullptr)
+	if (m_ImmediateCommandList == nullptr)
 	{
-		PRINT_DEBUG("[RenderList] call push on command list before a setup call");
+		PRINT_DEBUG("[RenderList] call RenderLight before a setup call");
+		DEBUG_BREAK;
+		return;
+	}
+}
+
+void RenderList::RenderGBuffer() const
+{
+	if (m_DeferredCommandList == nullptr)
+	{
+		PRINT_DEBUG("[RenderList] call RenderGBuffer list before a setup call");
 		DEBUG_BREAK;
 		return;
 	}
@@ -88,14 +88,6 @@ void RenderList::PushOnCommandList() const
 			continue;
 		}
 
-		// the component is not valid
-		if (!component->IsValid())
-		{
-			PRINT_DEBUG("Error : component is not valid");
-			DEBUG_BREAK;
-			continue;
-		}
-
 		// get component data to prepare for rendering
 		Actor * actor = component->GetActor();
 		ADDRESS_ID cbvAddress = component->GetConstBufferAddress();
@@ -111,16 +103,40 @@ void RenderList::PushOnCommandList() const
 
 		// update the constant buffer on GPU
 		render.GetConstantBuffer(DX12RenderEngine::eTransform)->UpdateConstantBuffer(cbvAddress, &constantBuffer, sizeof(TransformConstantBuffer));
-		component->PushOnCommandList(m_CommandList);
+		component->PushOnCommandList(m_DeferredCommandList);
 	}
+}
+
+void RenderList::PushRenderComponent(const RenderComponent * i_RenderComponent)
+{
+	// the component is not valid
+	if (!i_RenderComponent->IsValid())
+	{
+		PRINT_DEBUG("Error : component is not valid");
+		DEBUG_BREAK;
+		return;
+	}
+
+	m_Components.push_back(i_RenderComponent);
+	
+	auto itr = m_RenderMeshData.begin();
+
+	while (itr != m_RenderMeshData.end())
+	{
+		if (*itr)->first == i_RenderComponent->GetMaterial()->GetId();
+	}
+
+}
+
+void RenderList::PushLightComponent(const LightComponent * i_Component)
+{
 }
 
 void RenderList::Reset()
 {
 	// reset variable, and allow to resetup and call the render list
-	m_CommandList	= nullptr;
-	m_Projection	= XMMatrixIdentity();
-	m_View			= XMMatrixIdentity();
+	m_DeferredCommandList	= nullptr;
+	m_ImmediateCommandList	= nullptr;
 
 	// clear list of components
 	m_Components.clear();

@@ -7,9 +7,6 @@
 // WinMain
 #include <Windows.h>
 
-// debug : to delete
-#include "engine/ResourcesManager.h"
-
 int WINAPI WinMain(
 	HINSTANCE hInstance,    //Main windows function
 	HINSTANCE hPrevInstance,
@@ -29,15 +26,5 @@ int WINAPI WinMain(
 
 	// initialize and run the engine
 	engine.Initialize(desc);
-
-	// initialize the world
-	World * world = engine.GetWorld();
-
-	// create objects...
-	Actor::ActorDesc cubeActor;
-	cubeActor.Name = L"Sphere";
-	cubeActor.Mesh = L"resources/obj/sphere.obj";
-	world->SpawnActor(cubeActor);
-
 	engine.Run();
 }

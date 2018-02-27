@@ -30,6 +30,9 @@ class UIConsole;
 class UIDebug;
 // editor
 class Editor;
+// resources
+class ResourceManager;
+class DX12ResourceManager;
 
 // class def
 class Engine
@@ -73,7 +76,9 @@ public:
 	Window *		GetWindow() const;
 
 	// accessors
-	ResourcesManager *	GetResourcesManager() const;
+	DX12ResourceManager *	GetRenderResourceManager() const;
+	ResourceManager *		GetResourceManager() const;
+
 	RenderList *		GetRenderList() const;
 	World *				GetWorld() const;
 	Console *			GetConsole() const;
@@ -115,13 +120,13 @@ private:
 	UINT			m_FramePerSecondsTargeted;
 	UINT			m_FramePerSecond;
 
-#ifdef _DEBUG
-	bool			m_IsInGame;
-#endif
-
 	// DX12 rendering
 	DX12RenderEngine *		m_RenderEngine;
 	RenderList *			m_RenderList;	// render list to render components
+
+	// resource management
+	DX12ResourceManager *	m_RenderResourceManager;
+	ResourceManager *		m_ResourceManager;
 
 	// game management
 	World *				m_CurrentWorld;
@@ -134,9 +139,6 @@ private:
 
 #ifdef ENGINE_DEBUG
 	// debug purpose
-
+	bool			m_IsInGame;
 #endif
-
-	// managers
-	ResourcesManager *	m_ResourcesManager;
 };

@@ -228,6 +228,12 @@
     <ClCompile Include="src\engine\Camera.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="src\dx12\DX12Resource.cpp">
+      <Filter>Source Files\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dx12\DX12ResourceManager.cpp">
+      <Filter>Source Files\DX12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
@@ -388,6 +394,12 @@
     </ClInclude>
     <ClInclude Include="src\engine\Camera.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dx12\DX12Resource.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dx12\DX12ResourceManager.h">
+      <Filter>Header Files\DX12</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
