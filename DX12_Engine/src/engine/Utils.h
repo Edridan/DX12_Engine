@@ -60,6 +60,11 @@ struct Color
 		b = i_Array[2];
 		return *this;
 	}
+
+	float * GetColorAsArray()
+	{
+		return (float*)this;
+	}
 };
 
 namespace color

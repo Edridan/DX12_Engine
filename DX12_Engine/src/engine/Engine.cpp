@@ -22,6 +22,9 @@
 #include "ui/UIDebug.h"
 // editor
 #include "editor/Editor.h"
+// resources
+#include "resource/DX12ResourceManager.h"
+#include "resource/ResourceManager.h"
 
 
 Engine *		Engine::s_Instance = nullptr;
@@ -106,7 +109,9 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 	// create managers
 	m_RenderList = new RenderList;
-	m_ResourcesManager = new ResourcesManager;
+	// resource management
+	m_ResourceManager			= new ResourceManager;
+	m_RenderResourceManager		= new DX12ResourceManager;
 
 	// setup settings
 	m_FramePerSecondsTargeted = i_Desc.FramePerSecondTargeted;
@@ -162,9 +167,6 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	// enable input
 	Input::SetKeyEventEnabled(true);
 
-	// load error resources
-	ASSERT(m_ResourcesManager->LoadErrorTexture(L"resources/tex/engine/error.bmp"));
-
 	m_Exit = false;
 }
 
@@ -193,7 +195,6 @@ void Engine::Run()
 		{
 			// camera management depending if the windows are selected or not
 			Camera * const freeCam = m_CurrentWorld->GetCurrentCamera();
-			// To do : disable input for the engine when a window is selected
 			freeCam->SetFreecamEnabled(!m_UILayer->IsOneWindowFocused());
 
 			// Input management
@@ -306,9 +307,14 @@ Window * Engine::GetWindow() const
 	return m_Window;
 }
 
-ResourcesManager * Engine::GetResourcesManager() const
+DX12ResourceManager * Engine::GetRenderResourceManager() const
 {
-	return m_ResourcesManager;
+	return m_RenderResourceManager;
+}
+
+ResourceManager * Engine::GetResourceManager() const
+{
+	return m_ResourceManager;
 }
 
 World * Engine::GetWorld() const
@@ -366,7 +372,8 @@ void Engine::CleanUpModules()
 
 	// delete manager
 	delete m_Console;
-	delete m_ResourcesManager;
+	delete m_RenderResourceManager;
+	delete m_ResourceManager;
 
 	delete m_Window;
 

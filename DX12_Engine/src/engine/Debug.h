@@ -23,6 +23,7 @@ enum PopUpIcon
 };
 
 #ifdef _DEBUG
+
 void OutputDebug(const char * i_Text, ...);
 void OutputDebugVS(const char * i_Text, ...);	// VS output only
 void PopUpWindow(PopUpIcon i_Icon, const char * i_Notif, const char * i_Text, ...);
@@ -49,12 +50,16 @@ do																			\
 	POPUP_ERROR(i_Text, __VA_ARGS__);	\
 	DEBUG_BREAK
 
+// dev
+#define TO_DO			ASSERT_ERROR("TO_DO")
+
+
 #else
 
 #define PRINT_DEBUG(i_Text, ...)	
 #define ASSERT(i_Condition)		i_Condition
 #define ASSERT_ERROR(i_Text,...)
-
+#define TO_DO
 
 #endif
 

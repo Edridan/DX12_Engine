@@ -37,10 +37,12 @@ public:
 	void							IncrementFenceValue(UINT i_Id = (UINT)-1);
 	void							SetFenceValue(UINT64 i_Val, UINT i_Id = (UINT)-1);
 
-	friend class DX12RenderEngine;
-private:
 	// context management
 	void				ResetContext();
+
+	friend class DX12RenderEngine;
+private:
+
 
 	// internal
 	UINT	GetIndex(UINT i_Id) const;

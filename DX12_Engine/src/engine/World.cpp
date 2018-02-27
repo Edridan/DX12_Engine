@@ -159,7 +159,6 @@ bool World::DeleteActor(Actor * i_ActorToRemove, bool i_RemoveChildren)
 	// call event before deletion
 	i_ActorToRemove->Destroyed();
 
-	// To do : call to a Destroy event on Actor
 	// remove the actor from the memory
 	delete i_ActorToRemove;
 

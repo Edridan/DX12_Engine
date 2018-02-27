@@ -3,8 +3,6 @@
 #include "dx12/DX12RenderEngine.h"
 #include "dx12/DX12Context.h"
 
-// To do : implement
-
 UITexture::UITexture(const RECT & i_Rect, ID3D12DescriptorHeap * i_Desc)
 	:m_Descriptor(i_Desc)
 {

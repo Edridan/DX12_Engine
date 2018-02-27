@@ -32,12 +32,12 @@ void DX12Debug::Delete()
 
 void DX12Debug::DrawDebugBox(const DirectX::XMFLOAT3 & i_Position, const Transform & i_Transform, Color & i_Color)
 {
-	// To do : implement
+	TO_DO;
 }
 
 void DX12Debug::DrawDebugLine(const DirectX::XMFLOAT3 & i_Start, const DirectX::XMFLOAT3 & i_End, Color & i_Color)
 {
-	// To do : Implement
+	TO_DO;
 }
 
 void DX12Debug::SetEnabled(bool i_Enabled)
