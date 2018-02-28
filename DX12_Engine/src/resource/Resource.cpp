@@ -27,6 +27,11 @@ bool Resource::IsLoaded() const
 	return m_IsLoaded;
 }
 
+void Resource::NotifyFinishLoad()
+{
+	m_IsLoaded = true;
+}
+
 inline std::string Resource::RemovePath(const std::string & i_Path) const
 {
 	int pos = i_Path.find_last_of('/');

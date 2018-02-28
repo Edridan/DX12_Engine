@@ -24,6 +24,9 @@ protected:
 	std::string			m_Name;	// name of the resource (can be specific, this is used for editor and gameplay programmers purpose)
 	std::string			m_Filepath;	// path of the resource (to the file that the resource come from, a file can contains more than one resource)
 
+	// called from child to notify the end of the CPU loading
+	void				NotifyFinishLoad();
+
 	// path information helper
 	std::string		RemovePath(const std::string & i_Path) const;	// this remove path and retreive the resource file
 	std::string		ExtractFileName(const std::string & i_Path) const;
