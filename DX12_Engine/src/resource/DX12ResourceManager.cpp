@@ -16,7 +16,6 @@ DX12Mesh * DX12ResourceManager::PushMesh(void * i_Data)
 	DX12Mesh * mesh = new DX12Mesh;
 
 	// setup data
-	newResource.IsFile = false;
 	newResource.Resource = mesh;
 	newResource.Data = i_Data;
 
@@ -30,27 +29,42 @@ DX12Mesh * DX12ResourceManager::PushMesh(void * i_Data)
 
 DX12Material * DX12ResourceManager::PushMaterial(void * i_Data)
 {
+	// create the resource
+	ResourceData newResource;
+	DX12Material * material = new DX12Material;
+
+	// setup data
+	newResource.Resource	= material;
+	newResource.Data		= i_Data;
+
+	ASSERT(newResource.Data && newResource.Resource);
+
+	// the resource is ready to be pushed on the GPU
+	m_ResourceQueue.push_back(newResource);
+
 	return nullptr;
 }
 
 DX12Texture * DX12ResourceManager::PushTexture(void * i_Data)
 {
-	return nullptr;
-}
+	// create the resource
+	ResourceData newResource;
+	DX12Texture * texture = new DX12Texture;
 
-DX12Material * DX12ResourceManager::PushMaterial(std::string & i_File)
-{
-	return nullptr;
-}
+	// setup data
+	newResource.Resource	= texture;
+	newResource.Data		= i_Data;
 
-DX12Texture * DX12ResourceManager::PushTexture(std::string & i_File)
-{
+	ASSERT(newResource.Data && newResource.Resource);
+
+	// the resource is ready to be pushed on the GPU
+	m_ResourceQueue.push_back(newResource);
+
 	return nullptr;
 }
 
 DX12ResourceManager::DX12ResourceManager()
 {
-
 }
 
 DX12ResourceManager::~DX12ResourceManager()
@@ -68,11 +82,7 @@ void DX12ResourceManager::PushResourceOnGPUWithWait()
 	for (size_t i = 0; i < m_ResourceQueue.size(); ++i)
 	{
 		ResourceData & data = m_ResourceQueue[i];
-
-		if (data.IsFile)
-			data.Resource->LoadFromFile((char*)data.Data, m_CopyContext->GetCommandList(), device);
-		else
-			data.Resource->LoadFromData(data.Data, m_CopyContext->GetCommandList(), device);
+		data.Resource->LoadFromData(data.Data, m_CopyContext->GetCommandList(), device);
 
 		// resource veryfication
 		ASSERT(data.Resource->GetFilepath() != "");

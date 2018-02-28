@@ -1,64 +1,47 @@
 #pragma once
 
-#include "d3dx12.h"
-#include "dx12/DX12Utils.h"
-#include <string>
+#include "DX12Resource.h"
+#include "engine/Utils.h"
+#include "dx12/d3dx12.h"
 
-class DX12Texture
+class DX12Texture : public DX12Resource
 {
 public:
-	// struct
-	struct ImageDataDesc
-	{
-		int BitsPerPixel;
-		int BytesPerRow;
-		int ImageSize;
-		int Width;
-		int Height;
-	};
-
-	struct ImageDesc
+	struct DX12TextureData
 	{
 		// default image data
-		int Width;
-		int Height;
-		std::wstring Name = L"Unnamed";	// texture name for debug purpose
-		BYTE * Data = nullptr;	// data for the image (must be corresponding the size and format)
-
-		// dx12 information
-		DXGI_FORMAT Format		= DXGI_FORMAT_R8G8B8A8_UNORM;
+		int				Width, Height;	// size of the image
+		DXGI_FORMAT		Format		= DXGI_FORMAT_R8G8B8A8_UNORM;	// format
+		BYTE *			ImageData = nullptr;	// image pixels data
+		// other
+		std::string		Name, Filepath;
 	};
 
-	DX12Texture(const wchar_t * i_Filename);
-	DX12Texture(const ImageDesc & i_Desc);
+	// destructor
 	~DX12Texture();
 
 	// information
-	IntVec2					GetSize() const;
-	const std::wstring &	GetName() const;
-	bool					IsLoaded() const;
-	DXGI_FORMAT				GetFormat() const;
+	DXGI_FORMAT					GetFormat() const;
+	IntVec2						GetSize() const;
+	D3D12_GPU_DESCRIPTOR_HANDLE	GetGPUDescriptorHandle() const;
+	D3D12_CPU_DESCRIPTOR_HANDLE	GetCPUDescriptorHandle() const;
 
-	// dx12 management
-	ID3D12DescriptorHeap *				GetDescriptorHeap() const;
-	const ID3D12Resource *				GetBuffer() const;
-	const D3D12_GPU_DESCRIPTOR_HANDLE	GetDescriptorHandle() const;
+	// friend class
+	friend class DX12ResourceManager;
 
 private:
-	// load image data helper
-	static int		LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, ImageDataDesc & o_Desc, LPCWSTR i_Filename);
+	DX12Texture();
+
+	// Inherited via DX12Resource
+	virtual void	LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device) override;
+
+	// helpers
+	HRESULT			CreateResourceBuffer(ID3D12Device * i_Device, const std::wstring & i_BufferName);
+	HRESULT			CreateUploadBuffer(ID3D12Device * i_Device, const std::wstring & i_BufferName);
 
 	// dx12
 	D3D12_RESOURCE_DESC		m_Desc;
-	ID3D12Resource *		m_TextureBuffer;
-	ID3D12Resource *		m_TextureBufferUploadHeap;
+	ID3D12Resource *		m_ResourceBuffer;
+	ID3D12Resource *		m_UploadBuffer;
 	ID3D12DescriptorHeap *	m_DescriptorHeap;
-	DXGI_FORMAT				m_Format;
-
-	// helpers
-	HRESULT			CreateTextureBufferResourceHeap(ID3D12Device * i_Device, const std::wstring & i_BufferName);
-	HRESULT			CreateTextureBufferUploadHeap(ID3D12Device * i_Device, const std::wstring & i_BufferName);
-
-	std::wstring		m_Name;
-	bool				m_IsLoaded;
 };

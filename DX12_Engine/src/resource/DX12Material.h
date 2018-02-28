@@ -1,109 +1,65 @@
 // material that contains data to render properly objects (color, textures...)
-
 #pragma once
-
-#include "dx12/DX12Utils.h"
-#include "dx12/DX12Shader.h"
-
-#include <string>
 
 // class predef
 class DX12Texture;
-// root and pipeline state
 class DX12RootSignature;
 class DX12PipelineState;
 
+#include "DX12Resource.h"
+#include "dx12/DX12Utils.h"
+#include "dx12/DX12Shader.h"
+#include "dx12/DX12ConstantBuffer.h"
+#include <string>
 
-class DX12Material
+class DX12Material : public DX12Resource
 {
 public:
-	// struct
-	struct DX12MaterialDesc
+	struct DX12MaterialData
 	{
-		// base color
-		std::string Name;
-		Color Ka, Kd, Ks, Ke;
-		float Ns;
-		DX12Texture *	map_Kd, * map_Ks, * map_Ka;
-
-		// default constructor
-		DX12MaterialDesc()
-			:Name("Default")
-			// set default color to pink (error color)
-			,Ka(color::Pink)
-			,Kd(color::Pink)
-			,Ks(color::Pink)
-			,Ke(color::Pink)
-			,Ns(1000.f)
-			,map_Kd(nullptr)
-			,map_Ks(nullptr)
-			,map_Ka(nullptr)
-		{}
+		// material data
+		Color Ka = color::Pink, Kd = color::Pink, Ks = color::Pink, Ke = color::Pink;
+		float Ns = 1000.f;
+		DX12Texture *	map_Kd = nullptr, *map_Ks = nullptr, *map_Ka = nullptr;
+		// data info
+		std::string	Name, Filepath;
 	};
 
-	// textures type managed by materials
-	enum ETextureType
-	{
-		eAmbient,
-		eSpecular,
-		eDiffuse,
-
-		eCount,
-	};
-
-	DX12Material(const DX12MaterialDesc & i_Desc);
+	// destructor
 	~DX12Material();
 
-	// material management
-	void		SetTexture(DX12Texture * i_Texture, ETextureType i_Type);
+	// dx12 management
+	void		PushPipelineState(ID3D12GraphicsCommandList * i_CommandList) const;
+	void		PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList, UINT i_RootParameter = 2 /* Root parameter index (basically 2 but can be changed) */) const;
+	void		UpdateConstantBuffer() const;	// this update constant buffer for Shader buffer
 
-	void		SetAmbientColor(const Color & i_Color);
-	void		SetDiffuseColor(const Color & i_Color);
-	void		SetEmissiveColor(const Color & i_Color);
-	void		SetSpecularColor(const Color & i_Color);
-	// reset the material
-	void		Set(const DX12MaterialDesc & i_Desc);
-
-	// flags
-	bool		HaveTexture(ETextureType i_Type) const;
-	bool		IsCompatibleWithFlags(UINT64 i_ElementFlag) const;
-
-	// id
-	UINT64				GetId() const;
-	const std::string & GetName() const;
-
-	// dx12
-	bool		NeedUpdate() const;
-	void		UpdateConstantBufferView();
-	void		SetupPipeline(ID3D12GraphicsCommandList * i_CommandList) const;
-	void		PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
-
+	friend class DX12ResourceManager;
 private:
-	// helpers
-	void		CreateShaderCode(std::wstring & o_Code, const DX12MaterialDesc & i_Desc, DX12Shader::EShaderType i_Type);
-	
-	// color of material
-	Color	m_ColorAmbient;
-	Color	m_ColorDiffuse;
-	Color	m_ColorSpecular;
-	Color	m_ColorEmissive;
+	DX12Material();
 
-	// name
-	std::string	m_Name;
+	// internal helper
+	void		GenerateRootSignature(ID3D12Device * i_Device);
+	void		GeneratePipelineState(ID3D12Device * i_Device);
 
-	// textures of the material (if null means not found or not used)
-	DX12Texture *			m_Textures[eCount];
-	ID3D12DescriptorHeap *	m_Descriptors[eCount];	// descriptor count
-	// id for the material
-	UINT64					m_Id;
+	// define data for material
+	__declspec(align(16)) struct MaterialData
+	{
+		DirectX::XMFLOAT4		Ka, Kd, Ks, Ke;
+		BOOL					Map_A, Map_D, Map_S;
+		float					Ns;
+	};
+
+	// Inherited via DX12Resource
+	virtual void LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device) override;
+
 	// pipeline state object
 	DX12RootSignature *		m_RootSignature;
 	DX12PipelineState *		m_PipelineState;
 
-	// other
-	float	m_SpecularExponent;
+	// external
+	DX12ConstantBuffer *	m_ConstantBuffer;
 
-	// management
-	bool		m_HaveChanged;
-	ADDRESS_ID	m_ConstantBuffer;
+	// material specs
+	ADDRESS_ID				m_BufferAddress;
+	MaterialData			m_Data;	// data sended to the GPU
 };

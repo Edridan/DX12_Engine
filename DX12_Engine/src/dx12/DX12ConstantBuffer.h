@@ -22,8 +22,8 @@ public:
 	UINT64						GetConstantElementSize() const;
 
 	// update buffer
-	void						UpdateConstantBuffer(ADDRESS_ID i_Address, void * i_Data, UINT i_Size);
-	void						UpdateConstantBufferForEachFrame(ADDRESS_ID i_Address, void * i_Data, UINT i_Size);
+	void						UpdateConstantBuffer(ADDRESS_ID i_Address, const void * i_Data, UINT i_Size);
+	void						UpdateConstantBufferForEachFrame(ADDRESS_ID i_Address, const void * i_Data, UINT i_Size);
 
 private:
 	// internal management

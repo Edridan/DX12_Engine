@@ -5,6 +5,7 @@
 #include <codecvt>
 
 #include <windows.h>
+#include <Shlwapi.h>
 
 void Files::FileToWStr(std::wstring & o_Out, const char * i_Filename)
 {
@@ -17,11 +18,28 @@ void Files::FileToWStr(std::wstring & o_Out, const char * i_Filename)
 	o_Out = wss.str();
 }
 
-std::string Files::ConvertToWinPath(const std::string & i_Filepath)
+FORCEINLINE std::string Files::ConvertToWinPath(const std::string & i_Filepath)
 {
-
-	return std::string();
+	return String::ReplaceAll(i_Filepath, "/", "\\");
 }
+
+std::wstring Files::ConvertToWinPath(const std::wstring & i_Filepath)
+{
+	return String::ReplaceAll(i_Filepath, L"/", L"\\");
+}
+
+bool Files::FileExist(const std::string & i_Filepath)
+{
+	std::string filepath = Files::ConvertToWinPath(i_Filepath);
+	return PathFileExistsA(filepath.c_str());;
+}
+
+bool Files::FileExist(const std::wstring & i_Filepath)
+{
+	std::wstring filepath = Files::ConvertToWinPath(i_Filepath);
+	return PathFileExistsW(filepath.c_str());;
+}
+
 
 void Files::GetFilesInFolder(std::vector<std::string>& o_Files, const std::string & i_Folder, const std::string & i_Filetype, bool i_ReturnFolderInFiles)
 {

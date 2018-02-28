@@ -53,7 +53,11 @@ const D3D12_INPUT_LAYOUT_DESC & DX12Mesh::GetInputLayoutDesc() const
 }
 
 DX12Mesh::DX12Mesh()
-	:DX12Resource()
+	:m_IndexBuffer(nullptr)
+	,m_VertexBuffer(nullptr)
+	,m_Count(0)
+	,m_IndexCount(0)
+	,m_VertexCount(0)
 {
 }
 
@@ -67,27 +71,18 @@ DX12Mesh::~DX12Mesh()
 	}
 }
 
-void DX12Mesh::LoadFromFile(const std::string & i_Filepath, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device)
-{
-	ASSERT_ERROR("Can't load mesh buffer from file, load mesh object from file");
-}
 
 void DX12Mesh::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device)
 {
-	// initialize data
-	m_IndexBuffer = m_VertexBuffer = nullptr;
-	m_IndexCount = m_VertexCount = 0;
-	m_Count = 0;
-
 	// we are retreiving data
-	DX12MeshData * data = (DX12MeshData*)i_Data;
+	const DX12MeshData * data = (const DX12MeshData*)i_Data;
 
-	// fill data
-	m_Name = data->Name;
-	m_Filepath = data->FileName;
+	// information
+	m_Name			= data->Name;
+	m_Filepath		= data->Filepath;
 
-	m_IndexCount = data->IndexCount;
-	m_VertexCount = data->VerticesCount;
+	m_IndexCount	= data->IndexCount;
+	m_VertexCount	= data->VerticesCount;
 	m_Count = (m_IndexCount != 0) ? m_IndexCount : m_VertexCount;
 
 	ASSERT(m_IndexCount != 0 || m_VertexCount != 0);
@@ -125,6 +120,9 @@ void DX12Mesh::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_C
 		m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT; // 32-bit unsigned integer (this is what a dword is, double word, a word is 2 bytes)
 		m_IndexBufferView.SizeInBytes = iBufferSize;
 	}
+
+	// delete the data
+	delete data;
 }
 
 HRESULT DX12Mesh::CreateBuffer(ID3D12Device * i_Device, ID3D12Resource ** i_Buffer, UINT i_BufferSize, const wchar_t * i_Name)

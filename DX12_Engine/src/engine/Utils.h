@@ -157,7 +157,11 @@ namespace Files
 {
 	void	FileToWStr(std::wstring & o_Out, const char * i_Filename);
 
-	std::string ConvertToWinPath(const std::string & i_Filepath);
+	std::string		ConvertToWinPath(const std::string & i_Filepath);
+	std::wstring	ConvertToWinPath(const std::wstring & i_Filepath);
+
+	bool	FileExist(const std::string & i_Filepath);
+	bool	FileExist(const std::wstring & i_Filepath);
 
 	void	GetFilesInFolder(std::vector<std::string> & o_Files, const std::string & i_Folder, const std::string & i_Filetype = "", bool i_ReturnFolderInFiles = false);
 	void	GetFilesInFolder(std::vector<std::wstring> & o_Files, const std::wstring & i_Folder, const std::wstring & i_Filetype = L"", bool i_ReturnFolderInFiles = false);

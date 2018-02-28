@@ -1,4 +1,7 @@
-// A resource can be a CPU or GPU resource management
+// A resource is a descriptor, he describe a resource and is able from this resource to create and generate data for other objects (rendering for example)
+// this also give the ability to store already loaded resources and do not reload them again (managed by the resource manager)
+// a resource contains the code to load from disk data, convert them and push them if needed to a DX12Resource (GPU oriented resources)
+// To do : reference counting and deletion if needed
 
 #pragma once
 
@@ -20,6 +23,11 @@ public:
 protected:
 	std::string			m_Name;	// name of the resource (can be specific, this is used for editor and gameplay programmers purpose)
 	std::string			m_Filepath;	// path of the resource (to the file that the resource come from, a file can contains more than one resource)
+
+	// path information helper
+	std::string		RemovePath(const std::string & i_Path) const;	// this remove path and retreive the resource file
+	std::string		ExtractFileName(const std::string & i_Path) const;
+	std::string		ExtractFilePath(const std::string & i_Path) const;
 
 	Resource();
 	virtual ~Resource() = 0;
