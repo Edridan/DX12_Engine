@@ -19,7 +19,8 @@ public:
 	};
 
 	// DX12
-	DX12Material *		GetDX12Material() const;
+	DX12Material *		GetDX12Material(const std::string & i_Name) const;
+	DX12Material *		GetDX12Material(size_t i_Index = 0) const;
 
 	// friend class
 	friend class ResourceManager;
@@ -27,7 +28,7 @@ private:
 	Material();
 	~Material();
 
-	DX12Material *		m_Material;
+	std::vector<DX12Material *>		m_Materials;	// a material (CPU side) can contains multiple materials
 
 	// Inherited via Resource
 	virtual void LoadFromFile(const std::string & i_Filepath) override;
