@@ -16,10 +16,10 @@ public:
 		UINT						VerticesCount = 0;	// vertices count
 		const BYTE *				VerticesBuffer = nullptr;	// must be filled
 		UINT						IndexCount = 0;	// indices : can be 0 if no indexes
-		const DWORD *				IndexBuffer = nullptr;	// null if no Index bbuffer	
+		const DWORD *				IndexBuffer = nullptr;	// null if no Index buffer	
 		// other
-		std::string					FileName;
-		std::string					Name;
+		std::string					Name, Filepath;
+
 	};
 
 	// external management
@@ -27,7 +27,7 @@ public:
 	const D3D12_INDEX_BUFFER_VIEW &			GetIndexBufferView() const;
 
 	// helper
-	HRESULT			PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList, UINT i_Instance = 1) const;
+	HRESULT							PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList, UINT i_Instance = 1) const;
 
 	// infomations
 	UINT							GetVerticeCount() const;
@@ -43,7 +43,6 @@ private:
 	~DX12Mesh();
 
 	// Inherited via DX12Resource
-	virtual void LoadFromFile(const std::string & i_Filepath, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device) override;
 	virtual void LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device) override;
 
 	// dx12 helpers

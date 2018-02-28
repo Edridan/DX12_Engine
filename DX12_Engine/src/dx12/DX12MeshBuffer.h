@@ -1,59 +1,64 @@
-// DX12MeshBuffer contains id to buffers and contains data for rendering
-// this is instanced by the DX12Mesh
 #pragma once
 
-#include <d3d12.h>
+#include "d3dx12.h"
+#include "dx12/DX12Utils.h"
 #include <string>
-#include "dx12/DX12Material.h"
 
-class DX12MeshBuffer
+class DX12Texture
 {
 public:
-	// contructor / destructor
-	DX12MeshBuffer(const D3D12_INPUT_LAYOUT_DESC & i_InputLayout, const BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name = L"Unknown");
-	DX12MeshBuffer(const D3D12_INPUT_LAYOUT_DESC & i_InputLayout, const BYTE * i_VerticesBuffer, UINT i_VerticesCount, const DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name = L"Unknown");
-	~DX12MeshBuffer();
+	// struct
+	struct ImageDataDesc
+	{
+		int BitsPerPixel;
+		int BytesPerRow;
+		int ImageSize;
+		int Width;
+		int Height;
+	};
 
-	const D3D12_INPUT_LAYOUT_DESC & GetInputLayout() const;
+	struct ImageDesc
+	{
+		// default image data
+		int Width;
+		int Height;
+		std::wstring Name = L"Unnamed";	// texture name for debug purpose
+		BYTE * Data = nullptr;	// data for the image (must be corresponding the size and format)
 
-	// push vertices buffer on commandlist
-	HRESULT					PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const;
-	UINT64					GetElementFlags() const;	// retreive flags to render the mesh buffer
+								// dx12 information
+		DXGI_FORMAT Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	};
+
+	DX12Texture(const wchar_t * i_Filename);
+	DX12Texture(const ImageDesc & i_Desc);
+	~DX12Texture();
+
+	// information
+	IntVec2					GetSize() const;
 	const std::wstring &	GetName() const;
-	// material management
-	DX12Material::DX12MaterialDesc		GetDefaultMaterialDesc() const;
-	void								SetDefaultMaterial(const DX12Material::DX12MaterialDesc & i_Desc);
+	bool					IsLoaded() const;
+	DXGI_FORMAT				GetFormat() const;
 
-	// material/mesh compatibility
-	bool					IsCompatible(const DX12Material::DX12MaterialDesc & i_Desc) const;
-	bool					IsCompatible(const DX12Material & i_Desc) const;
+	// dx12 management
+	ID3D12DescriptorHeap *				GetDescriptorHeap() const;
+	const ID3D12Resource *				GetBuffer() const;
+	const D3D12_GPU_DESCRIPTOR_HANDLE	GetDescriptorHandle() const;
 
-	// friend class
-	friend class DX12Mesh;
 private:
-	// dx12 helpers
-	static HRESULT	CreateBuffer(ID3D12Resource ** i_Buffer, UINT i_BufferSize, const wchar_t * i_Name = L"Default Buffer");
-	static HRESULT	UpdateData(ID3D12GraphicsCommandList* i_CommandList, ID3D12Resource * i_Buffer, UINT i_BufferSize, const BYTE * i_Data);
+	// load image data helper
+	static int		LoadImageDataFromFile(BYTE** o_ImageData, D3D12_RESOURCE_DESC & o_ResourceDescription, ImageDataDesc & o_Desc, LPCWSTR i_Filename);
 
-	// DX12
-	D3D12_INPUT_LAYOUT_DESC				m_InputLayoutDesc;
-	// Buffer
-	ID3D12Resource*						m_VertexBuffer;
-	ID3D12Resource*						m_IndexBuffer;
-	// Buffer view
-	D3D12_VERTEX_BUFFER_VIEW			m_VertexBufferView;
-	D3D12_INDEX_BUFFER_VIEW				m_IndexBufferView;
-	// Material
-	DX12Material::DX12MaterialDesc		m_DefaultMaterial;	// material default (unset if not managed)
-	// Other
-	std::wstring 						m_Name;
-	// element flags
-	UINT64								m_ElementFlags;
+	// dx12
+	D3D12_RESOURCE_DESC		m_Desc;
+	ID3D12Resource *		m_TextureBuffer;
+	ID3D12Resource *		m_TextureBufferUploadHeap;
+	ID3D12DescriptorHeap *	m_DescriptorHeap;
+	DXGI_FORMAT				m_Format;
 
-	const bool		m_HaveIndex;
-	const UINT		m_Count;	// vertices/index count for drawing
+	// helpers
+	HRESULT			CreateTextureBufferResourceHeap(ID3D12Device * i_Device, const std::wstring & i_BufferName);
+	HRESULT			CreateTextureBufferUploadHeap(ID3D12Device * i_Device, const std::wstring & i_BufferName);
 
-#ifdef _DEBUG
-	static UINT s_MeshInstanciated;
-#endif
+	std::wstring		m_Name;
+	bool				m_IsLoaded;
 };

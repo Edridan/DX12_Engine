@@ -88,6 +88,24 @@
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{298efdb5-fad3-4b82-926c-2297ee068e05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Resource">
+      <UniqueIdentifier>{f36e2673-2d6c-4e46-8f17-461dcd4f5ac0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resource">
+      <UniqueIdentifier>{d7ff957a-119d-4fbe-85f2-485cf6f11aae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Resource\DX12">
+      <UniqueIdentifier>{4daed13d-bc00-4501-bc67-a51d81796fe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Resource\Other">
+      <UniqueIdentifier>{1431ac70-4360-4769-94d5-6053c6e6a652}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resource\DX12">
+      <UniqueIdentifier>{aaf37656-bfb9-4ffb-9bc0-bc512d990343}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resource\Other">
+      <UniqueIdentifier>{56bc8ab7-8b64-4166-89ce-20d93142d871}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
@@ -96,22 +114,10 @@
     <ClCompile Include="src\dx12\DX12Shader.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="src\dx12\DX12Texture.cpp">
-      <Filter>Source Files\DX12</Filter>
-    </ClCompile>
     <ClCompile Include="src\dx12\DX12Utils.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="src\dx12\DX12ConstantBuffer.cpp">
-      <Filter>Source Files\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\dx12\DX12Material.cpp">
-      <Filter>Source Files\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\dx12\DX12Mesh.cpp">
-      <Filter>Source Files\DX12</Filter>
-    </ClCompile>
-    <ClCompile Include="src\dx12\DX12MeshBuffer.cpp">
       <Filter>Source Files\DX12</Filter>
     </ClCompile>
     <ClCompile Include="src\dx12\DX12RenderEngine.cpp">
@@ -124,9 +130,6 @@
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="src\engine\Clock.cpp">
-      <Filter>Source Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\engine\ResourcesManager.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp">
@@ -228,19 +231,40 @@
     <ClCompile Include="src\engine\Camera.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\dx12\DX12Resource.cpp">
-      <Filter>Source Files\DX12</Filter>
+    <ClCompile Include="src\resource\DX12Resource.cpp">
+      <Filter>Source Files\Resource\DX12</Filter>
     </ClCompile>
-    <ClCompile Include="src\dx12\DX12ResourceManager.cpp">
-      <Filter>Source Files\DX12</Filter>
+    <ClCompile Include="src\resource\DX12ResourceManager.cpp">
+      <Filter>Source Files\Resource\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\Resource.cpp">
+      <Filter>Source Files\Resource\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\ResourceManager.cpp">
+      <Filter>Source Files\Resource\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\Mesh.cpp">
+      <Filter>Source Files\Resource\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\DX12Mesh.cpp">
+      <Filter>Source Files\Resource\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\DX12Texture.cpp">
+      <Filter>Source Files\Resource\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\DX12Material.cpp">
+      <Filter>Source Files\Resource\DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\Material.cpp">
+      <Filter>Source Files\Resource\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\Texture.cpp">
+      <Filter>Source Files\Resource\Other</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
       <Filter>Lib\TinyObjLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="src\dx12\DX12Texture.h">
-      <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\dx12\DX12Utils.h">
       <Filter>Header Files\DX12</Filter>
@@ -249,15 +273,6 @@
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\dx12\DX12ConstantBuffer.h">
-      <Filter>Header Files\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\dx12\DX12Material.h">
-      <Filter>Header Files\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\dx12\DX12Mesh.h">
-      <Filter>Header Files\DX12</Filter>
-    </ClInclude>
-    <ClInclude Include="src\dx12\DX12MeshBuffer.h">
       <Filter>Header Files\DX12</Filter>
     </ClInclude>
     <ClInclude Include="src\dx12\DX12RenderEngine.h">
@@ -277,9 +292,6 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resource Files\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="src\engine\ResourcesManager.h">
-      <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Window.h">
       <Filter>Header Files\Engine</Filter>
@@ -395,11 +407,35 @@
     <ClInclude Include="src\engine\Camera.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\dx12\DX12Resource.h">
-      <Filter>Header Files\DX12</Filter>
+    <ClInclude Include="src\resource\DX12Resource.h">
+      <Filter>Header Files\Resource\DX12</Filter>
     </ClInclude>
-    <ClInclude Include="src\dx12\DX12ResourceManager.h">
-      <Filter>Header Files\DX12</Filter>
+    <ClInclude Include="src\resource\DX12ResourceManager.h">
+      <Filter>Header Files\Resource\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\Resource.h">
+      <Filter>Header Files\Resource\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\ResourceManager.h">
+      <Filter>Header Files\Resource\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\Mesh.h">
+      <Filter>Header Files\Resource\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\DX12Material.h">
+      <Filter>Header Files\Resource\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\DX12Mesh.h">
+      <Filter>Header Files\Resource\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\DX12Texture.h">
+      <Filter>Header Files\Resource\DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\Texture.h">
+      <Filter>Header Files\Resource\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\Material.h">
+      <Filter>Header Files\Resource\Other</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

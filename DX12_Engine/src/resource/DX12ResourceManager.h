@@ -22,11 +22,7 @@ public:
 	DX12Material *		PushMaterial(void * i_Data);
 	DX12Texture *		PushTexture(void * i_Data);
 
-	// load resources from file path
-	DX12Material *		PushMaterial(std::string & i_File);
-	DX12Texture *		PushTexture(std::string & i_File);
-
-
+	// friend class
 	friend class Engine;
 private:
 	DX12ResourceManager();
@@ -38,7 +34,6 @@ private:
 	
 	struct ResourceData
 	{
-		bool			IsFile = false;
 		void *			Data = nullptr;
 		DX12Resource *	Resource = nullptr;
 	};

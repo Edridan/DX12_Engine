@@ -3,7 +3,7 @@
 #include "engine/Debug.h"
 
 DX12Resource::DX12Resource()
-	:Resource()
+	:m_Id((UINT64)this)
 {
 }
 
@@ -11,13 +11,33 @@ DX12Resource::~DX12Resource()
 {
 }
 
-void DX12Resource::LoadFromFile(const std::string & i_Filepath)
+UINT64 DX12Resource::GetId() const
 {
-	ASSERT_ERROR("Do not use this LoadFromFile to load a DX12Resource");
+	return m_Id;
 }
 
-void DX12Resource::LoadFromData(const void * i_Data)
+const std::string & DX12Resource::GetName() const
 {
-	ASSERT_ERROR("Do not use this LoadFromData to load a DX12Resource");
+	return m_Name;
+}
 
+const std::string & DX12Resource::GetFilepath() const
+{
+	return m_Filepath;
+}
+
+bool DX12Resource::IsValid() const
+{
+	return m_IsLoaded;
+}
+
+void DX12Resource::FinishLoading()
+{
+	m_IsLoaded = true;
+	NotifyEndFinish();
+}
+
+void DX12Resource::NotifyEndFinish()
+{
+	// To do : implement in some child resource that need clean resource on GPU
 }

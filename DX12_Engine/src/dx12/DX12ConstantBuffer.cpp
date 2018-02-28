@@ -131,7 +131,7 @@ UINT64 DX12ConstantBuffer::GetConstantElementSize() const
 	return m_ElementSize;
 }
 
-void DX12ConstantBuffer::UpdateConstantBuffer(ADDRESS_ID i_Address, void * i_Data, UINT i_Size)
+void DX12ConstantBuffer::UpdateConstantBuffer(ADDRESS_ID i_Address, const void * i_Data, UINT i_Size)
 {
 	const int frameIndex = GetFrameIndex();
 
@@ -149,9 +149,10 @@ void DX12ConstantBuffer::UpdateConstantBuffer(ADDRESS_ID i_Address, void * i_Dat
 	}
 }
 
-void DX12ConstantBuffer::UpdateConstantBufferForEachFrame(ADDRESS_ID i_Address, void * i_Data, UINT i_Size)
+void DX12ConstantBuffer::UpdateConstantBufferForEachFrame(ADDRESS_ID i_Address, const void * i_Data, UINT i_Size)
 {
 	ASSERT(i_Address < m_BufferSize);
+	ASSERT(m_IsDuplicated);	// verify if the constant buffer is duplicated
 
 	if (m_ConstantBufferReservedAddress[i_Address] == true)
 	{

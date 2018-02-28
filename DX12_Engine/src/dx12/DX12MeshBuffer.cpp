@@ -1,208 +1,305 @@
-#include "dx12/DX12MeshBuffer.h"
+#include "dx12/DX12Material.h"
 
-#include "d3dx12.h"
-#include "dx12/DX12Utils.h"
-#include "dx12/DX12Mesh.h"
-#include "dx12/DX12Context.h"
-#include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RenderEngine.h"
+#include "dx12/DX12ConstantBuffer.h"
+#include "dx12/DX12PipelineState.h"
+#include "dx12/DX12RootSignature.h"
+#include "dx12/DX12RenderTarget.h"
+#include "dx12/DX12DepthBuffer.h"
+#include "dx12/DX12Texture.h"
+#include "engine/Utils.h"
 
-
-#ifdef _DEBUG
-UINT DX12MeshBuffer::s_MeshInstanciated = 0;
-#endif
-
-DX12MeshBuffer::DX12MeshBuffer(const D3D12_INPUT_LAYOUT_DESC & i_InputLayout, const BYTE * i_VerticesBuffer, UINT i_VerticesCount, const std::wstring & i_Name)
-	:m_Count(i_VerticesCount)
-	,m_IndexBuffer(nullptr)
-	,m_IndexBufferView()
-	,m_HaveIndex(false)
-	,m_Name(i_Name.c_str())
-	,m_ElementFlags(DX12PipelineState::CreateFlagsFromInputLayout(i_InputLayout))
+DX12Material::DX12Material(const DX12MaterialDesc & i_Desc)
+	:m_ColorAmbient(i_Desc.Ka)
+	, m_ColorDiffuse(i_Desc.Kd)
+	, m_ColorSpecular(i_Desc.Ks)
+	, m_ColorEmissive(i_Desc.Ke)
+	, m_SpecularExponent(i_Desc.Ns)
+	, m_HaveChanged(true)
+	, m_ConstantBuffer(UnavailableAdressId)
+	, m_Name(i_Desc.Name)
+	, m_Id((UINT64)this)
 {
-	// get size of the input layout
-	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
-	i_InputLayout.NumElements;
-
-	// retreive informations
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
-	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
-	ID3D12CommandQueue * commandQueue = DX12RenderEngine::GetInstance().GetCommandQueue();
+	ID3D12Device * device = render.GetDevice();
 
-	const UINT stride = DX12PipelineState::GetElementSize(i_InputLayout);
-	const UINT vBufferSize = i_VerticesCount * stride;
+	// manage if the material have texture or not
+	SetTexture(i_Desc.map_Kd, eDiffuse);
+	SetTexture(i_Desc.map_Ks, eSpecular);
+	SetTexture(i_Desc.map_Ka, eAmbient);
 
-	// create vertex buffer
-	CreateBuffer(&m_VertexBuffer, vBufferSize, i_Name.c_str());
-	UpdateData(commandList, m_VertexBuffer, vBufferSize, (i_VerticesBuffer));
+	// reserve address for constant buffer
+	m_ConstantBuffer = render.GetConstantBuffer(DX12RenderEngine::eMaterial)->ReserveVirtualAddress();
+	UpdateConstantBufferView();	// update to constant buffer
 
-	// create a vertex buffer view for the triangle. We get the GPU memory address to the pointer using the GetGPUVirtualAddress() method
-	m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
-	m_VertexBufferView.StrideInBytes = stride;
-	m_VertexBufferView.SizeInBytes = vBufferSize;
+	// create root signature
+	m_RootSignature = new DX12RootSignature();
+	// generate default root signature
+
+	// constant buffer
+	m_RootSignature->AddConstantBuffer(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);	// b0 : transform constant
+	m_RootSignature->AddConstantBuffer(1, 0, D3D12_SHADER_VISIBILITY_ALL);		// b1 : global constant
+	m_RootSignature->AddConstantBuffer(2, 0, D3D12_SHADER_VISIBILITY_PIXEL);	// b2 : material constant
+
+																				// add textures
+	D3D12_DESCRIPTOR_RANGE descriptorTableRanges[eCount];
+
+	for (UINT i = 0; i < eCount; ++i)
+	{
+		descriptorTableRanges[i].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // this is a range of shader resource views (descriptors)
+		descriptorTableRanges[i].NumDescriptors = 1; // we only have one texture right now, so the range is only 1
+		descriptorTableRanges[i].BaseShaderRegister = i; // start index of the shader registers in the range
+		descriptorTableRanges[i].RegisterSpace = 0; // space 0. can usually be zero
+		descriptorTableRanges[i].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
+	}
+
+	m_RootSignature->AddDescriptorRange(&descriptorTableRanges[0], 1, D3D12_SHADER_VISIBILITY_PIXEL);
+	m_RootSignature->AddDescriptorRange(&descriptorTableRanges[1], 1, D3D12_SHADER_VISIBILITY_PIXEL);
+	m_RootSignature->AddDescriptorRange(&descriptorTableRanges[2], 1, D3D12_SHADER_VISIBILITY_PIXEL);
+
+	// add static sampler for textures
+	D3D12_STATIC_SAMPLER_DESC sampler = {};
+
+	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.MipLODBias = 0;
+	sampler.MaxAnisotropy = 0;
+	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+	sampler.MinLOD = 0.0f;
+	sampler.MaxLOD = D3D12_FLOAT32_MAX;
+	sampler.ShaderRegister = 0;
+	sampler.RegisterSpace = 0;
+	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	m_RootSignature->AddStaticSampler(sampler);
+
+	m_RootSignature->Create(device,
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+		| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
+		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
+		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS);
+
+	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/deferred/GBufferPixel.hlsl");
+	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/deferred/GBufferVertex.hlsl");
+
+	// create pipeline state object
+	D3D12_INPUT_LAYOUT_DESC inputLayout;
+	DX12PipelineState::CreateInputLayoutFromFlags(inputLayout, DX12PipelineState::EElementFlags::eHaveNormal | DX12PipelineState::EElementFlags::eHaveTexcoord);
+
+	DX12PipelineState::PipelineStateDesc desc;
+
+	desc.InputLayout = inputLayout;
+	desc.RootSignature = m_RootSignature;
+	desc.VertexShader = VShader;
+	desc.PixelShader = PShader;
+	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+	// setup render target
+	desc.RenderTargetCount = DX12RenderEngine::ERenderTargetId::eRenderTargetCount;
+	desc.RenderTargetFormat[0] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eNormal)->GetFormat();
+	desc.RenderTargetFormat[1] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eDiffuse)->GetFormat();
+	desc.RenderTargetFormat[2] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::eSpecular)->GetFormat();
+	desc.RenderTargetFormat[3] = render.GetRenderTarget(DX12RenderEngine::ERenderTargetId::ePosition)->GetFormat();
+
+	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
+	desc.DepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
+	desc.DepthStencilFormat = render.GetDepthBuffer()->GetFormat();
+
+	m_PipelineState = new DX12PipelineState(desc);
 }
 
-DX12MeshBuffer::DX12MeshBuffer(const D3D12_INPUT_LAYOUT_DESC & i_InputLayout, const BYTE * i_VerticesBuffer, UINT i_VerticesCount, const DWORD * i_IndexBuffer, UINT i_IndexCount, const std::wstring & i_Name)
-	:m_Count(i_IndexCount)
-	,m_HaveIndex(true)
-	,m_Name(i_Name.c_str())
-	,m_ElementFlags(DX12PipelineState::CreateFlagsFromInputLayout(i_InputLayout))
+DX12Material::~DX12Material()
 {
-	// get size of the input layout
-	D3D12_INPUT_LAYOUT_DESC elem = i_InputLayout;
-	i_InputLayout.NumElements;
-
-	// copy input layout
-	DX12PipelineState::CopyInputLayout(m_InputLayoutDesc, i_InputLayout);
-
-	// retreive informations
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
-	ID3D12GraphicsCommandList * commandList = render.GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
-	ID3D12CommandQueue * commandQueue = render.GetCommandQueue();
-	// vertices count
-	const UINT stride = DX12PipelineState::GetElementSize(i_InputLayout);
-	const UINT vBufferSize = i_VerticesCount * stride;
-	// index count
-	const UINT iBufferSize = sizeof(DWORD) * i_IndexCount;
 
-	// create vertex buffer
-	CreateBuffer(&m_VertexBuffer, vBufferSize, i_Name.c_str());
-	UpdateData(commandList, m_VertexBuffer, vBufferSize, (i_VerticesBuffer));
-
-	CreateBuffer(&m_IndexBuffer, iBufferSize, i_Name.c_str());
-	UpdateData(commandList, m_IndexBuffer, iBufferSize, reinterpret_cast<const BYTE*>(i_IndexBuffer));
-
-	// create a vertex buffer view for the triangle. We get the GPU memory address to the pointer using the GetGPUVirtualAddress() method
-	m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
-	m_VertexBufferView.StrideInBytes = stride;
-	m_VertexBufferView.SizeInBytes = vBufferSize;
-
-	// create a index buffer view for the triangle. We get the GPU memory address to the vertex pointer using the GetGPUVirtualAddress() method
-	m_IndexBufferView.BufferLocation = m_IndexBuffer->GetGPUVirtualAddress();
-	m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT; // 32-bit unsigned integer (this is what a dword is, double word, a word is 2 bytes)
-	m_IndexBufferView.SizeInBytes = iBufferSize;
-}
-
-DX12MeshBuffer::~DX12MeshBuffer()
-{
-	// cleanup resources
-	//SAFE_RELEASE(m_VertexBuffer);
-
-	// release if needed the index buffer
-	if (m_HaveIndex)
+	if (m_ConstantBuffer != UnavailableAdressId)
 	{
-		/*SAFE_RELEASE(m_IndexBuffer);*/
+		render.GetConstantBuffer(DX12RenderEngine::eMaterial)->ReleaseVirtualAddress(m_ConstantBuffer);
 	}
 }
 
-const D3D12_INPUT_LAYOUT_DESC & DX12MeshBuffer::GetInputLayout() const
+inline void DX12Material::SetTexture(DX12Texture * i_Texture, ETextureType i_Type)
 {
-	return m_InputLayoutDesc;
-}
-
-HRESULT DX12MeshBuffer::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
-{
-	i_CommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView); // set the vertex buffer (using the vertex buffer view)
-
-	if (m_HaveIndex)
+	if (i_Type < eCount)
 	{
-		i_CommandList->IASetIndexBuffer(&m_IndexBufferView);	// push the index buffer into the command list
-		i_CommandList->DrawIndexedInstanced(m_Count, 1, 0, 0, 0);	// draw indexed vertices
-	}
-	else
-	{
-		i_CommandList->DrawInstanced(m_Count, 1, 0, 0);	// draw triangles
-	}
+		m_Textures[i_Type] = i_Texture;
 
-	return S_OK;
+		if (i_Texture)
+		{
+			m_Descriptors[i_Type] = i_Texture->GetDescriptorHeap();
+		}
+		else
+		{
+			m_Descriptors[i_Type] = nullptr;
+		}
+	}
 }
 
-UINT64 DX12MeshBuffer::GetElementFlags() const
+void DX12Material::SetAmbientColor(const Color & i_Color)
 {
-	return m_ElementFlags;
+	m_HaveChanged = true;
+	m_ColorAmbient = i_Color;
 }
 
-const std::wstring & DX12MeshBuffer::GetName() const
+void DX12Material::SetDiffuseColor(const Color & i_Color)
+{
+	m_HaveChanged = true;
+	m_ColorDiffuse = i_Color;
+}
+
+void DX12Material::SetEmissiveColor(const Color & i_Color)
+{
+	m_HaveChanged = true;
+	m_ColorEmissive = i_Color;
+}
+
+void DX12Material::SetSpecularColor(const Color & i_Color)
+{
+	m_HaveChanged = true;
+
+}
+
+void DX12Material::Set(const DX12MaterialDesc & i_Desc)
+{
+	m_ColorAmbient = i_Desc.Ka;
+	m_ColorDiffuse = i_Desc.Kd;
+	m_ColorSpecular = i_Desc.Ks;
+	m_ColorEmissive = i_Desc.Ke;
+
+	m_HaveChanged = true;
+
+	m_ConstantBuffer = UnavailableAdressId;
+
+	m_Name = i_Desc.Name;
+
+	// manage if the material have texture or not
+	SetTexture(i_Desc.map_Kd, eDiffuse);
+	SetTexture(i_Desc.map_Ks, eSpecular);
+	SetTexture(i_Desc.map_Ka, eAmbient);
+
+	m_HaveChanged = true;
+}
+
+UINT64 DX12Material::GetId() const
+{
+	return m_Id;
+}
+
+const std::string & DX12Material::GetName() const
 {
 	return m_Name;
 }
 
-DX12Material::DX12MaterialDesc DX12MeshBuffer::GetDefaultMaterialDesc() const
+inline bool DX12Material::HaveTexture(ETextureType i_Type) const
 {
-	return m_DefaultMaterial;
+	if (i_Type < eCount)
+	{
+		return m_Textures[i_Type] != nullptr;
+	}
+	return false;
 }
 
-void DX12MeshBuffer::SetDefaultMaterial(const DX12Material::DX12MaterialDesc & i_Desc)
+bool DX12Material::IsCompatibleWithFlags(UINT64 i_ElementFlag) const
 {
-	// update default material
-	m_DefaultMaterial = i_Desc;
+	const bool haveTex = HaveTexture(eAmbient) || HaveTexture(eDiffuse) || HaveTexture(eSpecular);
+
+	if (haveTex && !(i_ElementFlag | DX12PipelineState::EElementFlags::eHaveTexcoord))
+		return false;
+
+	return true;
 }
 
-bool DX12MeshBuffer::IsCompatible(const DX12Material::DX12MaterialDesc & i_Desc) const
+bool DX12Material::NeedUpdate() const
 {
 	return false;
 }
 
-bool DX12MeshBuffer::IsCompatible(const DX12Material & i_Desc) const
+inline void DX12Material::UpdateConstantBufferView()
 {
-	return false;
+	struct MaterialStruct
+	{
+		DirectX::XMFLOAT4		Ka, Kd, Ks, Ke;
+		BOOL					Map_A, Map_D, Map_S;
+		float					Ns;
+	};
+
+	// error management
+	if (m_ConstantBuffer == UnavailableAdressId)
+	{
+		PRINT_DEBUG("Error, the constant buffer address is not set");
+		DEBUG_BREAK;
+		return;
+	}
+
+	if (m_HaveChanged)
+	{
+		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
+		// push constant buffer to the gpu
+		MaterialStruct mat;
+
+		mat.Ka = ColorToVec4(m_ColorAmbient);
+		mat.Kd = ColorToVec4(m_ColorDiffuse);
+		mat.Ks = ColorToVec4(m_ColorSpecular);
+		mat.Ke = ColorToVec4(m_ColorEmissive);
+
+		mat.Map_A = HaveTexture(eAmbient);
+		mat.Map_D = HaveTexture(eDiffuse);
+		mat.Map_S = HaveTexture(eSpecular);
+
+		mat.Ns = m_SpecularExponent;
+
+		// update the buffer
+		render.GetConstantBuffer(DX12RenderEngine::eMaterial)->UpdateConstantBufferForEachFrame(m_ConstantBuffer, &mat, sizeof(MaterialStruct));
+
+		m_HaveChanged = false;
+	}
 }
 
-inline HRESULT DX12MeshBuffer::CreateBuffer(ID3D12Resource ** i_Buffer, UINT i_BufferSize, const wchar_t * i_Name)
+void DX12Material::SetupPipeline(ID3D12GraphicsCommandList * i_CommandList) const
 {
-	HRESULT hr;
-	ID3D12Device * device = DX12RenderEngine::GetInstance().GetDevice();
-
-	hr = device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), // a default heap
-		D3D12_HEAP_FLAG_NONE, // no flags
-		&CD3DX12_RESOURCE_DESC::Buffer(i_BufferSize), // resource description for a buffer
-		D3D12_RESOURCE_STATE_COPY_DEST, // we will start this heap in the copy destination state since we will copy data
-										// from the upload heap to this heap
-		nullptr, // optimized clear value must be null for this type of resource. used for render targets and depth/stencil buffers
-		IID_PPV_ARGS(i_Buffer));
-
-	// return if failed
-	if (FAILED(hr)) return hr;
-
-	(*i_Buffer)->SetName(i_Name);
-	return hr;
+	// add pso and root signature to the commandlist
+	i_CommandList->SetGraphicsRootSignature(m_RootSignature->GetRootSignature());
+	// Setup the pipeline state
+	i_CommandList->SetPipelineState(m_PipelineState->GetPipelineState());
 }
 
-inline HRESULT DX12MeshBuffer::UpdateData(ID3D12GraphicsCommandList* i_CommandList, ID3D12Resource * i_Buffer, UINT i_BufferSize, const BYTE * i_Data)
+void DX12Material::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
 {
-	HRESULT hr;
-	ID3D12Device * device						= DX12RenderEngine::GetInstance().GetDevice();
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
-	ID3D12Resource* bufferUploadHeap;
-	hr = device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), // upload heap
-		D3D12_HEAP_FLAG_NONE, // no flags
-		&CD3DX12_RESOURCE_DESC::Buffer(i_BufferSize), // resource description for a buffer
-		D3D12_RESOURCE_STATE_GENERIC_READ, // GPU will read from this buffer and copy its contents to the default heap
-		nullptr,
-		IID_PPV_ARGS(&bufferUploadHeap));
+	// error management
+	if (m_ConstantBuffer == UnavailableAdressId)
+	{
+		PRINT_DEBUG("Error, the constant buffer address is not set");
+		DEBUG_BREAK;
+		return;
+	}
 
-	// return if failed
-	if (FAILED(hr)) return hr;
+	// set descriptors
 
-	bufferUploadHeap->SetName(L"Vertex Buffer Upload Resource Heap");
+	// parameter 0 is already used by the CBV for transform so we start to the 
+	i_CommandList->SetGraphicsRootConstantBufferView(2, render.GetConstantBuffer(DX12RenderEngine::eMaterial)->GetUploadVirtualAddress(m_ConstantBuffer));
 
-	// store buffer in upload heap
-	D3D12_SUBRESOURCE_DATA data = {};
-	data.pData = i_Data; // pointer to our vertex array
-	data.RowPitch = i_BufferSize; // size of all our triangle vertex data
-	data.SlicePitch = i_BufferSize; // also the size of our triangle vertex data
+	// bind textures
+	for (UINT i = 0; i < ETextureType::eCount; ++i)
+	{
+		ID3D12DescriptorHeap ** descriptors = (ID3D12DescriptorHeap **)(&m_Descriptors[i]);
 
-	// we are now creating a command with the command list to copy the data from
-	// the upload heap to the default heap
-	UINT64 size = UpdateSubresources(i_CommandList, i_Buffer, bufferUploadHeap, 0, 0, 1, &data);
-	
-	// return if failed
-	if (size != i_BufferSize) return E_UNEXPECTED;
+		if (HaveTexture((ETextureType)i))
+		{
+			// update the descriptor for the resources
+			//i_CommandList->SetDescriptorHeaps(1, descriptors);
+			i_CommandList->SetGraphicsRootDescriptorTable(3 + i, m_Textures[i]->GetDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+		}
+	}
 
-	// transition the vertex buffer data from copy destination state to vertex buffer state
-	i_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(i_Buffer, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
+}
 
-	return hr;
+void DX12Material::CreateShaderCode(std::wstring & o_Code, const DX12MaterialDesc & i_Desc, DX12Shader::EShaderType i_Type)
+{
+
 }
