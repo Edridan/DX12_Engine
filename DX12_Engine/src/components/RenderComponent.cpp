@@ -153,7 +153,6 @@ FORCEINLINE void RenderComponent::DrawUIMaterial()
 
 		const int currentItem = selectedItem;
 
-
 		Files::GetFilesInFolder(files, "resources/obj", ".mtl", true);
 
 		for (size_t i = 0; (i < files.size() && i < 128); ++i)
@@ -215,8 +214,7 @@ FORCEINLINE void RenderComponent::DrawUIMesh()
 				fileToLoad = fileToLoad.substr(10);
 			}
 
-			std::wstring file;
-			String::Utf8ToUtf16(file, fileToLoad);
+			
 		}
 
 
