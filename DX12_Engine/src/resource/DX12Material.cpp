@@ -53,17 +53,6 @@ void DX12Material::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList *
 {
 	const DX12MaterialData * data = (const DX12MaterialData*)i_Data;
 
-	// colors
-	m_Data.Ka = ColorToVec4(data->Ka);
-	m_Data.Kd = ColorToVec4(data->Kd);
-	m_Data.Ke = ColorToVec4(data->Ke);
-	m_Data.Ks = ColorToVec4(data->Ks);
-
-	m_Data.Ns = data->Ns;
-
-	// To do : manage texture
-	m_Data.Map_A = m_Data.Map_D = m_Data.Map_S = false;
-
 	// upload data to the GPU
 	m_ConstantBuffer = DX12RenderEngine::GetInstance().GetConstantBuffer(DX12RenderEngine::eMaterial);
 	m_BufferAddress = m_ConstantBuffer->ReserveVirtualAddress();
@@ -84,6 +73,19 @@ void DX12Material::PreloadData(const void * i_Data)
 	// informations
 	m_Name = data->Name;
 	m_Filepath = data->Filepath;
+
+	// colors
+	m_Data.Ka = ColorToVec4(data->Ka);
+	m_Data.Kd = ColorToVec4(data->Kd);
+	m_Data.Ke = ColorToVec4(data->Ke);
+	m_Data.Ks = ColorToVec4(data->Ks);
+
+	m_Data.Ns = data->Ns;
+
+	// To do : manage texture
+	m_Data.Map_A = m_Data.Map_D = m_Data.Map_S = false;
+
+	// To do : preload textures on the GPU
 }
 
 void DX12Material::Release()
