@@ -1,12 +1,10 @@
 #include "RenderComponent.h"
 
 #include "engine/Engine.h"
-#include "engine/ResourcesManager.h"
-
-#include "dx12/DX12Mesh.h"
-#include "dx12/DX12MeshBuffer.h"
-#include "dx12/DX12Texture.h"
 #include "dx12/DX12RenderEngine.h"
+#include "resource/ResourceManager.h"
+#include "resource/DX12Mesh.h"
+#include "resource/Mesh.h"
 
 RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor)
 	:ActorComponent(i_Actor, "Render Component")
@@ -21,31 +19,22 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 	// material management
 	if (i_Desc.Material == nullptr)
 	{
-		// retreive the material default from mesh
-		m_Material = new DX12Material(m_Mesh->GetDefaultMaterialDesc());
+		TO_DO;
 	}
 	else
 	{
-		if (!m_Mesh->IsCompatible(*i_Desc.Material)) 
-		{
-			m_Material = new DX12Material(*i_Desc.Material);
-		}
-		else
-		{
-			PRINT_DEBUG("Error, the material is not compatible with the mesh");
-			return;
-		}
+		// retreive the material default from mesh
+		m_Material = i_Desc.Material;
 	}
+
 
 	// assert for debug
 	ASSERT(m_Material != nullptr);
 	ASSERT(m_Mesh != nullptr);
 
-	// retreive a constant buffer address
-	//m_ConstBuffer = render.ReserveConstantBufferVirtualAddress();
+	// manage constant buffer address
 	m_ConstBuffer = render.GetConstantBuffer(DX12RenderEngine::eTransform)->ReserveVirtualAddress();
-
-	m_Material->UpdateConstantBufferView();
+	m_Material->UpdateConstantBuffer();
 }
 
 RenderComponent::RenderComponent(Actor * i_Actor)
@@ -62,9 +51,6 @@ RenderComponent::RenderComponent(Actor * i_Actor)
 RenderComponent::~RenderComponent()
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
-
-	// cleanup resources
-	if (m_Mesh) delete m_Mesh;
 	
 	if (m_ConstBuffer != UnavailableAdressId)
 		render.GetConstantBuffer(DX12RenderEngine::eTransform)->ReleaseVirtualAddress(m_ConstBuffer);
@@ -77,7 +63,7 @@ void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandLis
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
 		//// add pso and root signature to the commandlist
-		m_Material->SetupPipeline(i_CommandList);
+		m_Material->PushPipelineState(i_CommandList);
 
 		// push transform buffer
 		if (m_ConstBuffer != UnavailableAdressId)
@@ -111,30 +97,22 @@ ADDRESS_ID RenderComponent::GetConstBufferAddress() const
 	return m_ConstBuffer;
 }
 
-void RenderComponent::SetMaterial(const DX12Material::DX12MaterialDesc & i_Desc)
+void RenderComponent::SetMaterial(const DX12Material * i_Material)
 {
-	if (m_Mesh->IsCompatible(i_Desc))
-	{
-		m_Material->Set(i_Desc);
-		m_Material->UpdateConstantBufferView();
-	}
-	else
-	{
-		PRINT_DEBUG("[Warning] setting a non compatible material to mesh %s", m_Mesh->GetName().c_str());
-	}
+	m_Material = i_Material;
 }
 
-DX12Material * RenderComponent::GetMaterial()
+const DX12Material * RenderComponent::GetMaterial() const
 {
 	return m_Material;
 }
 
-void RenderComponent::SetMeshBuffer(const DX12MeshBuffer * i_Mesh)
+void RenderComponent::SetMeshBuffer(const DX12Mesh * i_Mesh)
 {
 	m_Mesh = i_Mesh;
 }
 
-const DX12MeshBuffer * RenderComponent::GetMeshBuffer()
+const DX12Mesh * RenderComponent::GetMeshBuffer()
 {
 	return m_Mesh;
 }
@@ -208,8 +186,7 @@ FORCEINLINE void RenderComponent::DrawUIMesh()
 		if (m_Mesh != nullptr)
 		{
 			selectedItem = 0;
-			files.push_back("");
-			String::Utf16ToUtf8(files[0], m_Mesh->GetName());
+			files.push_back(m_Mesh->GetName());
 		}
 
 		const int currentItem = selectedItem;
@@ -239,8 +216,6 @@ FORCEINLINE void RenderComponent::DrawUIMesh()
 
 			std::wstring file;
 			String::Utf8ToUtf16(file, fileToLoad);
-
-			SetMeshBuffer(Engine::GetInstance().GetResourcesManager()->GetMesh(file.c_str())->GetRootMesh());
 		}
 
 

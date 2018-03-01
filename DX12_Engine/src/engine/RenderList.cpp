@@ -38,10 +38,6 @@ size_t RenderList::RenderComponentCount() const
 	return m_Components.size();
 }
 
-void RenderList::RenderGBuffer() const
-{
-}
-
 void RenderList::RenderLight() const
 {
 	if (m_ImmediateCommandList == nullptr)
@@ -123,7 +119,7 @@ void RenderList::PushRenderComponent(const RenderComponent * i_RenderComponent)
 
 	while (itr != m_RenderMeshData.end())
 	{
-		if (*itr)->first == i_RenderComponent->GetMaterial()->GetId();
+		//if (((UINT64)(*itr)->first) == i_RenderComponent->GetMaterial()->GetId());
 	}
 
 }

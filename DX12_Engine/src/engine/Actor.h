@@ -29,7 +29,7 @@ public:
 		// actor logic
 		bool NeedTick				= false;
 		// actor rendering
-		std::wstring Mesh			= L"";
+		std::string Mesh			= "";
 		UINT SubMeshId				= (UINT)-1;
 	};
 

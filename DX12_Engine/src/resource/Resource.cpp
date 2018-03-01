@@ -19,7 +19,7 @@ const std::string & Resource::GetFilepath() const
 
 bool Resource::IsValid() const
 {
-	return m_IsValid;
+	return m_IsLoaded && !m_IsReleased;
 }
 
 bool Resource::IsLoaded() const
@@ -32,9 +32,15 @@ void Resource::NotifyFinishLoad()
 	m_IsLoaded = true;
 }
 
-inline std::string Resource::RemovePath(const std::string & i_Path) const
+void Resource::Release()
 {
-	int pos = i_Path.find_last_of('/');
+	// the resource can be still GPU loaded
+	m_IsReleased = true;
+}
+
+std::string Resource::RemovePath(const std::string & i_Path) const
+{
+	size_t pos = i_Path.find_last_of('/');
 	
 	if (pos != std::string::npos)
 	{
@@ -44,10 +50,10 @@ inline std::string Resource::RemovePath(const std::string & i_Path) const
 	return "";
 }
 
-inline std::string Resource::ExtractFileName(const std::string & i_Path) const
+std::string Resource::ExtractFileName(const std::string & i_Path) const
 {
 	std::string fileName = RemovePath(i_Path);
-	int pos = fileName.find_last_of('.');
+	size_t pos = fileName.find_last_of('.');
 
 	if (pos != std::string::npos)
 	{
@@ -60,7 +66,7 @@ inline std::string Resource::ExtractFileName(const std::string & i_Path) const
 
 std::string Resource::ExtractFilePath(const std::string & i_Path) const
 {
-	int pos = i_Path.find_last_of('/');
+	size_t pos = i_Path.find_last_of('/');
 
 	if (pos != std::string::npos)
 	{
@@ -72,8 +78,14 @@ std::string Resource::ExtractFilePath(const std::string & i_Path) const
 
 Resource::Resource()
 	:m_Id((UINT64)this)
-	,m_Filepath("Generated : " + String::Int64ToString(m_Id))	// will be changed if the resource is loaded from file
+	,m_Filepath("Generated : " + String::Int64ToString((long)m_Id))	// will be changed if the resource is loaded from file
 	,m_Name(m_Filepath)
+	,m_IsLoaded(false)
+	,m_IsReleased(false)
+{
+}
+
+Resource::~Resource()
 {
 }
 

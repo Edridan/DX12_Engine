@@ -14,8 +14,10 @@
 #include "engine/Clock.h"
 #include "engine/Window.h"
 #include "engine/Console.h"
-#include "engine/ResourcesManager.h"
 #include "engine/RenderList.h"
+// resources
+#include "resource/ResourceManager.h"		// CPU side resource (that can load also GPU resources)
+#include "resource/DX12ResourceManager.h"	// GPU side resources
 // ui
 #include "ui/UILayer.h"
 #include "ui/UIConsole.h"
@@ -248,7 +250,7 @@ void Engine::Run()
 			Camera * cam = m_CurrentWorld->GetCurrentCamera();
 
 			// dx12 related
-			setup.CommandList = m_RenderEngine->GetContext(DX12RenderEngine::eDeferred)->GetCommandList();
+			setup.DeferredCommandList = m_RenderEngine->GetContext(DX12RenderEngine::eDeferred)->GetCommandList();
 			// camera related
 			setup.ProjectionMatrix	= XMLoadFloat4x4(&cam->GetProjMatrix());
 			setup.ViewMatrix		= XMLoadFloat4x4(&cam->GetViewMatrix());
@@ -261,7 +263,7 @@ void Engine::Run()
 			m_CurrentWorld->RenderWorld(m_RenderList);
 
 			// push the components on the commandlist to prepare for a render
-			m_RenderList->PushOnCommandList();
+			m_RenderList->RenderGBuffer();
 		}
 
 		// render ui
@@ -343,7 +345,8 @@ Engine::Engine()
 	,m_EngineClock(nullptr)
 	,m_Window(nullptr)
 	// managers
-	,m_ResourcesManager(nullptr)
+	,m_ResourceManager(nullptr)
+	,m_RenderResourceManager(nullptr)
 	,m_Console(nullptr)
 	// ui
 	,m_UILayer(nullptr)
@@ -360,7 +363,7 @@ Engine::~Engine()
 void Engine::CleanUpResources()
 {
 	// clean resources
-	m_ResourcesManager->CleanUpResources();
+	m_ResourceManager->CleanResources();
 }
 
 void Engine::CleanUpModules()

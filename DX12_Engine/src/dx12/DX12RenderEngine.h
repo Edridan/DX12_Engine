@@ -26,7 +26,7 @@ class DX12RenderTarget;
 class DX12RootSignature;
 class DX12PipelineState;
 class DX12DepthBuffer;
-class DX12MeshBuffer;
+class DX12Mesh;
 class DX12Context;
 
 // Render engine implementation
@@ -208,7 +208,7 @@ private:
 	ADDRESS_ID				m_ImmediateContextBuffer;
 
 	// primitive rectangle mesh
-	DX12MeshBuffer *		m_RectMesh;
+	DX12Mesh *				m_RectMesh;
 
 	// Depth buffer
 	DX12DepthBuffer *		m_DepthBuffer;	// Depth buffer handler

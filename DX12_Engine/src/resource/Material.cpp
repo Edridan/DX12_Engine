@@ -2,7 +2,7 @@
 
 #include "engine/Debug.h"
 #include "engine/Engine.h"
-#include "engine/ResourceManager.h"
+#include "resource/ResourceManager.h"
 #include "resource/DX12Material.h"
 #include "resource/DX12ResourceManager.h"
 

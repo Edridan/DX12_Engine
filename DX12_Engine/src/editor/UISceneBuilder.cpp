@@ -23,11 +23,11 @@ UISceneBuilder::UISceneBuilder(UIActorBuilder * i_ActorBuilder)
 
 	// cube actor
 	s_ActorDesc[1].Name = L"Cube";
-	s_ActorDesc[1].Mesh = L"Cube";
+	s_ActorDesc[1].Mesh = "Cube";
 
 	// plane actor
 	s_ActorDesc[2].Name = L"Plane";
-	s_ActorDesc[2].Mesh = L"Plane";
+	s_ActorDesc[2].Mesh = "Plane";
 
 	// light actor
 	s_ActorDesc[3].Name = L"Light_Empty";	// To do
