@@ -228,8 +228,6 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 					// retreive the mesh
 					DX12Mesh * meshBuffer = mesh->GetMeshBuffer(i);
 
-				
-
 					// setup name
 					std::wstring wShapeName;
 					std::string shapeName = meshBuffer->GetName();

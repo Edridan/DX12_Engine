@@ -126,6 +126,7 @@ namespace String
 	// itoa
 	std::string		IntToString(int i_Value);
 	std::string		Int64ToString(long int i_Value);
+	std::string		UInt64ToString(unsigned long int i_Value);
 
 	// specific operation
 	bool		EndWith(const std::string & i_String, const std::string & i_End);

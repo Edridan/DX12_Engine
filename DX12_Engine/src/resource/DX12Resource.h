@@ -34,10 +34,11 @@ protected:
 private:
 	// load resource
 	virtual void		LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device) = 0;
+	virtual void		PreloadData(const void * i_Data);	// preload needed data for recognition (as name setup...)
 
 	// callbacks
 	void				FinishLoading();	// callback when the resource have finished loaded
-	virtual void		NotifyEndFinish();	// this is called in the childs and overriden if some resources need to be cleaned on the GPU
+	virtual void		NotifyFinishLoading();	// this is called in the childs and overriden if some resources need to be cleaned on the GPU
 	// information
 	const UINT64		m_Id;
 

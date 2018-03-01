@@ -46,6 +46,8 @@ public:
 
 	// main call for engine
 	HRESULT			InitializeDX12();
+	HRESULT			InitializeDX12Resources();
+	HRESULT			GenerateContexts();
 	HRESULT			PrepareForRender();
 	HRESULT			Render();
 

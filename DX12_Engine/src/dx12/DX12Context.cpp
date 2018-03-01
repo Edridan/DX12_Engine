@@ -74,13 +74,13 @@ ID3D12Device * DX12Context::GetDevice() const
 
 ID3D12Fence * DX12Context::GetFence(UINT i_Id) const
 {
-	ASSERT(i_Id < m_FrameCount);
+	ASSERT(GetIndex(i_Id) < m_FrameCount);
 	return m_Fences[GetIndex(i_Id)];
 }
 
 UINT64 DX12Context::GetFenceValue(UINT i_Id) const
 {
-	ASSERT(i_Id < m_FrameCount);
+	ASSERT(GetIndex(i_Id) < m_FrameCount);
 	return m_FencesValues[GetIndex(i_Id)];
 }
 

@@ -188,6 +188,8 @@ Mesh * ResourceManager::GetGeneratedMeshByFilename(const std::string & i_Filenam
 			return (*itr).second;
 		++itr;
 	}
+
+	return nullptr;
 }
 
 Material * ResourceManager::GetGeneratedMaterialByFilename(const std::string & i_Filename)
@@ -199,6 +201,8 @@ Material * ResourceManager::GetGeneratedMaterialByFilename(const std::string & i
 			return (*itr).second;
 		++itr;
 	}
+
+	return nullptr;
 }
 
 Texture * ResourceManager::GetGeneratedTextureByFilename(const std::string & i_Filename)
@@ -210,6 +214,8 @@ Texture * ResourceManager::GetGeneratedTextureByFilename(const std::string & i_F
 			return (*itr).second;
 		++itr;
 	}
+
+	return nullptr;
 }
 
 FORCEINLINE Mesh * ResourceManager::GetMeshById(UINT64 i_Id) const

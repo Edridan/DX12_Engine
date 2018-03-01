@@ -154,8 +154,16 @@ std::string String::IntToString(int i_Value)
 
 std::string String::Int64ToString(long int i_Value)
 {
-	char buffer[32];
+	char buffer[64];
 	_ltoa_s(i_Value, buffer, 10);
+
+	return std::string(buffer);
+}
+
+std::string String::UInt64ToString(unsigned long int i_Value)
+{
+	char buffer[64];
+	_ultoa_s(i_Value, buffer, 10);
 
 	return std::string(buffer);
 }

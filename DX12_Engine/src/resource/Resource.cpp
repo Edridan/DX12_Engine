@@ -44,7 +44,7 @@ std::string Resource::RemovePath(const std::string & i_Path) const
 	
 	if (pos != std::string::npos)
 	{
-		return i_Path.substr(pos);
+		return i_Path.substr(pos + 1);
 	}
 	// unable to find the last "/" 
 	return "";
@@ -70,7 +70,7 @@ std::string Resource::ExtractFilePath(const std::string & i_Path) const
 
 	if (pos != std::string::npos)
 	{
-		return i_Path.substr(0, pos - 1);
+		return i_Path.substr(0, pos + 1);
 	}
 	// unable to find the last "/" 
 	return "";
@@ -78,11 +78,11 @@ std::string Resource::ExtractFilePath(const std::string & i_Path) const
 
 Resource::Resource()
 	:m_Id((UINT64)this)
-	,m_Filepath("Generated : " + String::Int64ToString((long)m_Id))	// will be changed if the resource is loaded from file
-	,m_Name(m_Filepath)
 	,m_IsLoaded(false)
 	,m_IsReleased(false)
 {
+	m_Filepath	= "Generated:" + String::UInt64ToString(m_Id);
+	m_Name		= m_Filepath;
 }
 
 Resource::~Resource()

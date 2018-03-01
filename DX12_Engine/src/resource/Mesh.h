@@ -17,7 +17,7 @@ class Mesh : public Resource
 {
 public:
 	// retreive DX12 data
-	DX12Mesh *		GetMeshBuffer(int i_Index = 0) const;
+	DX12Mesh *		GetMeshBuffer(size_t i_Index = 0) const;
 	DX12Mesh *		GetMeshBuffer(const std::string & i_Name) const;
 	DX12Material *	GetMaterial(int i_MeshIndex = 0, int i_MaterialIndex = 0) const;
 	DX12Material *	GetMaterial(const std::string & i_Name, int i_MaterialIndex = 0) const;

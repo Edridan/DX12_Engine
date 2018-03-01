@@ -26,5 +26,16 @@ int WINAPI WinMain(
 
 	// initialize and run the engine
 	engine.Initialize(desc);
+
+	// initialize the world
+	World * world = engine.GetWorld();
+
+	// create objects...
+	Actor::ActorDesc cubeActor;
+	cubeActor.Name = L"Sphere";
+	cubeActor.Mesh = "resources/obj/sphere.obj";
+	
+	world->SpawnActor(cubeActor);
+
 	engine.Run();
 }
