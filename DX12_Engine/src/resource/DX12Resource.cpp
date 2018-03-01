@@ -7,6 +7,12 @@ DX12Resource::DX12Resource()
 {
 }
 
+DX12Resource::DX12Resource(bool i_IsLoaded)
+	:m_IsLoaded(i_IsLoaded)
+	,m_Id((UINT64)this)
+{
+}
+
 void DX12Resource::Release()
 {
 	m_IsLoaded = false;

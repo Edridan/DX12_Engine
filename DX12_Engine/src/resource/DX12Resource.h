@@ -25,6 +25,7 @@ public:
 protected:
 	// called by childs
 	DX12Resource();
+	DX12Resource(bool i_IsLoaded);	// specific load from outside the dx12 loader
 
 	virtual void		Release();	// release resources loaded on GPU
 
