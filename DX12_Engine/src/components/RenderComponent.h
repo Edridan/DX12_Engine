@@ -8,11 +8,10 @@
 #include "ActorComponent.h"
 #include "dx12/d3dx12.h"
 #include "dx12/DX12Utils.h"
-#include "dx12/DX12Material.h"
+#include "resource/DX12Material.h"
 #include <vector>
 #include <string>
 
-class DX12MeshBuffer;
 class DX12Texture;
 class DX12Mesh;
 class Actor;
@@ -37,8 +36,8 @@ public:
 	struct RenderComponentDesc
 	{
 		// mesh
-		const DX12MeshBuffer *					Mesh = nullptr;			// mesh pointer
-		const DX12Material::DX12MaterialDesc *	Material = nullptr;		// if null, we take the default mesh material
+		const DX12Mesh *				Mesh = nullptr;			// mesh pointer
+		const DX12Material	 *			Material = nullptr;		// if null, we take the default mesh material
 	};
 
 	RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_Actor);
@@ -54,18 +53,18 @@ public:
 	ADDRESS_ID		GetConstBufferAddress() const;
 
 	// manage render stuff
-	void					SetMaterial(const DX12Material::DX12MaterialDesc & i_Desc);
-	DX12Material *			GetMaterial();
-	void					SetMeshBuffer(const DX12MeshBuffer * i_Mesh);
-	const DX12MeshBuffer *	GetMeshBuffer();
+	void					SetMaterial(const DX12Material * i_Material);
+	const DX12Material *	GetMaterial() const;
+	void					SetMeshBuffer(const DX12Mesh * i_Mesh);
+	const DX12Mesh *		GetMeshBuffer();
 
 	// render management
 	bool			IsRenderable() const;
 
 private:
 	// rendering
-	const DX12MeshBuffer *		m_Mesh;
-	DX12Material *				m_Material;	// material instance that manage the rendering pass
+	const DX12Mesh *			m_Mesh;
+	const DX12Material *		m_Material;	// material instance that manage the rendering pass
 
 	// dx12
 	ADDRESS_ID					m_ConstBuffer;	// const buffer for 3D matrices

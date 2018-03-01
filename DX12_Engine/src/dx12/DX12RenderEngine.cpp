@@ -2,13 +2,13 @@
 
 #include <assert.h>
 #include "dx12/d3dx12.h"
-#include "dx12/DX12Mesh.h"
 #include "dx12/DX12Context.h"
 #include "dx12/DX12RootSignature.h"
 #include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RenderTarget.h"
-#include "dx12/DX12MeshBuffer.h"
 #include "dx12/DX12DepthBuffer.h"
+#include "dx12/DX12ConstantBuffer.h"
+#include "resource/DX12Mesh.h"
 #include "engine/Engine.h"
 
 #ifdef DX12_DEBUG
@@ -470,7 +470,7 @@ void DX12RenderEngine::PushRectPrimitive2D(ID3D12GraphicsCommandList * i_Command
 
 D3D12_INPUT_LAYOUT_DESC DX12RenderEngine::GetPrimitiveInputLayout() const
 {
-	return m_RectMesh->GetInputLayout();
+	return m_RectMesh->GetInputLayoutDesc();
 }
 
 D3D12_VIEWPORT DX12RenderEngine::GetViewportOnRect(const Rect & i_ViewPort) const
@@ -734,7 +734,7 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateImmediateContext()
 
 	DX12PipelineState::PipelineStateDesc desc;
 
-	desc.InputLayout = m_RectMesh->GetInputLayout();
+	desc.InputLayout = m_RectMesh->GetInputLayoutDesc();
 	desc.RootSignature = m_ImmediateRootSignature;
 	desc.VertexShader = VShader;
 	desc.PixelShader = PShader;
@@ -796,7 +796,8 @@ void DX12RenderEngine::GeneratePrimitiveShapes()
 	D3D12_INPUT_LAYOUT_DESC inputLayout;
 	DX12PipelineState::CreateInputLayoutFromFlags(inputLayout, DX12PipelineState::eHaveTexcoord);
 
-	m_RectMesh = new DX12MeshBuffer(inputLayout, (BYTE*)VRect, 4u, IRect, 6u, L"Rect");
+	TO_DO;
+	//m_RectMesh = new DX12MeshBuffer(inputLayout, (BYTE*)VRect, 4u, IRect, 6u, L"Rect");
 }
 
 FORCEINLINE void DX12RenderEngine::GenerateRenderTargets()

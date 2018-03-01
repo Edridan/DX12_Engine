@@ -31,13 +31,15 @@ std::wstring Files::ConvertToWinPath(const std::wstring & i_Filepath)
 bool Files::FileExist(const std::string & i_Filepath)
 {
 	std::string filepath = Files::ConvertToWinPath(i_Filepath);
-	return PathFileExistsA(filepath.c_str());;
+	//return PathFileExists(filepath.c_str());
+	return false;
 }
 
 bool Files::FileExist(const std::wstring & i_Filepath)
 {
 	std::wstring filepath = Files::ConvertToWinPath(i_Filepath);
-	return PathFileExistsW(filepath.c_str());;
+	//return PathFileExists(filepath.c_str());
+	return false;
 }
 
 

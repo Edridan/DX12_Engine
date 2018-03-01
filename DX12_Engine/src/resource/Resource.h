@@ -26,6 +26,7 @@ protected:
 
 	// called from child to notify the end of the CPU loading
 	void				NotifyFinishLoad();
+	virtual void		Release();	// this release the resource CPU side
 
 	// path information helper
 	std::string		RemovePath(const std::string & i_Path) const;	// this remove path and retreive the resource file
@@ -33,7 +34,7 @@ protected:
 	std::string		ExtractFilePath(const std::string & i_Path) const;
 
 	Resource();
-	virtual ~Resource() = 0;
+	virtual ~Resource();
 
 private:
 	// load resource
@@ -45,7 +46,6 @@ private:
 
 	// information
 	const UINT64		m_Id;
-	
-	bool				m_IsValid;
 	bool				m_IsLoaded;
+	bool				m_IsReleased;
 };

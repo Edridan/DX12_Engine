@@ -17,6 +17,7 @@ public:
 		int ImageSize;
 		int Width;
 		int Height;
+		DXGI_FORMAT	Format;
 	};
 
 	// retreive GPU data
@@ -30,17 +31,6 @@ private:
 	// Inherited via Resource
 	virtual void LoadFromFile(const std::string & i_Filepath) override;
 	virtual void LoadFromData(const void * i_Data) override;
-
-	// struct
-	struct ImageDataDesc
-	{
-		int			BitsPerPixel;
-		int			BytesPerRow;
-		int			ImageSize;
-		int			Width;
-		int			Height;
-		DXGI_FORMAT	Format;
-	};
 
 	// helpers
 	int			LoadImageDataFromFile(BYTE ** o_Data, ImageDataDesc & o_ImageDesc, LPCWSTR i_Filename);

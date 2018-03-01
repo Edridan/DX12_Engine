@@ -127,6 +127,11 @@ size_t Mesh::GetMaterialCount(int i_Index) const
 	return m_MeshData[i_Index].Materials.size();
 }
 
+bool Mesh::IsMultiMesh() const
+{
+	return (m_MeshData.size() > 1);
+}
+
 void Mesh::LoadFromFile(const std::string & i_Filepath)
 {
 	Engine & engine = Engine::GetInstance();
@@ -212,6 +217,8 @@ FORCEINLINE void Mesh::LoadPrimitiveMesh(const std::string & i_PrimitiveName)
 	}
 
 	m_MeshData.push_back(meshData);
+
+	NotifyFinishLoad();
 }
 
 FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
@@ -221,7 +228,7 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 
 	tinyobj::attrib_t					attrib;
 	std::vector<tinyobj::shape_t>		shapes;
-	std::vector<tinyobj::material_t>	material;
+	std::vector<tinyobj::material_t>	materials;
 
 	// create load directory
 	std::string error;
@@ -231,7 +238,7 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 	std::string objFilepath(i_Filepath);
 
 	// load the mesh and materials
-	bool ret = tinyobj::LoadObj(&attrib, &shapes, &material, &error, objFilepath.c_str(), materialFolder.c_str());
+	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &error, objFilepath.c_str(), materialFolder.c_str());
 
 	if (!ret)
 	{
@@ -315,19 +322,22 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 			}
 		}
 
-		//Material * material = resourceManager->GetMaterial()
+		std::string materialName = "Generated:" + m_Filepath + "_" + m_Name;
 
+		// To do : search before and 
+
+		Material::MaterialData matData;
+		matData.Filepath = materialName;	// put the identifier
+		matData.MaterialCount = meshMaterials.size();
+		matData.Materials = new Material::MaterialSpec[matData.MaterialCount];
 
 		for (size_t i = 0; i < meshMaterials.size(); ++i)
 		{
+			tinyobj::material_t mat = materials[meshMaterials[i]];
+			Material::MaterialSpec & m = matData.Materials[i];
 
-			tinyobj::material_t mat = material[meshMaterials[i]];
-
-			Material::MaterialData mData;
-			
-			// setup the name of the material
-			mData.Name		= mat.name;
-			mData.Filepath	= m_Filepath;
+			// Name
+			m.Name = mat.name;
 
 			// To do : load textures
 			/*desc.map_Ka = LoadTexture(mat.ambient_texname, textureFolder, resourcesManager);
@@ -335,13 +345,33 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 			desc.map_Ks = LoadTexture(mat.specular_texname, textureFolder, resourcesManager);*/
 
 			// retreive other data
-			mData.Ka = mat.ambient;
-			mData.Kd = mat.diffuse;
-			mData.Ke = mat.emission;
-			mData.Ks = mat.specular;
-			
+			m.Ka = mat.ambient;
+			m.Kd = mat.diffuse;
+			m.Ke = mat.emission;
+			m.Ks = mat.specular;
 		}
 
+		Material * material = resourceManager->LoadMaterialWithData(&matData);
+		
+		if (material->IsLoaded())
+		{
+			for (size_t i = 0; i < meshMaterials.size(); ++i)
+			{
+				tinyobj::material_t mat = materials[meshMaterials[i]];
+				DX12Material * m = material->GetDX12Material(mat.name);
+
+				if (m != nullptr)
+				{
+					mData.Materials.push_back(m);
+				}
+			}
+		}
+		else
+		{
+			ASSERT_ERROR("Error when loading materials");
+			return;
+		}
+		
 		// generate layout for the shape
 		D3D12_INPUT_LAYOUT_DESC layout;
 		DX12PipelineState::CreateInputLayoutFromFlags(layout, flags);
@@ -360,14 +390,17 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 
 		m_MeshData.push_back(mData);
 	}
+
+	NotifyFinishLoad();
 }
 
 Mesh::Mesh()
+	:Resource()
+	,m_MeshData()
 {
 }
 
 Mesh::~Mesh()
 {
 	// release resource
-	
 }

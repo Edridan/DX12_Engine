@@ -6,6 +6,7 @@
 #pragma once
 
 #include "dx12/d3dx12.h"
+#include "dx12/DX12Utils.h"
 #include <DirectXMath.h>
 #include <vector>
 
@@ -16,7 +17,7 @@ class RenderComponent;	// this is the basis component to render objects
 class LightComponent;
 class Actor;
 class DX12Material;
-class DX12MeshBuffer;
+class DX12Mesh;
 
 class RenderList
 {
@@ -67,7 +68,7 @@ private:
 	struct RenderMeshData
 	{
 		Actor *				m_Actor = nullptr;
-		DX12MeshBuffer *	m_Mesh = nullptr;
+		DX12Mesh		 *	m_Mesh = nullptr;
 		ADDRESS_ID			m_ConstBuffer = UnavailableAdressId;
 	};
 

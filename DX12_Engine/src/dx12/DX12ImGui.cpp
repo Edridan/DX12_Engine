@@ -3,10 +3,9 @@
 #include <windows.h>
 #include "DX12RenderEngine.h"
 #include "DX12Shader.h"
-#include "DX12Texture.h"
 #include "DX12Context.h"
 #include "engine/Engine.h"
-
+#include "resource/DX12Texture.h"
 
 HRESULT ImGuiD3D12::InitializeDX12ImGui()
 {

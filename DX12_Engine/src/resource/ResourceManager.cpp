@@ -87,10 +87,30 @@ Texture * ResourceManager::GetTexture(const std::string & i_File)
 	return texture;
 }
 
+Material * ResourceManager::LoadMaterialWithData(const void * i_Data)
+{
+	Material * material = new Material;
+	material->LoadFromData(i_Data);
+	
+	if (material->IsLoaded())
+	{
+		m_AllResources[material->GetId()] = material;
+		m_MaterialsId[material->GetId()] = material;
+	}
+	else
+	{
+		ASSERT_ERROR("Unable to load material");
+		delete material;
+		material = nullptr;
+	}
+
+	return material;
+}
+
 Mesh * ResourceManager::GetMeshByName(const std::string & i_Name) const
 {
-	auto itr = m_Meshes.begin();
-	while (itr != m_Meshes.end())
+	auto itr = m_MeshesId.begin();
+	while (itr != m_MeshesId.end())
 	{
 		if ((*itr).second->GetName() == i_Name)
 			return (*itr).second;
@@ -102,8 +122,8 @@ Mesh * ResourceManager::GetMeshByName(const std::string & i_Name) const
 
 Material * ResourceManager::GetMaterialByName(const std::string & i_Name) const
 {
-	auto itr = m_Materials.begin();
-	while (itr != m_Materials.end())
+	auto itr = m_MaterialsId.begin();
+	while (itr != m_MaterialsId.end())
 	{
 		if ((*itr).second->GetName() == i_Name)
 			return (*itr).second;
@@ -115,8 +135,8 @@ Material * ResourceManager::GetMaterialByName(const std::string & i_Name) const
 
 Texture * ResourceManager::GetTextureByName(const std::string & i_Name) const
 {
-	auto itr = m_Textures.begin();
-	while (itr != m_Textures.end())
+	auto itr = m_TexturesId.begin();
+	while (itr != m_TexturesId.end())
 	{
 		if ((*itr).second->GetName() == i_Name)
 			return (*itr).second;
@@ -128,8 +148,8 @@ Texture * ResourceManager::GetTextureByName(const std::string & i_Name) const
 
 void ResourceManager::GetAllMeshByName(std::vector<Mesh*> o_Out, const std::string & i_Name) const
 {
-	auto itr = m_Meshes.begin();
-	while (itr != m_Meshes.end())
+	auto itr = m_MeshesId.begin();
+	while (itr != m_MeshesId.end())
 	{
 		if ((*itr).second->GetName() == i_Name)
 			o_Out.push_back((*itr).second);
@@ -139,8 +159,8 @@ void ResourceManager::GetAllMeshByName(std::vector<Mesh*> o_Out, const std::stri
 
 void ResourceManager::GetAllTexturesByName(std::vector<Texture*> o_Out, const std::string & i_Name) const
 {
-	auto itr = m_Textures.begin();
-	while (itr != m_Textures.end())
+	auto itr = m_TexturesId.begin();
+	while (itr != m_TexturesId.end())
 	{
 		if ((*itr).second->GetName() == i_Name)
 			o_Out.push_back((*itr).second);
@@ -150,11 +170,44 @@ void ResourceManager::GetAllTexturesByName(std::vector<Texture*> o_Out, const st
 
 void ResourceManager::GetAllMaterialsByName(std::vector<Material*> o_Out, const std::string & i_Name) const
 {
-	auto itr = m_Materials.begin();
-	while (itr != m_Materials.end())
+	auto itr = m_MaterialsId.begin();
+	while (itr != m_MaterialsId.end())
 	{
 		if ((*itr).second->GetName() == i_Name)
 			o_Out.push_back((*itr).second);
+		++itr;
+	}
+}
+
+Mesh * ResourceManager::GetGeneratedMeshByFilename(const std::string & i_Filename)
+{
+	auto itr = m_MeshesId.begin();
+	while (itr != m_MeshesId.end())
+	{
+		if ((*itr).second->GetFilepath() == i_Filename)
+			return (*itr).second;
+		++itr;
+	}
+}
+
+Material * ResourceManager::GetGeneratedMaterialByFilename(const std::string & i_Filename)
+{
+	auto itr = m_MaterialsId.begin();
+	while (itr != m_MaterialsId.end())
+	{
+		if ((*itr).second->GetFilepath() == i_Filename)
+			return (*itr).second;
+		++itr;
+	}
+}
+
+Texture * ResourceManager::GetGeneratedTextureByFilename(const std::string & i_Filename)
+{
+	auto itr = m_TexturesId.begin();
+	while (itr != m_TexturesId.end())
+	{
+		if ((*itr).second->GetFilepath() == i_Filename)
+			return (*itr).second;
 		++itr;
 	}
 }
@@ -208,6 +261,16 @@ bool ResourceManager::ReleaseResource(const UINT64 i_Id)
 {
 	TO_DO;
 	return false;
+}
+
+void ResourceManager::CleanUnusedResources()
+{
+	TO_DO;
+}
+
+void ResourceManager::CleanResources()
+{
+	TO_DO;
 }
 
 ResourceManager::ResourceManager()

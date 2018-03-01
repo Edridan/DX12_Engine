@@ -18,6 +18,8 @@ public:
 	Mesh *		GetMesh(const std::string & i_File);
 	Material *	GetMaterial(const std::string & i_File);
 	Texture *	GetTexture(const std::string & i_File);
+	// resource loading with data
+	Material *	LoadMaterialWithData(const void * i_Data);
 
 	// To do : manage data generated resources (can be loaded with unique id)
 
@@ -30,6 +32,11 @@ public:
 	void		GetAllMeshByName(std::vector<Mesh*> o_Out, const std::string & i_Name) const;
 	void		GetAllTexturesByName(std::vector<Texture*> o_Out, const std::string & i_Name) const;
 	void		GetAllMaterialsByName(std::vector<Material*> o_Out, const std::string & i_Name) const;
+	// retreive a generated resource by filename (filename can be used as identifier)
+	// warning : this cost a lot
+	Mesh *		GetGeneratedMeshByFilename(const std::string & i_FileName);
+	Material *	GetGeneratedMaterialByFilename(const std::string & i_Filename);
+	Texture *	GetGeneratedTextureByFilename(const std::string & i_Filename);
 
 	// retreive an already resource with id
 	Mesh *			GetMeshById(UINT64 i_Id) const;
@@ -44,6 +51,8 @@ public:
 
 	// release resource
 	bool			ReleaseResource(const UINT64 i_Id);	// release resource by Id
+	void			CleanUnusedResources();	// clean resources witch are not used
+	void			CleanResources();	// clean all loaded resources
 
 	friend class Engine;
 private:

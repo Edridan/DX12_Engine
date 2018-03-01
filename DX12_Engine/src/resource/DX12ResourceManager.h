@@ -1,7 +1,7 @@
 #pragma once
 
 #include "engine/Defines.h"
-
+#include "dx12/d3dx12.h"
 #include <vector>
 #include <map>
 

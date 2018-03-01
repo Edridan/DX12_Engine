@@ -6,10 +6,12 @@
 #include "engine/World.h"
 // engine
 #include "engine/Engine.h"
-#include "engine/ResourcesManager.h"
 // dx12
 #include "dx12/DX12RenderEngine.h"
-#include "dx12/DX12Mesh.h"
+// resources
+#include "resource/ResourceManager.h"
+#include "resource/DX12Mesh.h"
+#include "resource/Mesh.h"
 
 XMMATRIX Actor::GetWorldTransform()
 {
@@ -190,48 +192,112 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 	}
 
 	// the actor have a mesh component attached to it
-	if (i_Desc.Mesh != L"")
+	if (i_Desc.Mesh != "")
 	{
+		std::string filepath, meshName;
+		size_t p = i_Desc.Mesh.find(':');
+
+		if (p != std::string::npos)
+		{
+			meshName = i_Desc.Mesh.substr(p + 1);
+			filepath = i_Desc.Mesh.substr(0, p);
+		}
+		else
+		{
+			filepath = i_Desc.Mesh;
+		}
+
 		// component description
-		RenderComponent::RenderComponentDesc componentDesc;
-		// load the mesh
-		ResourcesManager * manager = Engine::GetInstance().GetResourcesManager();
-		DX12Mesh * mesh = manager->GetMesh(i_Desc.Mesh.c_str());	// load mesh if needed
+		ResourceManager * manager = Engine::GetInstance().GetResourceManager();
+		// Mesh retreiving
+		Mesh * mesh = manager->GetMesh(i_Desc.Mesh.c_str());	// retreive the mesh from resource manager
 
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
 		if (mesh != nullptr)
 		{
-			// load root mesh or all submeshes in different actors
-			if (i_Desc.SubMeshId == (UINT)-1)
+			// fully load the mesh : create mesh and objects per shapes
+			if (meshName == "" && mesh->IsMultiMesh())
 			{
-				componentDesc.Mesh = mesh->GetRootMesh();
-				//mesh->GetTextures(componentDesc.Textures);
+				// create child actors
+				ActorDesc childDesc;
+				childDesc.Mesh = i_Desc.Mesh;
 
-				// if the current mesh have some submesh
-				if (mesh->HaveSubMeshes())
+				for (size_t i = 0; i < mesh->GetMeshCount(); ++i)
 				{
-					// load them into other game objects
-					ActorDesc childDesc;
+					// retreive the mesh
+					DX12Mesh * meshBuffer = mesh->GetMeshBuffer(i);
 
-					childDesc.Mesh = i_Desc.Mesh;
-					childDesc.Name = m_Name.append(L"_SubObject");
-					
-					for (size_t i = 0; i < mesh->SubMeshesCount(); ++i)
-					{
-						// load submeshes
-						childDesc.SubMeshId = (UINT)i;
-						m_World->SpawnActor(childDesc, this);
-					}
+				
+
+					// setup name
+					std::wstring wShapeName;
+					std::string shapeName = meshBuffer->GetName();
+					String::Utf8ToUtf16(wShapeName, shapeName);
+					childDesc.Name = m_Name.append(wShapeName);
+					childDesc.Mesh = filepath + ":" + shapeName;
+
+					m_World->SpawnActor(childDesc, this);
 				}
+			}
+			else if (meshName == "" && !mesh->IsMultiMesh())
+			{
+				RenderComponent::RenderComponentDesc componentDesc;
+				
+				// retreive the material/mesh buffer
+				componentDesc.Mesh = mesh->GetMeshBuffer(0);
+				componentDesc.Material = mesh->GetMaterial(0, 0);
+
+				// load the main shape
+				AttachRenderComponent(componentDesc);
+
+			}
+			else if (meshName != "")
+			{
+				RenderComponent::RenderComponentDesc componentDesc;
+
+				// retreive the material/mesh buffer
+				componentDesc.Mesh = mesh->GetMeshBuffer(meshName);
+				componentDesc.Material = mesh->GetMaterial(meshName, 0);
+
+				// load the main shape
+				AttachRenderComponent(componentDesc);
 			}
 			else
 			{
-				componentDesc.Mesh = mesh->GetSubMeshes(i_Desc.SubMeshId);
-				//mesh->GetTextures(componentDesc.Textures, i_Desc.SubMeshId);
+				ASSERT_ERROR("Unknown error");
 			}
 
-			AttachRenderComponent(componentDesc);
+			//// load root mesh or all submeshes in different actors
+			//if (i_Desc.SubMeshId == (UINT)-1)
+			//{
+			//	componentDesc.Mesh = mesh->GetMeshBuffer();
+			//	//mesh->GetTextures(componentDesc.Textures);
+
+			//	// if the current mesh have some submesh
+			//	if (mesh->HaveSubMeshes())
+			//	{
+			//		// load them into other game objects
+			//		ActorDesc childDesc;
+
+			//		childDesc.Mesh = i_Desc.Mesh;
+			//		childDesc.Name = m_Name.append(L"_SubObject");
+			//		
+			//		for (size_t i = 0; i < mesh->SubMeshesCount(); ++i)
+			//		{
+			//			// load submeshes
+			//			childDesc.SubMeshId = (UINT)i;
+			//			m_World->SpawnActor(childDesc, this);
+			//		}
+			//	}
+			//}
+			//else
+			//{
+			//	componentDesc.Mesh = mesh->GetSubMeshes(i_Desc.SubMeshId);
+			//	//mesh->GetTextures(componentDesc.Textures, i_Desc.SubMeshId);
+			//}
+
+			//AttachRenderComponent(componentDesc);
 		}
 		else
 		{

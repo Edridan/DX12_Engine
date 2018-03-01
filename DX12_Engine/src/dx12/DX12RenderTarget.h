@@ -1,7 +1,7 @@
 #pragma once
 
-#include "dx12/DX12Texture.h"
 #include "dx12/DX12DescriptorHeap.h"
+#include "resource/DX12Texture.h"
 #include <dxgi1_4.h>
 #include "d3dx12.h"
 
