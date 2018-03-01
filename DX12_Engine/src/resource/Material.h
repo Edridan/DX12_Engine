@@ -8,19 +8,30 @@ class DX12Material;
 class Material : public Resource
 {
 public:
-	struct MaterialData
+	struct MaterialSpec
 	{
 		// material data
 		Color Ka = color::Pink, Kd = color::Pink, Ks = color::Pink, Ke = color::Pink;
 		float Ns = 1000.f;
+		std::string	Name;
+	};
+
+	struct MaterialData
+	{
+		MaterialSpec *		Materials;
+		size_t				MaterialCount;
+
 		std::string	ImagePath;
 		// data info
-		std::string	Name, Filepath;
+		std::string Filepath;
 	};
 
 	// DX12
 	DX12Material *		GetDX12Material(const std::string & i_Name) const;
 	DX12Material *		GetDX12Material(size_t i_Index = 0) const;
+
+	// infomation
+	size_t				GetMaterialCount() const;
 
 	// friend class
 	friend class ResourceManager;

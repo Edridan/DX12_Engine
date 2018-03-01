@@ -212,7 +212,6 @@ FORCEINLINE void Mesh::LoadPrimitiveMesh(const std::string & i_PrimitiveName)
 	}
 
 	m_MeshData.push_back(meshData);
-
 }
 
 FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
@@ -316,30 +315,31 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 			}
 		}
 
+		//Material * material = resourceManager->GetMaterial()
+
+
 		for (size_t i = 0; i < meshMaterials.size(); ++i)
 		{
 
 			tinyobj::material_t mat = material[meshMaterials[i]];
 
 			Material::MaterialData mData;
-			// setup the name of the material
 			
+			// setup the name of the material
+			mData.Name		= mat.name;
+			mData.Filepath	= m_Filepath;
 
-			desc.Name = mat.name;
-
-			// load textures
-			desc.map_Ka = LoadTexture(mat.ambient_texname, textureFolder, resourcesManager);
+			// To do : load textures
+			/*desc.map_Ka = LoadTexture(mat.ambient_texname, textureFolder, resourcesManager);
 			desc.map_Kd = LoadTexture(mat.diffuse_texname, textureFolder, resourcesManager);
-			desc.map_Ks = LoadTexture(mat.specular_texname, textureFolder, resourcesManager);
-			// to do : load other textures
+			desc.map_Ks = LoadTexture(mat.specular_texname, textureFolder, resourcesManager);*/
 
 			// retreive other data
-			desc.Ka = mat.ambient;
-			desc.Kd = mat.diffuse;
-			desc.Ke = mat.emission;
-			desc.Ks = mat.specular;
-
-			meshBuffer->SetDefaultMaterial(desc);
+			mData.Ka = mat.ambient;
+			mData.Kd = mat.diffuse;
+			mData.Ke = mat.emission;
+			mData.Ks = mat.specular;
+			
 		}
 
 		// generate layout for the shape

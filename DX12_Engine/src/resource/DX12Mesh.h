@@ -44,6 +44,7 @@ private:
 
 	// Inherited via DX12Resource
 	virtual void LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device) override;
+	virtual void Release() override;
 
 	// dx12 helpers
 	static HRESULT	CreateBuffer(ID3D12Device * i_Device, ID3D12Resource ** i_Buffer, UINT i_BufferSize, const wchar_t * i_Name = L"Default Buffer");

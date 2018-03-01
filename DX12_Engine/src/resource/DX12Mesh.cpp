@@ -63,12 +63,6 @@ DX12Mesh::DX12Mesh()
 
 DX12Mesh::~DX12Mesh()
 {
-	SAFE_RELEASE(m_VertexBuffer);
-
-	if (HaveIndexBuffer())
-	{
-		SAFE_RELEASE(m_IndexBuffer);
-	}
 }
 
 
@@ -123,6 +117,19 @@ void DX12Mesh::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_C
 
 	// delete the data
 	delete data;
+}
+
+void DX12Mesh::Release()
+{
+	SAFE_RELEASE(m_VertexBuffer);
+
+	if (HaveIndexBuffer())
+	{
+		SAFE_RELEASE(m_IndexBuffer);
+	}
+
+	// call for release of the resource
+	DX12Resource::Release();
 }
 
 HRESULT DX12Mesh::CreateBuffer(ID3D12Device * i_Device, ID3D12Resource ** i_Buffer, UINT i_BufferSize, const wchar_t * i_Name)

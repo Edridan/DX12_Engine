@@ -18,15 +18,7 @@ DX12Material::DX12Material()
 
 DX12Material::~DX12Material()
 {
-	// release address from constant buffer
-	if (m_ConstantBuffer != nullptr)
-	{
-		m_ConstantBuffer->ReleaseVirtualAddress(m_BufferAddress);
-	}
-
-	// release dx12 resources
-	if (m_RootSignature)	delete m_RootSignature;
-	if (m_PipelineState)	delete m_PipelineState;
+	Release();
 }
 
 void DX12Material::PushPipelineState(ID3D12GraphicsCommandList * i_CommandList) const
@@ -83,6 +75,21 @@ void DX12Material::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList *
 
 	// delete the data
 	delete data;
+}
+
+void DX12Material::Release()
+{
+	// release address from constant buffer
+	if (m_ConstantBuffer != nullptr)
+	{
+		m_ConstantBuffer->ReleaseVirtualAddress(m_BufferAddress);
+	}
+
+	// release dx12 resources
+	if (m_RootSignature)	delete m_RootSignature;
+	if (m_PipelineState)	delete m_PipelineState;
+
+	DX12Resource::Release();
 }
 
 FORCEINLINE void DX12Material::GenerateRootSignature(ID3D12Device * i_Device)

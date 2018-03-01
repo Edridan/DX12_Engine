@@ -31,9 +31,7 @@ DX12Texture::DX12Texture()
 
 DX12Texture::~DX12Texture()
 {
-	SAFE_RELEASE(m_UploadBuffer);
-	SAFE_RELEASE(m_ResourceBuffer);
-	SAFE_RELEASE(m_DescriptorHeap);
+	Release();
 }
 
 void DX12Texture::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device)
@@ -93,6 +91,15 @@ void DX12Texture::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * 
 
 	// delete the data
 	delete data;
+}
+
+void DX12Texture::Release()
+{
+	SAFE_RELEASE(m_UploadBuffer);
+	SAFE_RELEASE(m_ResourceBuffer);
+	SAFE_RELEASE(m_DescriptorHeap);
+
+	DX12Resource::Release();
 }
 
 FORCEINLINE HRESULT DX12Texture::CreateResourceBuffer(ID3D12Device * i_Device, const std::wstring & i_BufferName)
