@@ -40,6 +40,7 @@ private:
 
 	// upload resource management
 	std::vector<ResourceData>		m_ResourceQueue;	// resource to load in queue
+	HANDLE							m_FenceEvent;		// a handle to an event when our fence is unlocked by the gpu
 
 	// push command list on GPU
 	DX12Context *					m_CopyContext;

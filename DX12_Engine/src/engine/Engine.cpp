@@ -92,6 +92,18 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	m_RenderEngine = &DX12RenderEngine::GetInstance();
 	m_RenderEngine->InitializeDX12();
 
+	// resource management
+	m_ResourceManager			= new ResourceManager;
+	m_RenderResourceManager		= new DX12ResourceManager;
+
+	// load resources for render engine
+	m_RenderEngine->InitializeDX12Resources();
+
+	// push data on GPU
+	m_RenderResourceManager->PushResourceOnGPUWithWait();
+
+	m_RenderEngine->GenerateContexts();
+
 	// intialize constant buffer
 	m_RenderEngine->GetConstantBuffer(DX12RenderEngine::eGlobal)->ReserveVirtualAddress();	// reserve the first address on the constant buffer
 
@@ -111,9 +123,6 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 	// create managers
 	m_RenderList = new RenderList;
-	// resource management
-	m_ResourceManager			= new ResourceManager;
-	m_RenderResourceManager		= new DX12ResourceManager;
 
 	// setup settings
 	m_FramePerSecondsTargeted = i_Desc.FramePerSecondTargeted;
@@ -166,6 +175,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	PRINT_DEBUG("Initilization... OK");
 #endif
 
+
 	// enable input
 	Input::SetKeyEventEnabled(true);
 
@@ -183,6 +193,9 @@ void Engine::Run()
 
 	while (!m_Exit)
 	{
+		// load resources if needed
+		m_RenderResourceManager->PushResourceOnGPUWithWait();	// Workaround : load each time a new objects
+
 		// pre update management
 		m_ElapsedTime = m_EngineClock->Restart().ToSeconds();
 

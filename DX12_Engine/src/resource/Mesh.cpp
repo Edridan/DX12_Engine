@@ -75,7 +75,7 @@ DWORD iCube[] = {
 ///////////////////////////////////////////////////////////////////
 // Mesh implementation
 
-DX12Mesh * Mesh::GetMeshBuffer(int i_Index) const
+DX12Mesh * Mesh::GetMeshBuffer(size_t i_Index) const
 {
 	ASSERT(i_Index < m_MeshData.size());
 	return m_MeshData[i_Index].MeshBuffer;
@@ -331,8 +331,12 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 		matData.MaterialCount = meshMaterials.size();
 		matData.Materials = new Material::MaterialSpec[matData.MaterialCount];
 
+		
+
 		for (size_t i = 0; i < meshMaterials.size(); ++i)
 		{
+			if (meshMaterials[i] == -1)	continue;	// the mesh have no material
+
 			tinyobj::material_t mat = materials[meshMaterials[i]];
 			Material::MaterialSpec & m = matData.Materials[i];
 
@@ -382,10 +386,17 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 
 		// fill buffers into the data
 		meshData->VerticesBuffer	= reinterpret_cast<BYTE*>(verticeBuffer);
-		meshData->VerticesCount		= verticeCount;
+		meshData->VerticesCount		= (UINT)verticeCount;
+
+		// fill name
+		meshData->Filepath	= m_Filepath;
+		meshData->Name		= shape->name;
 
 		// generate the mesh (will be uploaded onto the GPU later)
 		mData.MeshBuffer = dx12ResourceManager->PushMesh(meshData);
+		mData.VertexData = reinterpret_cast<BYTE*>(verticeBuffer);
+		mData.IndexData = nullptr;
+
 		ASSERT(mData.MeshBuffer != nullptr);
 
 		m_MeshData.push_back(mData);

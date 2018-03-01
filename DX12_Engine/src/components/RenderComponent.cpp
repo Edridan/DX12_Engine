@@ -34,7 +34,7 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 
 	// manage constant buffer address
 	m_ConstBuffer = render.GetConstantBuffer(DX12RenderEngine::eTransform)->ReserveVirtualAddress();
-	m_Material->UpdateConstantBuffer();
+	//m_Material->UpdateConstantBuffer();
 }
 
 RenderComponent::RenderComponent(Actor * i_Actor)
@@ -58,7 +58,8 @@ RenderComponent::~RenderComponent()
 
 void RenderComponent::PushOnCommandList(ID3D12GraphicsCommandList * i_CommandList) const
 {
-	if (m_Mesh != nullptr && m_Actor != nullptr /*&& m_Material != nullptr*/)
+	if (m_Mesh != nullptr && m_Actor != nullptr && m_Material != nullptr &&
+		m_Mesh->IsValid() && m_Material->IsValid())
 	{
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 

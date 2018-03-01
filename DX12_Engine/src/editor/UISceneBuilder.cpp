@@ -87,7 +87,7 @@ FORCEINLINE void UISceneBuilder::SelectActor(Actor * i_Actor)
 
 FORCEINLINE void UISceneBuilder::DrawActor(Actor * i_Actor)
 {
-	std::string actorName, actorId = String::IntToString(i_Actor->GetId());
+	std::string actorName, actorId = String::UInt64ToString(i_Actor->GetId());
 	String::Utf16ToUtf8(actorName, i_Actor->GetName());
 
 	// select the actor needed

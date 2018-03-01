@@ -36,13 +36,18 @@ bool DX12Resource::IsValid() const
 	return m_IsLoaded;
 }
 
+void DX12Resource::PreloadData(const void * i_Data)
+{
+	// do nothing basically but can be overloaded if needed
+}
+
 void DX12Resource::FinishLoading()
 {
 	m_IsLoaded = true;
-	NotifyEndFinish();
+	NotifyFinishLoading();
 }
 
-void DX12Resource::NotifyEndFinish()
+void DX12Resource::NotifyFinishLoading()
 {
 	// To do : implement in some child resource that need clean resource on GPU
 }

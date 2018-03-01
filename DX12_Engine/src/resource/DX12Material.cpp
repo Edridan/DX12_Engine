@@ -53,10 +53,6 @@ void DX12Material::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList *
 {
 	const DX12MaterialData * data = (const DX12MaterialData*)i_Data;
 
-	// informations
-	m_Name		= data->Name;
-	m_Filepath	= data->Filepath;
-
 	// colors
 	m_Data.Ka = ColorToVec4(data->Ka);
 	m_Data.Kd = ColorToVec4(data->Kd);
@@ -73,8 +69,21 @@ void DX12Material::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList *
 	m_BufferAddress = m_ConstantBuffer->ReserveVirtualAddress();
 	UpdateConstantBuffer();
 
+	// generate pipeline state
+	GenerateRootSignature(i_Device);
+	GeneratePipelineState(i_Device);
+
 	// delete the data
 	delete data;
+}
+
+void DX12Material::PreloadData(const void * i_Data)
+{
+	const DX12MaterialData * data = (const DX12MaterialData*)i_Data;
+
+	// informations
+	m_Name = data->Name;
+	m_Filepath = data->Filepath;
 }
 
 void DX12Material::Release()

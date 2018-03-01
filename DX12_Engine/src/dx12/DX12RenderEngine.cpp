@@ -8,6 +8,7 @@
 #include "dx12/DX12RenderTarget.h"
 #include "dx12/DX12DepthBuffer.h"
 #include "dx12/DX12ConstantBuffer.h"
+#include "resource/DX12ResourceManager.h"
 #include "resource/DX12Mesh.h"
 #include "engine/Engine.h"
 
@@ -187,7 +188,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_SwapChain = static_cast<IDXGISwapChain3*>(tempSwapChain);
 	m_FrameIndex = m_SwapChain->GetCurrentBackBufferIndex();
 
-
 	GenerateDeferredContext();
 
 	// -- Create the Back Buffers (render target views) Descriptor Heap -- //
@@ -220,11 +220,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		ASSERT_ERROR("Error : Fences -> CreateEvent");
 		return E_FAIL;
 	}
-
-	// -- Generate primitive meshes -- //
-	GeneratePrimitiveShapes();
-	GenerateRenderTargets();
-
 	// -- Create constant buffer -- //
 
 	for (size_t i = 0; i < EConstantBufferId::eConstantBufferCount; ++i)
@@ -252,12 +247,42 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	m_DepthBuffer = new DX12DepthBuffer(depthBufferDesc);
 
+	// -- Generate primitive meshes -- //
+	GenerateRenderTargets();
+
+	// -- Setup viewport and scissor -- //
+	m_Viewport.TopLeftX = 0;
+	m_Viewport.TopLeftY = 0;
+	m_Viewport.Width = (FLOAT)m_WindowSize.x;
+	m_Viewport.Height = (FLOAT)m_WindowSize.y;
+	m_Viewport.MinDepth = 0.0f;
+	m_Viewport.MaxDepth = 1.0f;
+
+	m_ScissorRect.left = 0;
+	m_ScissorRect.top = 0;
+	m_ScissorRect.right = m_WindowSize.x;
+	m_ScissorRect.bottom = m_WindowSize.y;
+
+	return S_OK;
+}
+
+HRESULT DX12RenderEngine::InitializeDX12Resources()
+{
+	// To do : add all dx12 resources as primitive meshes, render target (which need to be a DX12Textures)
+
+	GeneratePrimitiveShapes();
 	// -- Create multiple default Pipeline State and Root Signature for predifined -- //
 
+	return S_OK;
+}
+
+HRESULT DX12RenderEngine::GenerateContexts()
+{
 	// generate default pipeline states objects
 	// this is going to create default pipeline state for drawing default objects
 	// this features : vertex coloring, one texture handling
 	GenerateImmediateContext();
+
 
 #ifdef DX12_DEBUG
 	DX12Debug::DX12DebugDesc debugDesc;
@@ -274,20 +299,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	DX12Debug::Create(debugDesc);
 	m_Debug = &DX12Debug::GetInstance();
 #endif
-
-
-	// -- Setup viewport and scissor -- //
-	m_Viewport.TopLeftX = 0;
-	m_Viewport.TopLeftY = 0;
-	m_Viewport.Width = (FLOAT)m_WindowSize.x;
-	m_Viewport.Height = (FLOAT)m_WindowSize.y;
-	m_Viewport.MinDepth = 0.0f;
-	m_Viewport.MaxDepth = 1.0f;
-
-	m_ScissorRect.left = 0;
-	m_ScissorRect.top = 0;
-	m_ScissorRect.right = m_WindowSize.x;
-	m_ScissorRect.bottom = m_WindowSize.y;
 
 	return S_OK;
 }
@@ -796,7 +807,19 @@ void DX12RenderEngine::GeneratePrimitiveShapes()
 	D3D12_INPUT_LAYOUT_DESC inputLayout;
 	DX12PipelineState::CreateInputLayoutFromFlags(inputLayout, DX12PipelineState::eHaveTexcoord);
 
-	TO_DO;
+	DX12Mesh::DX12MeshData * meshData = new DX12Mesh::DX12MeshData;
+
+	meshData->Name = "Rect";
+	meshData->Filepath = "Generated:Rect";
+	meshData->VerticesBuffer = reinterpret_cast<const BYTE*>(VRect);
+	meshData->VerticesCount = 4;
+	meshData->IndexBuffer = IRect;
+	meshData->IndexCount = 6;
+	meshData->InputLayout = inputLayout;
+
+	DX12ResourceManager * manager = Engine::GetInstance().GetRenderResourceManager();
+	m_RectMesh = manager->PushMesh(meshData);
+
 	//m_RectMesh = new DX12MeshBuffer(inputLayout, (BYTE*)VRect, 4u, IRect, 6u, L"Rect");
 }
 
