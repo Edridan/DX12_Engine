@@ -30,6 +30,11 @@ DX12Material * Material::GetDX12Material(size_t i_Index /* = 0 */) const
 	return nullptr;
 }
 
+size_t Material::GetMaterialCount() const
+{
+	return m_Materials.size();
+}
+
 
 Material::Material()
 	:Resource()
@@ -96,32 +101,38 @@ void Material::LoadFromFile(const std::string & i_Filepath)
 
 void Material::LoadFromData(const void * i_Data)
 {
-	MaterialData * mData = (MaterialData*)i_Data;
-	DX12Material::DX12MaterialData * mData = new DX12Material::DX12MaterialData;
+	MaterialData * data = (MaterialData*)i_Data;
 
-	// fill resource mData
-	mData->Name = mData->Name;
-	mData->Filepath = mData->Filepath;
-
-	// material mData
-	mData->Ka = mData->Ka;
-	mData->Kd = mData->Kd;
-	mData->Ke = mData->Ke;
-	mData->Ks = mData->Ks;
-
-	// To do : 
-	mData->map_Ka = mData->map_Kd = mData->map_Ks = false;
-
-	DX12Material * material = Engine::GetInstance().GetRenderResourceManager()->PushMaterial(mData);
-	
-	if (material == nullptr)
+	for (size_t i = 0; i < data->MaterialCount; ++i)
 	{
-		ASSERT_ERROR("Unable to load DX12Material correctly");
-		DEBUG_BREAK;
-		return;
-	}
+		// create material data for each material to be created (will be deleted by the DX12Material when finish loading)
+		DX12Material::DX12MaterialData * mData = new DX12Material::DX12MaterialData;
+		const MaterialSpec & mDesc = data->Materials[i];
 
-	m_Materials.push_back(material);
+		// fill resource mData
+		mData->Name		= mDesc.Name;
+		mData->Filepath = data->Filepath;
+
+		// material mData
+		mData->Ka = mDesc.Ka;
+		mData->Kd = mDesc.Kd;
+		mData->Ke = mDesc.Ke;
+		mData->Ks = mDesc.Ks;
+
+		// To do : 
+		mData->map_Ka = mData->map_Kd = mData->map_Ks = false;
+
+		DX12Material * material = Engine::GetInstance().GetRenderResourceManager()->PushMaterial(mData);
+
+		if (material == nullptr)
+		{
+			ASSERT_ERROR("Unable to load DX12Material correctly");
+			DEBUG_BREAK;
+			return;
+		}
+
+		m_Materials.push_back(material);
+	}
 
 	// notify the load is finished for this texture
 	NotifyFinishLoad();

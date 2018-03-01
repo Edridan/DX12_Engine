@@ -26,6 +26,8 @@ protected:
 	// called by childs
 	DX12Resource();
 
+	virtual void		Release();	// release resources loaded on GPU
+
 	std::string			m_Name;	// name of the resource (can be specific, this is used for editor and gameplay programmers purpose)
 	std::string			m_Filepath;	// path of the resource (to the file that the resource come from, a file can contains more than one resource)
 

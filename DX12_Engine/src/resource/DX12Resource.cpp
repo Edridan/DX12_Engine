@@ -7,6 +7,11 @@ DX12Resource::DX12Resource()
 {
 }
 
+void DX12Resource::Release()
+{
+	m_IsLoaded = false;
+}
+
 DX12Resource::~DX12Resource()
 {
 }

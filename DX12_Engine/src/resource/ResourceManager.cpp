@@ -14,7 +14,13 @@ Mesh * ResourceManager::GetMesh(const std::string & i_File)
 		// load the mesh with the file
 		mesh = new Mesh;
 		mesh->LoadFromFile(i_File);
-		if (mesh->IsLoaded())	m_Meshes[i_File] = mesh;	// update the container
+
+		if (mesh->IsLoaded())
+		{
+			m_Meshes[i_File]				= mesh;	// update the container
+			m_MeshesId[mesh->GetId()]		= mesh;
+			m_AllResources[mesh->GetId()]	= mesh;
+		}
 		else
 		{
 			// the mesh is not loaded correctly : we destroy it
@@ -37,7 +43,12 @@ Material * ResourceManager::GetMaterial(const std::string & i_File)
 		material = new Material;
 		material->LoadFromFile(i_File);
 
-		if (material->IsLoaded())	m_Materials[i_File] = material;
+		if (material->IsLoaded())
+		{
+			m_Materials[i_File]					= material;
+			m_MaterialsId[material->GetId()]	= material;
+			m_AllResources[material->GetId()]	= material;
+		}
 		else
 		{
 			ASSERT_ERROR("Unable to load material %s", i_File.c_str());
@@ -59,7 +70,12 @@ Texture * ResourceManager::GetTexture(const std::string & i_File)
 		texture = new Texture;
 		texture->LoadFromFile(i_File);
 
-		if (texture->IsLoaded())		m_Textures[i_File] = texture;
+		if (texture->IsLoaded())
+		{
+			m_Textures[i_File]					= texture;
+			m_TexturesId[texture->GetId()]		= texture;
+			m_AllResources[texture->GetId()]	= texture;
+		}
 		else
 		{
 			ASSERT_ERROR("Unable to load texture %s", i_File.c_str());
@@ -141,6 +157,57 @@ void ResourceManager::GetAllMaterialsByName(std::vector<Material*> o_Out, const 
 			o_Out.push_back((*itr).second);
 		++itr;
 	}
+}
+
+FORCEINLINE Mesh * ResourceManager::GetMeshById(UINT64 i_Id) const
+{
+	auto itr = m_MeshesId.find(i_Id);
+	if (itr != m_MeshesId.end())
+	{
+		return (*itr).second;
+	}
+
+	return nullptr;
+}
+
+FORCEINLINE Texture * ResourceManager::GetTextureById(UINT64 i_Id) const
+{
+	auto itr = m_TexturesId.find(i_Id);
+	if (itr != m_TexturesId.end())
+	{
+		return (*itr).second;
+	}
+
+	return nullptr;
+}
+
+FORCEINLINE Material * ResourceManager::GetMaterialById(UINT64 i_Id) const
+{
+	auto itr = m_MaterialsId.find(i_Id);
+	if (itr != m_MaterialsId.end())
+	{
+		return (*itr).second;
+	}
+
+	return nullptr;
+}
+
+Resource * ResourceManager::GetResourceById(UINT64 i_Id) const
+{
+	// this will search by resource
+	auto itr = m_AllResources.find(i_Id);
+	if (itr != m_AllResources.end())
+	{
+		return (*itr).second;
+	}
+
+	return nullptr;
+}
+
+bool ResourceManager::ReleaseResource(const UINT64 i_Id)
+{
+	TO_DO;
+	return false;
 }
 
 ResourceManager::ResourceManager()

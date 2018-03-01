@@ -34,6 +34,7 @@ private:
 
 	// Inherited via DX12Resource
 	virtual void	LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device) override;
+	virtual void	Release() override;
 
 	// helpers
 	HRESULT			CreateResourceBuffer(ID3D12Device * i_Device, const std::wstring & i_BufferName);
