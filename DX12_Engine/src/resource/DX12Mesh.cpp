@@ -60,6 +60,7 @@ DX12Mesh::DX12Mesh(DX12MeshData * i_Data, ID3D12GraphicsCommandList * i_CommandL
 	,m_IndexCount(0)
 	,m_VertexCount(0)
 {
+	PreloadData(i_Data);
 	LoadFromData(i_Data, i_CommandList, i_Device);
 }
 
@@ -81,20 +82,6 @@ void DX12Mesh::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_C
 {
 	// we are retreiving data
 	const DX12MeshData * data = (const DX12MeshData*)i_Data;
-
-	// information
-	m_Name			= data->Name;
-	m_Filepath		= data->Filepath;
-
-	m_IndexCount	= data->IndexCount;
-	m_VertexCount	= data->VerticesCount;
-	m_Count = (m_IndexCount != 0) ? m_IndexCount : m_VertexCount;
-
-	ASSERT(m_IndexCount != 0 || m_VertexCount != 0);
-	ASSERT(m_Count != 0);
-
-	// retreive the inpût layout
-	DX12PipelineState::CopyInputLayout(m_InputLayoutDesc, data->InputLayout);
 
 	// vertices count
 	const UINT stride = DX12PipelineState::GetElementSize(m_InputLayoutDesc);
@@ -128,6 +115,26 @@ void DX12Mesh::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_C
 
 	// delete the data
 	delete data;
+}
+
+void DX12Mesh::PreloadData(const void * i_Data)
+{
+	// we are retreiving data
+	const DX12MeshData * data = (const DX12MeshData*)i_Data;
+
+	// information
+	m_Name = data->Name;
+	m_Filepath = data->Filepath;
+
+	m_IndexCount = data->IndexCount;
+	m_VertexCount = data->VerticesCount;
+	m_Count = (m_IndexCount != 0) ? m_IndexCount : m_VertexCount;
+
+	ASSERT(m_IndexCount != 0 || m_VertexCount != 0);
+	ASSERT(m_Count != 0);
+
+	// retreive the input layout
+	DX12PipelineState::CopyInputLayout(m_InputLayoutDesc, data->InputLayout);
 }
 
 void DX12Mesh::Release()

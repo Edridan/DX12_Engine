@@ -38,24 +38,6 @@ void DX12Texture::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * 
 {
 	const DX12TextureData * data = (const DX12TextureData*)i_Data;
 
-	// other
-	m_Name		= data->Name;
-	m_Filepath	= data->Filepath;
-
-	// retreive information to loading the texture
-	m_Desc = {};
-	m_Desc.Dimension			= D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	m_Desc.Alignment			= 0;
-	m_Desc.Width				= data->Width;
-	m_Desc.Height				= data->Height;
-	m_Desc.DepthOrArraySize		= 1;
-	m_Desc.MipLevels			= 1;
-	m_Desc.Format				= data->Format;
-	m_Desc.SampleDesc.Count		= 1;
-	m_Desc.SampleDesc.Quality	= 0;
-	m_Desc.Layout				= D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	m_Desc.Flags				= D3D12_RESOURCE_FLAG_NONE;
-
 	std::wstring heapName, uploadName;
 	String::Utf8ToUtf16(heapName, m_Name);
 	heapName += L" Resource Buffer";
@@ -91,6 +73,29 @@ void DX12Texture::LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * 
 
 	// delete the data
 	delete data;
+}
+
+void DX12Texture::PreloadData(const void * i_Data)
+{
+	const DX12TextureData * data = (const DX12TextureData*)i_Data;
+
+	// other
+	m_Name = data->Name;
+	m_Filepath = data->Filepath;
+
+	// retreive information to loading the texture
+	m_Desc = {};
+	m_Desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	m_Desc.Alignment = 0;
+	m_Desc.Width = data->Width;
+	m_Desc.Height = data->Height;
+	m_Desc.DepthOrArraySize = 1;
+	m_Desc.MipLevels = 1;
+	m_Desc.Format = data->Format;
+	m_Desc.SampleDesc.Count = 1;
+	m_Desc.SampleDesc.Quality = 0;
+	m_Desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	m_Desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 }
 
 void DX12Texture::Release()

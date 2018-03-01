@@ -47,6 +47,7 @@ private:
 
 	// Inherited via DX12Resource
 	virtual void LoadFromData(const void * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device) override;
+	virtual void PreloadData(const void * i_Data) override;
 	virtual void Release() override;
 
 	// dx12 helpers
