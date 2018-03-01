@@ -46,6 +46,7 @@ public:
 
 	// main call for engine
 	HRESULT			InitializeDX12();
+	// To do : clean this part of code, pre load all data and generate dependant as context etc...
 	HRESULT			InitializeDX12Resources();
 	HRESULT			GenerateContexts();
 	HRESULT			PrepareForRender();
