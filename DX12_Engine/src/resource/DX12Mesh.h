@@ -38,6 +38,9 @@ public:
 	// friend class
 	friend class DX12ResourceManager;
 
+	// load with special command list
+	DX12Mesh(DX12MeshData * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device);
+
 private:
 	DX12Mesh();
 	~DX12Mesh();

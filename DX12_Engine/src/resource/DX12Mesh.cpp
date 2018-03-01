@@ -52,6 +52,17 @@ const D3D12_INPUT_LAYOUT_DESC & DX12Mesh::GetInputLayoutDesc() const
 	return m_InputLayoutDesc;
 }
 
+DX12Mesh::DX12Mesh(DX12MeshData * i_Data, ID3D12GraphicsCommandList * i_CommandList, ID3D12Device * i_Device)
+	:DX12Resource(true)	// the data is loaded on different path than the resource manager
+	,m_IndexBuffer(nullptr)
+	,m_VertexBuffer(nullptr)
+	,m_Count(0)
+	,m_IndexCount(0)
+	,m_VertexCount(0)
+{
+	LoadFromData(i_Data, i_CommandList, i_Device);
+}
+
 DX12Mesh::DX12Mesh()
 	:m_IndexBuffer(nullptr)
 	,m_VertexBuffer(nullptr)
