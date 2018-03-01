@@ -789,7 +789,7 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateDeferredContext()
 void DX12RenderEngine::GeneratePrimitiveShapes()
 {
 	// create a rectangle mesh for final rendering of buffers
-	const float VRect[] =
+	static const float VRect[] =
 	{
 		-1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
 		1.0f, -1.0f, 0.0f,		1.0f, 0.0f,
@@ -797,7 +797,7 @@ void DX12RenderEngine::GeneratePrimitiveShapes()
 		1.0f, 1.0f, 0.0f,		1.0f, 1.0f
 	};
 
-	const DWORD IRect[] =
+	static const DWORD IRect[] =
 	{
 		0, 1, 2,
 		1, 0, 3
@@ -809,13 +809,13 @@ void DX12RenderEngine::GeneratePrimitiveShapes()
 
 	DX12Mesh::DX12MeshData * meshData = new DX12Mesh::DX12MeshData;
 
-	meshData->Name = "Rect";
-	meshData->Filepath = "Generated:Rect";
-	meshData->VerticesBuffer = reinterpret_cast<const BYTE*>(VRect);
-	meshData->VerticesCount = 4;
-	meshData->IndexBuffer = IRect;
-	meshData->IndexCount = 6;
-	meshData->InputLayout = inputLayout;
+	meshData->Name				= "Generated:Rect";
+	meshData->Filepath			= "Generated:Rect";
+	meshData->VerticesBuffer	= reinterpret_cast<const BYTE*>(VRect);
+	meshData->VerticesCount		= 4;
+	meshData->IndexBuffer		= IRect;
+	meshData->IndexCount		= 6;
+	meshData->InputLayout		= inputLayout;
 
 	DX12ResourceManager * manager = Engine::GetInstance().GetRenderResourceManager();
 	m_RectMesh = manager->PushMesh(meshData);
