@@ -5,7 +5,7 @@
 #include "resource/Material.h"
 #include "resource/Texture.h"
 
-Mesh * ResourceManager::GetMesh(const std::string & i_File)
+Mesh * ResourceManager::LoadMesh(const std::string & i_File)
 {
 	Mesh * mesh = m_Meshes[i_File];
 
@@ -33,7 +33,7 @@ Mesh * ResourceManager::GetMesh(const std::string & i_File)
 	return mesh;
 }
 
-Material * ResourceManager::GetMaterial(const std::string & i_File)
+Material * ResourceManager::LoadMaterial(const std::string & i_File)
 {
 	Material * material = m_Materials[i_File];
 
@@ -60,7 +60,7 @@ Material * ResourceManager::GetMaterial(const std::string & i_File)
 	return material;
 }
 
-Texture * ResourceManager::GetTexture(const std::string & i_File)
+Texture * ResourceManager::LoadTexture(const std::string & i_File)
 {
 	Texture * texture = m_Textures[i_File];
 
@@ -179,6 +179,33 @@ void ResourceManager::GetAllMaterialsByName(std::vector<Material*> o_Out, const 
 	}
 }
 
+Mesh * ResourceManager::GetMeshByFilename(const std::string & i_Filename) const
+{
+	auto itr = m_Meshes.find(i_Filename);
+	if (itr != m_Meshes.end())
+		return (*itr).second;
+
+	return nullptr;
+}
+
+Material * ResourceManager::GetMaterialByFilename(const std::string & i_Filename) const
+{
+	auto itr = m_Materials.find(i_Filename);
+	if (itr != m_Materials.end())
+		return (*itr).second;
+
+	return nullptr;
+}
+
+Texture * ResourceManager::GetTextureByFilename(const std::string & i_Filename) const
+{
+	auto itr = m_Textures.find(i_Filename);
+	if (itr != m_Textures.end())
+		return (*itr).second;
+
+	return nullptr;
+}
+
 Mesh * ResourceManager::GetGeneratedMeshByFilename(const std::string & i_Filename)
 {
 	auto itr = m_MeshesId.begin();
@@ -276,7 +303,14 @@ void ResourceManager::CleanUnusedResources()
 
 void ResourceManager::CleanResources()
 {
-	TO_DO;
+	auto itr = m_AllResources.begin();
+	while (itr != m_AllResources.end())
+	{
+		// unload each resources
+		(*itr).second->Unload();
+		delete (*itr).second;
+		++itr;
+	}
 }
 
 ResourceManager::ResourceManager()
