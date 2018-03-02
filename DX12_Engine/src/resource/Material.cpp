@@ -53,13 +53,14 @@ void Material::LoadFromFile(const std::string & i_Filepath)
 	// generate the file reader to load the material with tinyobj loader
 	tinyobj::MaterialFileReader fileReader(i_Filepath);
 	std::vector<tinyobj::material_t> materials;
+	std::map<std::string, int> materialMap;
 	std::string error;
 
 	// fill global information
 	m_Filepath	= i_Filepath;
 	m_Name		= i_Filepath;
 
-	fileReader("", &materials, nullptr, &error);
+	fileReader("", &materials, &materialMap, &error);
 
 	if (materials.size() == 0)
 	{

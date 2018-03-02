@@ -17,11 +17,7 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
 	// material management
-	if (i_Desc.Material == nullptr)
-	{
-		TO_DO;
-	}
-	else
+	if (i_Desc.Material != nullptr)
 	{
 		// retreive the material default from mesh
 		m_Material = i_Desc.Material;
@@ -129,6 +125,7 @@ bool RenderComponent::IsRenderable() const
 #include "ui/UI.h"
 #include "engine/Engine.h"
 #include "resource/ResourceManager.h"
+#include "resource/Material.h"
 #include "resource/Mesh.h"
 #include "resource/DX12Mesh.h"
 
@@ -142,35 +139,83 @@ FORCEINLINE void RenderComponent::DrawUIMaterial()
 {
 	if (ImGui::TreeNode("Material"))
 	{
-		// retreive materials
+		ResourceManager * manager = Engine::GetInstance().GetResourceManager();
+
+		static Actor * actor = nullptr;
 		std::vector<std::string> files;
-		static const char * items[128];
-		static int selectedItem = -1;
+		std::vector<std::string> materials;
+		static Material * mat = nullptr;
+		static const char * charFiles[128];
+		static const char * charMat[128];
+		static int selectedMat = -1;
+		static int selectedFile = -1;
 
+		files.clear();
+		materials.clear();
 
-		if (m_Material != nullptr)
+		// initialize if needed
+		if (actor != m_Actor)
 		{
-			selectedItem = 0;
-			files.push_back(m_Material->GetName());
+			actor = m_Actor;
+			selectedFile = -1;
+			selectedMat = -1;
 		}
 
-		const int currentItem = selectedItem;
+		if (mat != nullptr)
+		{
+			selectedFile = 0;
+			files.push_back(mat->GetFilepath());
+		}
+
+		const int currentFile = selectedFile;
+		int currentMat = selectedMat;
+
+		files.push_back("Default");
 
 		Files::GetFilesInFolder(files, "resources/obj", ".mtl", true);
 
 		for (size_t i = 0; (i < files.size() && i < 128); ++i)
 		{
-			items[i] = files[i].c_str();
+			charFiles[i] = files[i].c_str();
 		}
 
-		ImGui::Combo("", &selectedItem, items, Math::Min((int)files.size(), 128));
+		ImGui::Combo("File", &selectedFile, charFiles, Math::Min((int)files.size(), 128));
 
-		if (selectedItem != currentItem)
+		if (selectedFile != currentFile)
 		{
-			// To do : load and change the material
-			
+			std::string fileToLoad = files[selectedFile];
+			Material * newMat = manager->LoadMaterial(fileToLoad);
+			ASSERT(newMat != nullptr);
+
+			if (mat != newMat)
+			{
+				currentMat = selectedMat = -1;
+				mat = newMat;
+			}
 		}
 
+		if (mat)
+		{
+			for (size_t i = 0; i < mat->GetMaterialCount() ;++i)
+			{
+				materials.push_back(mat->GetDX12Material(i)->GetName());
+				charMat[i] = materials[i].c_str();
+			}
+		}
+		else if (m_Material != nullptr)
+		{
+			selectedMat = 0;
+			materials.push_back(m_Mesh->GetName());
+			charMat[0] = materials[0].c_str();
+		}
+
+		ImGui::Combo("Shape", &selectedMat, charMat, Math::Min((int)materials.size(), 128));
+
+		if (selectedMat != currentMat && mat)
+		{
+			// change the shape
+			m_Material = mat->GetDX12Material(selectedMat);
+		}
 
 		ImGui::TreePop();
 	}
