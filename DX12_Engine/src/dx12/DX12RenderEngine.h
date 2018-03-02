@@ -46,9 +46,8 @@ public:
 
 	// main call for engine
 	HRESULT			InitializeDX12();
+	HRESULT			InitializeRender();	// call this after the DX12Resource manager instanciation
 	// To do : clean this part of code, pre load all data and generate dependant as context etc...
-	HRESULT			InitializeDX12Resources();
-	HRESULT			GenerateContexts();
 	HRESULT			PrepareForRender();
 	HRESULT			Render();
 
@@ -176,6 +175,7 @@ private:
 	HRESULT				GenerateDeferredContext();		// create different deferred context
 	void				GeneratePrimitiveShapes();		// create primitive 2D shapes
 	void				GenerateRenderTargets();		// create all render target instead of Back Buffer
+	HRESULT				GenerateContexts();
 	// Initialize contexts to prepare for render
 	HRESULT				InitializeImmediateContext();
 	HRESULT				InitializeDeferredContext();

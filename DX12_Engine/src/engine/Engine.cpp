@@ -94,15 +94,10 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 	// resource management
 	m_ResourceManager			= new ResourceManager;
-	m_RenderResourceManager		= new DX12ResourceManager;
+	m_RenderResourceManager		= new DX12ResourceManager;	// create GPU resources (need DX12Initialized)
 
-	// load resources for render engine
-	m_RenderEngine->InitializeDX12Resources();
-
-	// push data on GPU
-	m_RenderResourceManager->PushResourceOnGPUWithWait();
-
-	m_RenderEngine->GenerateContexts();
+	// initialize rendering pipeline and GBuffer creation (need the DX12ResourceManager)
+	m_RenderEngine->InitializeRender();
 
 	// intialize constant buffer
 	m_RenderEngine->GetConstantBuffer(DX12RenderEngine::eGlobal)->ReserveVirtualAddress();	// reserve the first address on the constant buffer
@@ -178,6 +173,9 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 	// enable input
 	Input::SetKeyEventEnabled(true);
+
+	// preload the resources
+	m_RenderResourceManager->PushResourceOnGPUWithWait();
 
 	m_Exit = false;
 }

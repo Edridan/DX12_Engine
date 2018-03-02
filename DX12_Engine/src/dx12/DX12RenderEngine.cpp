@@ -188,8 +188,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	m_SwapChain = static_cast<IDXGISwapChain3*>(tempSwapChain);
 	m_FrameIndex = m_SwapChain->GetCurrentBackBufferIndex();
 
-	GenerateDeferredContext();
-
 	// -- Create the Back Buffers (render target views) Descriptor Heap -- //
 
 	// Create a RTV for each buffer (double buffering is two buffers, tripple buffering is 3).
@@ -205,14 +203,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		}
 	}
 
-	DX12RenderTarget::RenderTargetDesc backRTVDesc;
-	backRTVDesc.Format				= backBufferDesc.Format;
-	backRTVDesc.Name				= L"Back Buffer";
-	backRTVDesc.IsShaderResource	= false;
-	backRTVDesc.Resource			= m_BackBufferResource;
-	
-	m_BackBuffer = new DX12RenderTarget(backRTVDesc);
-
 	// create a handle to a m_Fences event
 	m_FenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	if (m_FenceEvent == nullptr)
@@ -220,13 +210,18 @@ HRESULT DX12RenderEngine::InitializeDX12()
 		ASSERT_ERROR("Error : Fences -> CreateEvent");
 		return E_FAIL;
 	}
-	// -- Create constant buffer -- //
 
+	return S_OK;
+}
+
+HRESULT DX12RenderEngine::InitializeRender()
+{
+	// -- Create constant buffer -- //
 	for (size_t i = 0; i < EConstantBufferId::eConstantBufferCount; ++i)
 	{
 		// create constant buffer of 256 slots of 256 bytes
 		m_ConstantBuffer[i] = new DX12ConstantBuffer(
-			s_ConstantBufferSize[i].ElementCount, 
+			s_ConstantBufferSize[i].ElementCount,
 			s_ConstantBufferSize[i].ElementSize
 		);
 	}
@@ -238,7 +233,6 @@ HRESULT DX12RenderEngine::InitializeDX12()
 	depthOptimizedClearValue.DepthStencil.Stencil = 0;
 
 	DX12DepthBuffer::DepthBufferDesc depthBufferDesc;
-
 	depthBufferDesc.Name = L"Depth buffer";
 	depthBufferDesc.BufferSize = IntVec2(m_WindowSize.x, m_WindowSize.y);
 	depthBufferDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -247,43 +241,29 @@ HRESULT DX12RenderEngine::InitializeDX12()
 
 	m_DepthBuffer = new DX12DepthBuffer(depthBufferDesc);
 
+	// -- Generate GBuffer -- //
+	GenerateDeferredContext();
+
+	// -- Handle the back buffer -- //
+
+	DX12RenderTarget::RenderTargetDesc backRTVDesc;
+	backRTVDesc.Format = m_SwapChainDesc.BufferDesc.Format;
+	backRTVDesc.Name = L"Back Buffer";
+	backRTVDesc.IsShaderResource = false;
+	backRTVDesc.Resource = m_BackBufferResource;
+
+	m_BackBuffer = new DX12RenderTarget(backRTVDesc);
+
+	// -- Generate primitive meshes for rendering -- //
+	GeneratePrimitiveShapes();
+
+	// -- Generate all contexts -- //
+	GenerateImmediateContext();
+
 	// -- Generate primitive meshes -- //
 	GenerateRenderTargets();
 
-	// -- Setup viewport and scissor -- //
-	m_Viewport.TopLeftX = 0;
-	m_Viewport.TopLeftY = 0;
-	m_Viewport.Width = (FLOAT)m_WindowSize.x;
-	m_Viewport.Height = (FLOAT)m_WindowSize.y;
-	m_Viewport.MinDepth = 0.0f;
-	m_Viewport.MaxDepth = 1.0f;
-
-	m_ScissorRect.left = 0;
-	m_ScissorRect.top = 0;
-	m_ScissorRect.right = m_WindowSize.x;
-	m_ScissorRect.bottom = m_WindowSize.y;
-
-	return S_OK;
-}
-
-HRESULT DX12RenderEngine::InitializeDX12Resources()
-{
-	// To do : add all dx12 resources as primitive meshes, render target (which need to be a DX12Textures)
-
-	GeneratePrimitiveShapes();
-	// -- Create multiple default Pipeline State and Root Signature for predifined -- //
-
-	return S_OK;
-}
-
-HRESULT DX12RenderEngine::GenerateContexts()
-{
-	// generate default pipeline states objects
-	// this is going to create default pipeline state for drawing default objects
-	// this features : vertex coloring, one texture handling
-	GenerateImmediateContext();
-
-
+	// -- Debug GBuffer management -- //
 #ifdef DX12_DEBUG
 	DX12Debug::DX12DebugDesc debugDesc;
 
@@ -299,6 +279,30 @@ HRESULT DX12RenderEngine::GenerateContexts()
 	DX12Debug::Create(debugDesc);
 	m_Debug = &DX12Debug::GetInstance();
 #endif
+
+	// -- Setup viewport and scissor -- //
+	m_Viewport.TopLeftX = 0;
+	m_Viewport.TopLeftY = 0;
+	m_Viewport.Width = (FLOAT)m_WindowSize.x;
+	m_Viewport.Height = (FLOAT)m_WindowSize.y;
+	m_Viewport.MinDepth = 0.0f;
+	m_Viewport.MaxDepth = 1.0f;
+
+	m_ScissorRect.left = 0;
+	m_ScissorRect.top = 0;
+	m_ScissorRect.right = m_WindowSize.x;
+	m_ScissorRect.bottom = m_WindowSize.y;
+
+	return E_NOTIMPL;
+}
+
+FORCEINLINE HRESULT DX12RenderEngine::GenerateContexts()
+{
+	// generate default pipeline states objects
+	// this is going to create default pipeline state for drawing default objects
+	// this features : vertex coloring, one texture handling
+	GenerateImmediateContext();
+	GenerateDeferredContext();
 
 	return S_OK;
 }

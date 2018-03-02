@@ -62,8 +62,10 @@ public:
 
 private:
 	// components to render
-	std::vector<const RenderComponent *>		m_Components;
+	std::vector<const RenderComponent *>		m_RenderComponents;
+	std::vector<const LightComponent *>			m_LightComponents;
 
+	// to do : render objects per materials and not loop between components
 	// materials management
 	struct RenderMeshData
 	{
