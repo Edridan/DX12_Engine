@@ -15,9 +15,9 @@ class ResourceManager
 {
 public:
 	// resource loading (id a resource with the same filepath is loaded, this return the resource and not load the resource)
-	Mesh *		GetMesh(const std::string & i_File);
-	Material *	GetMaterial(const std::string & i_File);
-	Texture *	GetTexture(const std::string & i_File);
+	Mesh *		LoadMesh(const std::string & i_File);
+	Material *	LoadMaterial(const std::string & i_File);
+	Texture *	LoadTexture(const std::string & i_File);
 	// resource loading with data
 	Material *	LoadMaterialWithData(const void * i_Data);
 
@@ -32,6 +32,12 @@ public:
 	void		GetAllMeshByName(std::vector<Mesh*> o_Out, const std::string & i_Name) const;
 	void		GetAllTexturesByName(std::vector<Texture*> o_Out, const std::string & i_Name) const;
 	void		GetAllMaterialsByName(std::vector<Material*> o_Out, const std::string & i_Name) const;
+	// get resource by filename
+	Mesh *		GetMeshByFilename(const std::string & i_Filename) const;
+	Material *	GetMaterialByFilename(const std::string & i_Filename) const;
+	Texture *	GetTextureByFilename(const std::string & i_Filename) const;
+
+
 	// retreive a generated resource by filename (filename can be used as identifier)
 	// warning : this cost a lot
 	Mesh *		GetGeneratedMeshByFilename(const std::string & i_FileName);

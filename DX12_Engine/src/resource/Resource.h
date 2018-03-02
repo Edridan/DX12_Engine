@@ -19,13 +19,14 @@ public:
 	bool					IsLoaded() const;	// the resource is loaded onto the GPU and can be used
 
 	// friend class
-	friend class DX12ResourceManager;
+	friend class ResourceManager;
 protected:
 	std::string			m_Name;	// name of the resource (can be specific, this is used for editor and gameplay programmers purpose)
 	std::string			m_Filepath;	// path of the resource (to the file that the resource come from, a file can contains more than one resource)
 
 	// called from child to notify the end of the CPU loading
 	void				NotifyFinishLoad();
+	virtual void		Unload();	// this destroy CPU and GPU resource (calling release)
 	virtual void		Release();	// this release the resource CPU side
 
 	// path information helper

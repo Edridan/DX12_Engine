@@ -210,7 +210,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 		// component description
 		ResourceManager * manager = Engine::GetInstance().GetResourceManager();
 		// Mesh retreiving
-		Mesh * mesh = manager->GetMesh(i_Desc.Mesh.c_str());	// retreive the mesh from resource manager
+		Mesh * mesh = manager->LoadMesh(i_Desc.Mesh.c_str());	// retreive the mesh from resource manager
 
 		DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 

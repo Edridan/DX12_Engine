@@ -32,6 +32,14 @@ void Resource::NotifyFinishLoad()
 	m_IsLoaded = true;
 }
 
+void Resource::Unload()
+{
+	Release();
+	// to do : release the GPU resources
+
+	m_IsLoaded = false;
+}
+
 void Resource::Release()
 {
 	// the resource can be still GPU loaded
