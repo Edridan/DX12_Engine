@@ -8,7 +8,7 @@
 
 RenderList::RenderList()
 {
-	m_Components.reserve(0x100);
+	m_RenderComponents.reserve(0x100);
 
 	// create default variable
 	Reset();
@@ -17,7 +17,7 @@ RenderList::RenderList()
 RenderList::~RenderList()
 {
 	// errors
-	if (m_Components.size() != 0)
+	if (m_RenderComponents.size() != 0)
 	{
 		PRINT_DEBUG("[RenderList] Warning, there is still components ready to be rendered in a render list");
 		DEBUG_BREAK;
@@ -35,7 +35,7 @@ void RenderList::SetupRenderList(const RenderListSetup & i_Setup)
 
 size_t RenderList::RenderComponentCount() const
 {
-	return m_Components.size();
+	return m_RenderComponents.size();
 }
 
 void RenderList::RenderLight() const
@@ -46,6 +46,15 @@ void RenderList::RenderLight() const
 		DEBUG_BREAK;
 		return;
 	}
+
+	// -- Render Lights -- //
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
+	for (size_t i = 0; i < m_LightComponents.size(); ++i)
+	{
+
+	}
+
 }
 
 void RenderList::RenderGBuffer() const
@@ -68,10 +77,10 @@ void RenderList::RenderGBuffer() const
 	XMStoreFloat4x4(&constantBuffer.m_Projection, XMMatrixTranspose(m_Projection));
 
 	// rendering opaque geometry
-	for (size_t i = 0; i < m_Components.size(); ++i)
+	for (size_t i = 0; i < m_RenderComponents.size(); ++i)
 	{
 		// retreive component data
-		const RenderComponent * component = m_Components[i];
+		const RenderComponent * component = m_RenderComponents[i];
 
 		// may some components are not renderable
 		if (!component->IsRenderable())	
@@ -113,19 +122,19 @@ void RenderList::PushRenderComponent(const RenderComponent * i_RenderComponent)
 		return;
 	}
 
-	m_Components.push_back(i_RenderComponent);
-	
-	auto itr = m_RenderMeshData.begin();
-
-	while (itr != m_RenderMeshData.end())
-	{
-		//if (((UINT64)(*itr)->first) == i_RenderComponent->GetMaterial()->GetId());
-	}
-
+	m_RenderComponents.push_back(i_RenderComponent);
 }
 
-void RenderList::PushLightComponent(const LightComponent * i_Component)
+void RenderList::PushLightComponent(const LightComponent * i_LightComponent)
 {
+	if (!i_LightComponent->IsValid())
+	{
+		PRINT_DEBUG("Error : light component unavailable");
+		DEBUG_BREAK;
+		return;
+	}
+
+	m_LightComponents.push_back(i_LightComponent);
 }
 
 void RenderList::Reset()
@@ -135,5 +144,5 @@ void RenderList::Reset()
 	m_ImmediateCommandList	= nullptr;
 
 	// clear list of components
-	m_Components.clear();
+	m_RenderComponents.clear();
 }

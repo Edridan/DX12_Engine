@@ -106,6 +106,9 @@
     <Filter Include="Source Files\Resource\Other">
       <UniqueIdentifier>{56bc8ab7-8b64-4166-89ce-20d93142d871}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Lights">
+      <UniqueIdentifier>{eb16999d-4645-4fb2-b1bf-cffbae5f68ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
@@ -260,6 +263,9 @@
     </ClCompile>
     <ClCompile Include="src\resource\Texture.cpp">
       <Filter>Source Files\Resource\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dx12\DX12Light.cpp">
+      <Filter>Source Files\DX12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -437,6 +443,9 @@
     <ClInclude Include="src\resource\Material.h">
       <Filter>Header Files\Resource\Other</Filter>
     </ClInclude>
+    <ClInclude Include="src\dx12\DX12Light.h">
+      <Filter>Header Files\DX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\fonts\Arial-font.png">
@@ -521,6 +530,9 @@
     </FxCompile>
     <FxCompile Include="src\shaders\debug\DebugGBufferVS.hlsl">
       <Filter>Shaders\Debug</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\light\PointLightPS.hlsl">
+      <Filter>Shaders\Lights</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
