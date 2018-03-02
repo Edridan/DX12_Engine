@@ -148,7 +148,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F1, "F1Debug", this, &Engine::OnF1Down, nullptr);
 	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F2, "F2Debug", this, &Engine::OnF2Down, nullptr);
-	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F3, "F5Debug", this, &Engine::OnF3Down, nullptr);
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F3, "F3Debug", this, &Engine::OnF3Down, nullptr);
 
 	m_IsInGame = false;
 
@@ -160,7 +160,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 
 	// editor creation
 	m_Editor = new Editor(editorDesc);
-	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F5, "F10Editor", this, &Engine::OnF5Down, nullptr);
+	Input::BindKeyEvent<Engine>(Input::eKeyDown, VK_F5, "F5Editor", this, &Engine::OnF5Down, nullptr);
 #endif
 
 #endif
