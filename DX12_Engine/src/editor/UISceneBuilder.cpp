@@ -163,7 +163,7 @@ void UISceneBuilder::DrawWindow()
 		}
 		ImGui::EndPopup();
 	}
-	else if (IsFocused())
+	else if (IsHovered())
 	{
 		if (ImGui::IsMouseClicked(1))
 		{
