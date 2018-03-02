@@ -255,6 +255,12 @@ FORCEINLINE void RenderComponent::DrawUIMesh()
 
 		ImGui::Combo("Shape", &selectedShape, charShapes, Math::Min((int)shapes.size(), 128));
 
+		if (selectedShape != currentShape && mesh)
+		{
+			// change the shape
+			m_Mesh = mesh->GetMeshBuffer(selectedShape);
+		}
+
 		ImGui::TreePop();
 	}
 }

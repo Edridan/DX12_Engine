@@ -71,8 +71,12 @@ void DX12Material::PreloadData(const void * i_Data)
 	const DX12MaterialData * data = (const DX12MaterialData*)i_Data;
 
 	// informations
-	m_Name = data->Name;
-	m_Filepath = data->Filepath;
+	if (data->Name != "")
+		m_Name = data->Name;
+	if (data->Filepath != "")
+		m_Filepath = data->Filepath;
+	else
+		m_Filepath = "Generated:" + String::UInt64ToString(GetId());
 
 	// colors
 	m_Data.Ka = ColorToVec4(data->Ka);

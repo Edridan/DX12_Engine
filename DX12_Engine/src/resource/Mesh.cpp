@@ -127,6 +127,19 @@ size_t Mesh::GetMaterialCount(int i_Index) const
 	return m_MeshData[i_Index].Materials.size();
 }
 
+size_t Mesh::GetMaterialCount(const std::string & i_Name) const
+{
+	for (size_t i = 0; i < m_MeshData.size(); ++i)
+	{
+		if (m_MeshData[i].MeshBuffer->GetName() == i_Name)
+		{
+			return m_MeshData[i].Materials.size();
+		}
+	}
+
+	return 0;
+}
+
 bool Mesh::IsMultiMesh() const
 {
 	return (m_MeshData.size() > 1);

@@ -1,9 +1,12 @@
 #include "DX12Resource.h"
 
+#include "engine/Utils.h"
 #include "engine/Debug.h"
 
 DX12Resource::DX12Resource()
 	:m_Id((UINT64)this)
+	,m_Name("Resource:" + String::Int64ToString(m_Id))
+	,m_Filepath(m_Name)
 {
 }
 
