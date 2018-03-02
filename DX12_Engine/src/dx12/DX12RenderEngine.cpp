@@ -833,20 +833,28 @@ FORCEINLINE void DX12RenderEngine::GenerateRenderTargets()
 
 	std::wstring rtName[eRenderTargetCount];
 
-	rtName[eNormal]		= L"Normal";
-	rtName[eSpecular]	= L"Specular";
-	rtName[eDiffuse]	= L"Diffuse";
-	rtName[ePosition]	= L"Position";
+	rtName[eNormal] = L"Normal";
+	rtName[eSpecular] = L"Specular";
+	rtName[eDiffuse] = L"Diffuse";
+	rtName[ePosition] = L"Position";
+
+
+	DXGI_FORMAT rtFormat[eRenderTargetCount];
+	rtFormat[eNormal]		= DXGI_FORMAT_R32G32B32A32_FLOAT;
+	rtFormat[ePosition]		= DXGI_FORMAT_R32G32B32A32_FLOAT;
+	rtFormat[eSpecular]		= DXGI_FORMAT_B8G8R8A8_UNORM;
+	rtFormat[eDiffuse]		= DXGI_FORMAT_B8G8R8A8_UNORM;
 	
 	// same description for each render target
 	DX12RenderTarget::RenderTargetDesc rtDesc;
-	rtDesc.BufferSize = m_WindowSize;
-	rtDesc.IsShaderResource = true;
+	rtDesc.BufferSize			= m_WindowSize;
+	rtDesc.IsShaderResource		= true;
 
 	for (UINT i = 0; i < eRenderTargetCount; ++i)
 	{
-		rtDesc.Name = rtName[i];
-		m_RenderTargets[i] = new DX12RenderTarget(rtDesc);
+		rtDesc.Name			= rtName[i];
+		rtDesc.Format		= rtFormat[i];
+		m_RenderTargets[i]	= new DX12RenderTarget(rtDesc);
 
 		// transition the render target to the pixel shader resources
 		GetContext(eImmediate)->GetCommandList()->ResourceBarrier(1, &m_RenderTargets[i]->GetResourceBarrier(D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));

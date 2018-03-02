@@ -21,7 +21,6 @@ public:
 	CD3DX12_GPU_DESCRIPTOR_HANDLE	GetGPUDescriptorHandle() const;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE	GetGPUDescriptorHandle(UINT i_Index) const;
 
-
 	// information
 	int						GetDescriptorSize() const;
 	int						GetDescriptorCount() const;

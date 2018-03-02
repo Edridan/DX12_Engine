@@ -170,7 +170,6 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	PRINT_DEBUG("Initilization... OK");
 #endif
 
-
 	// enable input
 	Input::SetKeyEventEnabled(true);
 
@@ -423,7 +422,6 @@ bool Engine::IsInGame() const
 {
 	return false;
 }
-
 #endif
 
 #endif

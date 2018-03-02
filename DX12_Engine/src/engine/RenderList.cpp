@@ -94,8 +94,8 @@ void RenderList::RenderGBuffer() const
 		}
 
 		// get component data to prepare for rendering
-		Actor * actor = component->GetActor();
-		ADDRESS_ID cbvAddress = component->GetConstBufferAddress();
+		Actor * actor			= component->GetActor();
+		ADDRESS_ID cbvAddress	= component->GetConstBufferAddress();
 
 		if (cbvAddress == UnavailableAdressId)
 		{
