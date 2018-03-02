@@ -128,6 +128,9 @@ bool RenderComponent::IsRenderable() const
 #ifdef WITH_EDITOR
 #include "ui/UI.h"
 #include "engine/Engine.h"
+#include "resource/ResourceManager.h"
+#include "resource/Mesh.h"
+#include "resource/DX12Mesh.h"
 
 void RenderComponent::DrawUIComponentInternal()
 {
@@ -177,20 +180,37 @@ FORCEINLINE void RenderComponent::DrawUIMesh()
 {
 	if (ImGui::TreeNode("Mesh"))
 	{
+		ResourceManager * manager = Engine::GetInstance().GetResourceManager();
+
 		// retreive materials
+		static const char * charFiles[128];
+		static const char * charShapes[128];
+		static int selectedMesh = -1;
+		static int selectedShape = -1;
+		static Actor * actor = nullptr;
+		static Mesh * mesh = nullptr;
 		std::vector<std::string> files;
-		static const char * items[128];
-		static int selectedItem = -1;
+		std::vector<std::string> shapes;
 
+		files.clear();
+		shapes.clear();
 
-		if (m_Mesh != nullptr)
+		// initialize if needed
+		if (actor != m_Actor)
 		{
-			selectedItem = 0;
-			files.push_back(m_Mesh->GetName());
+			actor = m_Actor;
+			selectedMesh = -1;
+			selectedShape = -1;
 		}
 
-		const int currentItem = selectedItem;
+		if (mesh != nullptr)
+		{
+			selectedMesh = 0;
+			files.push_back(mesh->GetFilepath());
+		}
 
+		const int currentMesh = selectedMesh;
+		int currentShape = selectedShape;
 
 		files.push_back("Primitive:Triangle");
 		files.push_back("Primitive:Plane");
@@ -200,23 +220,40 @@ FORCEINLINE void RenderComponent::DrawUIMesh()
 
 		for (size_t i = 0; (i < files.size() && i < 128); ++i)
 		{
-			items[i] = files[i].c_str();
+			charFiles[i] = files[i].c_str();
 		}
 
-		ImGui::Combo("", &selectedItem, items, Math::Min((int)files.size(), 128));
+		ImGui::Combo("Mesh", &selectedMesh, charFiles, Math::Min((int)files.size(), 128));
 
-		if (selectedItem != currentItem)
+		if (selectedMesh != currentMesh)
 		{
-			std::string fileToLoad = files[selectedItem];
-			// change the mesh
-			if (String::StartWith(files[selectedItem], "Primitive:"))
-			{
-				fileToLoad = fileToLoad.substr(10);
-			}
+			std::string fileToLoad = files[selectedMesh];
+			Mesh * newMesh = manager->LoadMesh(fileToLoad);
+			ASSERT(newMesh != nullptr);
 
-			
+			if (mesh != newMesh)
+			{
+				currentShape = selectedShape = -1;
+				mesh = newMesh;
+			}
 		}
 
+		if (mesh)
+		{
+			for (size_t i = 0; i < mesh->GetMeshCount(); ++i)
+			{
+				shapes.push_back(mesh->GetMeshBuffer(i)->GetName());
+				charShapes[i] = shapes[i].c_str();
+			}
+		}
+		else if (m_Mesh != nullptr)
+		{
+			selectedShape = 0;
+			shapes.push_back(m_Mesh->GetName());
+			charShapes[0] = shapes[0].c_str();
+		}
+
+		ImGui::Combo("Shape", &selectedShape, charShapes, Math::Min((int)shapes.size(), 128));
 
 		ImGui::TreePop();
 	}
