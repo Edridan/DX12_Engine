@@ -49,6 +49,11 @@ bool UIWindow::IsFocused() const
 	return (m_Active && m_Focused);
 }
 
+bool UIWindow::IsHovered() const
+{
+	return m_IsHovered;
+}
+
 void UIWindow::StartDraw()
 {
 	bool active = m_Active;

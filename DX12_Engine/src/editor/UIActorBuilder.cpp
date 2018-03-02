@@ -89,7 +89,7 @@ void UIActorBuilder::DrawWindow()
 		m_Actor->GetComponent(i)->DrawUIComponent();
 	}
 
-	if (IsFocused() && ImGui::IsMouseClicked(1))
+	if (IsHovered() && ImGui::IsMouseClicked(1))
 	{
 		ImGui::OpenPopup("add_component");
 	}

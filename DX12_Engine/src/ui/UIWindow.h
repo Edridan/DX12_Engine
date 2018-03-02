@@ -41,6 +41,7 @@ public:
 	unsigned int	GetId() const;
 	const char *	GetName() const;
 	bool			IsFocused() const;
+	bool			IsHovered() const;
 
 	// Draw window using imgui, you can update the data here
 	void			StartDraw();
