@@ -278,6 +278,18 @@ FORCEINLINE Material * ResourceManager::GetMaterialById(UINT64 i_Id) const
 	return nullptr;
 }
 
+size_t ResourceManager::GetResourceCount(EResourceType i_ResourceType) const
+{
+	switch (i_ResourceType)
+	{
+	case ResourceManager::eAll:			return m_AllResources.size();
+	case ResourceManager::eMesh:		return m_MeshesId.size();
+	case ResourceManager::eTexture:		return m_TexturesId.size();
+	case ResourceManager::eMaterial:	return m_MaterialsId.size();
+	default:							return 0;
+	}
+}
+
 Resource * ResourceManager::GetResourceById(UINT64 i_Id) const
 {
 	// this will search by resource
@@ -285,6 +297,51 @@ Resource * ResourceManager::GetResourceById(UINT64 i_Id) const
 	if (itr != m_AllResources.end())
 	{
 		return (*itr).second;
+	}
+
+	return nullptr;
+}
+
+Mesh * ResourceManager::GetMeshByIndex(size_t i_Index) const
+{
+	if (i_Index > m_Meshes.size())	return nullptr;
+
+	auto itr = m_MeshesId.begin();
+	while (itr != m_MeshesId.end())
+	{
+		if (i_Index == 0)		return (*itr).second;
+		++itr;
+		--i_Index;
+	}
+
+	return nullptr;
+}
+
+Material * ResourceManager::GetMaterialByIndex(size_t i_Index) const
+{
+	if (i_Index > m_MaterialsId.size())	return nullptr;
+
+	auto itr = m_MaterialsId.begin();
+	while (itr != m_MaterialsId.end())
+	{
+		if (i_Index == 0)		return (*itr).second;
+		++itr;
+		--i_Index;
+	}
+
+	return nullptr;
+}
+
+Texture * ResourceManager::GetTextureByIndex(size_t i_Index) const
+{
+	if (i_Index > m_TexturesId.size())	return nullptr;
+
+	auto itr = m_TexturesId.begin();
+	while (itr != m_TexturesId.end())
+	{
+		if (i_Index == 0)		return (*itr).second;
+		++itr;
+		--i_Index;
 	}
 
 	return nullptr;

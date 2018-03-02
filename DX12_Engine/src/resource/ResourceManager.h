@@ -50,10 +50,21 @@ public:
 	Material *		GetMaterialById(UINT64 i_Id) const;
 
 	// informations
-	
+	enum EResourceType
+	{
+		eAll,
+		eMesh,
+		eTexture,
+		eMaterial,
+	};
+	size_t		GetResourceCount(EResourceType i_ResourceType) const;
 
 	// research resource by id
 	Resource *		GetResourceById(UINT64 i_Id) const;
+	// retreive the resources by index (randomly)
+	Mesh *			GetMeshByIndex(size_t i_Index) const;
+	Material *		GetMaterialByIndex(size_t i_Index) const;
+	Texture *		GetTextureByIndex(size_t i_Index) const;
 
 	// release resource
 	bool			ReleaseResource(const UINT64 i_Id);	// release resource by Id
