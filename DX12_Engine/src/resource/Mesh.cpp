@@ -141,7 +141,7 @@ void Mesh::LoadFromFile(const std::string & i_Filepath)
 	if (String::StartWith(i_Filepath, "Primitive:"))
 	{
 		// generate name for the resource
-		m_Name = i_Filepath.substr(11);	// remove "Primitive:" from the file path 
+		m_Name = i_Filepath.substr(10);	// remove "Primitive:" from the file path 
 		LoadPrimitiveMesh(i_Filepath);
 	}
 	else
@@ -159,11 +159,11 @@ void Mesh::LoadFromData(const void * i_Data)
 
 FORCEINLINE void Mesh::LoadPrimitiveMesh(const std::string & i_PrimitiveName)
 {
-	DX12Mesh::DX12MeshData mData;
+	DX12Mesh::DX12MeshData * mData = new DX12Mesh::DX12MeshData;
 
 	// name
-	mData.Filepath	= i_PrimitiveName;
-	mData.Name		= m_Name;
+	mData->Filepath	= i_PrimitiveName;
+	mData->Name		= m_Name;
 
 	// input description management
 	const D3D12_INPUT_ELEMENT_DESC inputDesc[] =
@@ -179,35 +179,35 @@ FORCEINLINE void Mesh::LoadPrimitiveMesh(const std::string & i_PrimitiveName)
 		sizeof(inputDesc) / sizeof(D3D12_INPUT_ELEMENT_DESC)
 	};
 
-	mData.InputLayout = layoutDesc;
+	mData->InputLayout = layoutDesc;
 
 	// generate mesh depending type
 	if (i_PrimitiveName == "Primitive:Cube")
 	{
-		mData.VerticesBuffer	= reinterpret_cast<BYTE*>(vCube);
-		mData.VerticesCount		= 24u;
-		mData.IndexBuffer		= iCube;
-		mData.IndexCount		= _countof(iCube);
+		mData->VerticesBuffer	= reinterpret_cast<BYTE*>(vCube);
+		mData->VerticesCount	= 24u;
+		mData->IndexBuffer		= iCube;
+		mData->IndexCount		= _countof(iCube);
 	}
 	else if (i_PrimitiveName == "Primitive:Plane")
 	{
-		mData.VerticesBuffer	= reinterpret_cast<BYTE*>(vPlane);
-		mData.VerticesCount		= 4u;
-		mData.IndexBuffer		= iPlane;
-		mData.IndexCount		= _countof(iPlane);
+		mData->VerticesBuffer	= reinterpret_cast<BYTE*>(vPlane);
+		mData->VerticesCount	= 4u;
+		mData->IndexBuffer		= iPlane;
+		mData->IndexCount		= _countof(iPlane);
 	}
 	else if (i_PrimitiveName == "Primitive:Triangle")
 	{
-		mData.VerticesBuffer	= reinterpret_cast<BYTE*>(vTriangle);
-		mData.VerticesCount		= 3u;
+		mData->VerticesBuffer	= reinterpret_cast<BYTE*>(vTriangle);
+		mData->VerticesCount	= 3u;
 	}
 
 	MeshData meshData;
-	meshData.VertexData = mData.VerticesBuffer;
-	meshData.IndexData = mData.IndexBuffer;
+	meshData.VertexData		= mData->VerticesBuffer;
+	meshData.IndexData		= mData->IndexBuffer;
 
 	// load mesh here
-	meshData.MeshBuffer = Engine::GetInstance().GetRenderResourceManager()->PushMesh(&mData);
+	meshData.MeshBuffer = Engine::GetInstance().GetRenderResourceManager()->PushMesh(mData);
 
 	if (meshData.MeshBuffer == nullptr)
 	{
