@@ -25,6 +25,7 @@ public:
 	// informations
 	size_t			GetMeshCount() const;
 	size_t			GetMaterialCount(int i_Index = 0) const;
+	size_t			GetMaterialCount(const std::string & i_Name) const;
 	bool			IsMultiMesh() const;	// mesh have multi shapes
 
 	friend class ResourceManager;

@@ -24,6 +24,7 @@ public:
 		std::string	ImagePath;
 		// data info
 		std::string Filepath;
+		std::string Name;
 	};
 
 	// DX12

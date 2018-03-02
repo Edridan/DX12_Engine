@@ -11,6 +11,7 @@
 // resources
 #include "resource/ResourceManager.h"
 #include "resource/DX12Mesh.h"
+#include "resource/Material.h"
 #include "resource/Mesh.h"
 
 XMMATRIX Actor::GetWorldTransform()
@@ -52,7 +53,7 @@ bool Actor::IsHidden() const
 
 bool Actor::NeedRendering() const
 {
-	return (m_RenderComponent != nullptr) && (!m_Hidden);
+	return ((m_RenderComponent != nullptr) || (m_LightComponent != nullptr)) && (!m_Hidden);
 }
 
 UINT Actor::ChildCount() const
@@ -256,7 +257,15 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 
 				// retreive the material/mesh buffer
 				componentDesc.Mesh = mesh->GetMeshBuffer(meshName);
+#ifdef ENGINE_DEBUG
+				if (mesh->GetMaterialCount(meshName) == 0)
+					componentDesc.Material = manager->GetMaterialByName("Default")->GetDX12Material();	// load default
+				else
+					componentDesc.Material = mesh->GetMaterial(meshName, 0);
+#else
+				// crash if not debug
 				componentDesc.Material = mesh->GetMaterial(meshName, 0);
+#endif /* ENGINE_DEBUG */
 
 				// load the main shape
 				AttachRenderComponent(componentDesc);

@@ -29,6 +29,11 @@
 #include "resource/ResourceManager.h"
 
 
+// debug purpose
+#ifdef ENGINE_DEBUG
+#include "resource/Material.h"
+#endif
+
 Engine *		Engine::s_Instance = nullptr;
 
 Engine & Engine::GetInstance()
@@ -173,8 +178,23 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	// enable input
 	Input::SetKeyEventEnabled(true);
 
+#ifdef ENGINE_DEBUG
+	Material::MaterialData matData;
+	matData.Name = "Default";
+	matData.Materials = new Material::MaterialSpec[1];
+	matData.Materials[0].Ka = color::Pink;
+	matData.Materials[0].Ke = color::Pink;
+	matData.Materials[0].Ks = color::Pink;
+	matData.Materials[0].Kd = color::Pink;
+	matData.Materials[0].Ns = 1000.f;
+	matData.Materials[0].Name = "Default";
+	matData.MaterialCount = 1;
+
+	m_ResourceManager->LoadMaterialWithData(&matData);
+#endif
 	// preload the resources
 	m_RenderResourceManager->PushResourceOnGPUWithWait();
+
 
 	m_Exit = false;
 }

@@ -103,6 +103,9 @@ void Material::LoadFromData(const void * i_Data)
 {
 	MaterialData * data = (MaterialData*)i_Data;
 
+	if (data->Name != "")		m_Name = data->Name;
+	if (data->Filepath != "")	m_Filepath	= data->Filepath;
+
 	for (size_t i = 0; i < data->MaterialCount; ++i)
 	{
 		// create material data for each material to be created (will be deleted by the DX12Material when finish loading)

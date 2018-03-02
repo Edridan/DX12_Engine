@@ -380,11 +380,20 @@ void World::RenderActor(const Actor * i_Actor, RenderList * i_RenderList) const
 	{
 		// then we need maybe to render the actor,
 		// this mean we push the render component to the render list
-		RenderComponent * component = i_Actor->GetRenderComponent();
+		RenderComponent * mesh = i_Actor->GetRenderComponent();
 
-		if (component->IsEnabled())
+		if (mesh != nullptr && mesh->IsEnabled())
 		{
-			i_RenderList->PushRenderComponent(component);
+			i_RenderList->PushRenderComponent(mesh);
+		}
+
+		// the actor have a light component attached to him
+		// we push the light component to the render list that will render properly the light
+		LightComponent * light = i_Actor->GetLightComponent();
+
+		if (light != nullptr && light->IsEnabled())
+		{
+			i_RenderList->PushLightComponent(light);
 		}
 	}
 

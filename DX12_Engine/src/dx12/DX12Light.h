@@ -6,6 +6,7 @@
 
 // class predef
 class DX12Shader;
+class DX12Mesh;
 class DX12PipelineState;
 class DX12RootSignature;
 
@@ -23,39 +24,35 @@ public:
 
 	// informations
 	ELightType		GetType() const;
-	
+	void			SetType(ELightType i_Type);
+
 	// setup the pipeline state
 	void			PushPipelineState(ID3D12GraphicsCommandList * i_CommandList) const;
-	void			PushDataOnConstantBuffer() const;
+	void			PushLightDataToConstantBuffer() const;
+	void			Render(ID3D12GraphicsCommandList * i_CommandList) const;
 
 	// initialize pipeline states into the render engine
 	friend class DX12RenderEngine;
 private:
-	DX12Shader			* m_Shader;	// this is a pixel shader to compute the light
+	// light data
+	struct LightData
+	{
+		DirectX::XMFLOAT4			Color;
+	};
+	
+	// light management
+	ELightType			m_Type;
 
-	// these are pipeline state for lights
+
+
+	// static data shared for each lights
 	struct PSO
 	{
 		DX12RootSignature *		RootSignature;
 		DX12PipelineState *		PipelineState;
 	};
-	static PSO		s_PipelineState[ELightType::eCount];
-
-	ADDRESS_ID		m_ConstantAddress;	// address for the light data
-
-	// data for lights
-	struct PointLightData
-	{
-
-	};
-
-	union LightData
-	{
-		PointLightData PointLight;
-
-	};
-
-	LightData	m_LightData;
+	static PSO			s_PipelineState[ELightType::eCount];
+	static DX12Mesh *	s_RectMesh;
 
 	// internal static call
 	static void		SetupPipelineStateObjects(PSO * i_PipelineStateObjects);
