@@ -65,7 +65,8 @@ DX12Mesh::DX12Mesh(DX12MeshData * i_Data, ID3D12GraphicsCommandList * i_CommandL
 }
 
 DX12Mesh::DX12Mesh()
-	:m_IndexBuffer(nullptr)
+	:DX12Resource()
+	,m_IndexBuffer(nullptr)
 	,m_VertexBuffer(nullptr)
 	,m_Count(0)
 	,m_IndexCount(0)
