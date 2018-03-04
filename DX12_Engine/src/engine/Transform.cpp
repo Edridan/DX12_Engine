@@ -127,7 +127,7 @@ inline void Transform::RecomputeMatrix()
 
 	XMMATRIX posMat = XMMatrixTranslation(tPos.x, tPos.y, tPos.z);
 
-	XMMATRIX mat = posMat * rotMat * scaleMat;
+	XMMATRIX mat = rotMat * scaleMat * posMat;
 
 	// compute matrix
 	XMStoreFloat4x4(&m_CacheMatrix, mat);
