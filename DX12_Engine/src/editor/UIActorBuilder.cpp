@@ -75,6 +75,7 @@ void UIActorBuilder::DrawWindow()
 	ImGui::Text("Actor Name");
 	ImGui::SameLine();
 	ImGui::InputText("", name, 128);
+
 	String::Utf8ToUtf16(WNewActorName, name);
 	m_Actor->SetName(WNewActorName);
 
