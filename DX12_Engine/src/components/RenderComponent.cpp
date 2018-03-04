@@ -184,7 +184,17 @@ FORCEINLINE void RenderComponent::DrawUIMaterial()
 		if (selectedFile != currentFile)
 		{
 			std::string fileToLoad = files[selectedFile];
-			Material * newMat = manager->LoadMaterial(fileToLoad);
+			Material * newMat = nullptr;
+
+			if (fileToLoad == "Default")
+			{
+				newMat = manager->GetMaterialByName("Default");
+			}
+			else
+			{
+				newMat = manager->LoadMaterial(fileToLoad);
+			}
+
 			ASSERT(newMat != nullptr);
 
 			if (mat != newMat)
