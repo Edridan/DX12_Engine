@@ -15,7 +15,6 @@ SamplerState tex_sample		: register(s0);
 cbuffer FrameBuffer : register(b0)
 {
 	float4 clear_color;
-
 }
 
 struct VS_OUTPUT

@@ -227,7 +227,6 @@ Console::CommandLine::EType Console::CommandLine::ParseType(const std::string & 
 		}
 		else
 		{
-			TO_DO;
 		}
 	}
 

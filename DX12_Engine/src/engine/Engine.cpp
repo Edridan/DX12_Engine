@@ -280,7 +280,8 @@ void Engine::Run()
 			Camera * cam = m_CurrentWorld->GetCurrentCamera();
 
 			// dx12 related
-			setup.DeferredCommandList = m_RenderEngine->GetContext(DX12RenderEngine::eDeferred)->GetCommandList();
+			setup.DeferredCommandList	= m_RenderEngine->GetContext(DX12RenderEngine::eDeferred)->GetCommandList();
+			setup.ImmediateCommandList	= m_RenderEngine->GetContext(DX12RenderEngine::eImmediate)->GetCommandList();
 			// camera related
 			setup.ProjectionMatrix	= XMLoadFloat4x4(&cam->GetProjMatrix());
 			setup.ViewMatrix		= XMLoadFloat4x4(&cam->GetViewMatrix());
@@ -288,12 +289,30 @@ void Engine::Run()
 			// setup render list
 			m_RenderList->Reset();	// reset the render list of the previous frame
 			m_RenderList->SetupRenderList(setup);
-
-			// render world
+			// push components to render to the render list
 			m_CurrentWorld->RenderWorld(m_RenderList);
+		}
 
+		// render the GBuffer
+		{
 			// push the components on the commandlist to prepare for a render
 			m_RenderList->RenderGBuffer();
+		}
+
+		// render lights in deferred
+		{
+#ifdef ENGINE_DEBUG
+			// if we draw debug
+			if (!m_RenderEngine->DebugIsEnabled())
+			{
+				// render lights
+				m_RenderList->RenderLight();
+			}
+#else
+			// render lights
+			m_RenderList->RenderLight();
+
+#endif /* ENGINE_DEBUG */
 		}
 
 		// render ui

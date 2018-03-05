@@ -23,14 +23,14 @@ RenderComponent::RenderComponent(const RenderComponentDesc & i_Desc, Actor * i_A
 		m_Material = i_Desc.Material;
 	}
 
-
+#ifndef WITH_EDITOR
 	// assert for debug
 	ASSERT(m_Material != nullptr);
 	ASSERT(m_Mesh != nullptr);
+#endif
 
 	// manage constant buffer address
 	m_ConstBuffer = render.GetConstantBuffer(DX12RenderEngine::eTransform)->ReserveVirtualAddress();
-	//m_Material->UpdateConstantBuffer();
 }
 
 RenderComponent::RenderComponent(Actor * i_Actor)

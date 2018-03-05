@@ -4,44 +4,27 @@
 
 #pragma once
 
+#include "dx12/DX12Light.h"
 #include "ActorComponent.h"
 
 class LightComponent : public ActorComponent
 {
 public:
-	// enums
-	enum LightType
-	{
-		ePointLight,
-		eSpotLight,
-		eDirectonnal,
-
-		eLightTypeCount
-	};
-
 	struct LightDesc
 	{
-		LightType		Type;
-		float			Color[4];
+		DX12Light::ELightType		Type;
+		float						Color[4];
 	};
 
 	LightComponent(const LightDesc & i_Desc, Actor * i_Actor);
 	LightComponent(Actor * i_Actor);
 	~LightComponent();
 
-	// lights defines
-	LightType			GetType() const;
-	const float *		GetColor() const;
-
-	// management
-	void				SetColor(const float i_Color[]);
-	void				SetType(LightType i_Type);
+	// light management
+	DX12Light *		GetLight() const;
 
 private:
-
-	// light manager
-	LightType		m_Type;
-	float			m_Color[4];
+	DX12Light *			m_Light;	// light internal management
 
 #ifdef WITH_EDITOR
 	// Inherited via ActorComponent

@@ -24,7 +24,7 @@ public:
 private:
 	// internal callbacks
 	void		DrawTransform(Transform * i_Transform);
-	void		DrawVector(DirectX::XMFLOAT3 & i_Vector, const char * i_Name, DirectX::XMFLOAT3 * o_Save = nullptr);
+	void		DrawVector(DirectX::XMFLOAT3 & i_Vector, const char * i_Name, DirectX::XMFLOAT3 * o_Save = nullptr, float i_Sensibility = 0.05f);
 
 	// Inherited via UIWindow
 	virtual void DrawWindow() override;

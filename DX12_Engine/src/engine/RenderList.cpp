@@ -8,7 +8,10 @@
 
 RenderList::RenderList()
 {
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
 	m_RenderComponents.reserve(0x100);
+	m_RectMesh = render.GetRectMesh();	// retreive the mesh for draw full frame
 
 	// create default variable
 	Reset();
@@ -52,7 +55,14 @@ void RenderList::RenderLight() const
 
 	for (size_t i = 0; i < m_LightComponents.size(); ++i)
 	{
+		const LightComponent * lightComponent = m_LightComponents[i];
+		DX12Light * light		= lightComponent->GetLight();
+		Actor * actor			= lightComponent->GetActor();
 
+		// render the light using pipeline state
+		light->PushPipelineState(m_ImmediateCommandList);
+		light->PushLightDataToConstantBuffer();	// push data if necessary
+		
 	}
 
 }

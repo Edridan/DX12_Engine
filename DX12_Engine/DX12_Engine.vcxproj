@@ -224,6 +224,7 @@
     <None Include="src\shaders\lib\EffectLib.hlsli" />
     <None Include="src\shaders\lib\GlobalBuffer.hlsli" />
     <None Include="src\shaders\lib\Lib.hlsli" />
+    <None Include="src\shaders\lib\LightBuffer.hlsli" />
     <None Include="src\shaders\lib\Material.hlsli" />
     <None Include="src\shaders\lib\Math.hlsli" />
     <None Include="src\shaders\lib\TransformBuffer.hlsli" />

@@ -29,14 +29,14 @@ FORCEINLINE void UIActorBuilder::DrawTransform(Transform * i_Transform)
 	XMFLOAT3 saved;
 	DrawVector(i_Transform->GetPosition(), "Position", &saved);
 	if (!Float3Eq(i_Transform->GetPosition(), saved))	i_Transform->SetPosition(saved);
-	DrawVector(i_Transform->GetRotation(), "Rotation", &saved);
+	DrawVector(i_Transform->GetRotation(), "Rotation", &saved, 0.5f);
 	if (!Float3Eq(i_Transform->GetRotation(), saved))	i_Transform->SetRotation(saved);
 	DrawVector(i_Transform->GetScale(), "Scale   ", &saved);
 	if (!Float3Eq(i_Transform->GetScale(), saved))		i_Transform->SetScale(saved);
 
 }
 
-FORCEINLINE void UIActorBuilder::DrawVector(DirectX::XMFLOAT3 & i_Vector, const char * i_Name, DirectX::XMFLOAT3 * o_Save)
+FORCEINLINE void UIActorBuilder::DrawVector(DirectX::XMFLOAT3 & i_Vector, const char * i_Name, DirectX::XMFLOAT3 * o_Save, float i_Sensibility)
 {
 	float transPos[3];
 
@@ -45,7 +45,7 @@ FORCEINLINE void UIActorBuilder::DrawVector(DirectX::XMFLOAT3 & i_Vector, const 
 	transPos[2] = i_Vector.z;
 
 	// draw the window
-	ImGui::DragFloat3(i_Name, transPos, 0.05f);
+	ImGui::DragFloat3(i_Name, transPos, i_Sensibility);
 
 	// output saved vector
 	if (o_Save != nullptr)

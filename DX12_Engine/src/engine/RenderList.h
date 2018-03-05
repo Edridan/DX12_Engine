@@ -65,6 +65,8 @@ private:
 	std::vector<const RenderComponent *>		m_RenderComponents;
 	std::vector<const LightComponent *>			m_LightComponents;
 
+	DX12Mesh *			m_RectMesh;
+
 	// to do : render objects per materials and not loop between components
 	// materials management
 	struct RenderMeshData
