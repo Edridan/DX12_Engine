@@ -2,6 +2,7 @@
 
 #include "DX12RootSignature.h"
 #include "DX12PipelineState.h"
+#include "DX12Shader.h"
 #include "resource/DX12Mesh.h"
 #include "DX12RenderEngine.h"
 
@@ -110,26 +111,28 @@ void DX12Light::PushLightDataToConstantBuffer() const
 	}
 }
 
-void DX12Light::SetupPipelineStateObjects(ID3D12Device * i_Device, const DX12Mesh * i_RectMesh)
+void DX12Light::SetupPipelineStateObjects(ID3D12Device * i_Device)
 {
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
 	// create signatures
 	s_RootSignature = new DX12RootSignature;
 
 	// add static sampler for textures
 	D3D12_STATIC_SAMPLER_DESC sampler = {};
 
-	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-	sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-	sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-	sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-	sampler.MipLODBias = 0;
-	sampler.MaxAnisotropy = 0;
-	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-	sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
-	sampler.MinLOD = 0.0f;
-	sampler.MaxLOD = D3D12_FLOAT32_MAX;
-	sampler.ShaderRegister = 0;
-	sampler.RegisterSpace = 0;
+	sampler.Filter			= D3D12_FILTER_MIN_MAG_MIP_POINT;
+	sampler.AddressU		= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressV		= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressW		= D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.MipLODBias		= 0;
+	sampler.MaxAnisotropy	= 0;
+	sampler.ComparisonFunc	= D3D12_COMPARISON_FUNC_NEVER;
+	sampler.BorderColor		= D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+	sampler.MinLOD			= 0.0f;
+	sampler.MaxLOD			= D3D12_FLOAT32_MAX;
+	sampler.ShaderRegister	= 0;
+	sampler.RegisterSpace	= 0;
 	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
 	s_RootSignature->AddStaticSampler(sampler);	// add static sampler
@@ -156,6 +159,24 @@ void DX12Light::SetupPipelineStateObjects(ID3D12Device * i_Device, const DX12Mes
 	s_RootSignature->Create(i_Device);
 
 	// generate root signatures for each lights specs
+	DX12PipelineState::PipelineStateDesc desc;
+
+	DX12Shader * pointLightPS = new DX12Shader(DX12Shader::ePixel, L"src/shaders/lights/pointlightPS.hlsl");
+
+	//desc.InputLayout = render.GetRectMesh()->GetInputLayoutDesc();
+	//desc.RootSignature = s_RootSignature;
+	//desc.VertexShader = pointLightPS;
+	//desc.PixelShader = PShader;
+	//desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	//desc.RenderTargetCount = 1;
+	//desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
+	//desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
+	//desc.DepthEnabled = false;
+
+	//m_ImmediatePipelineState = new DX12PipelineState(desc);
+
+
+	s_PipelineState[ELightType::ePointLight] = new DX12PipelineState();
 
 }
 

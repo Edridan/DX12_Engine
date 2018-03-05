@@ -69,5 +69,5 @@ private:
 	static DX12RootSignature *				s_RootSignature;	// root signature shared for each lights
 
 	// internal static call
-	static void		SetupPipelineStateObjects(ID3D12Device * i_Device, const DX12Mesh * i_RectMesh);
+	static void		SetupPipelineStateObjects(ID3D12Device * i_Device);
 };

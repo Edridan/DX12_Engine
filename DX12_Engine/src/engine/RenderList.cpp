@@ -155,4 +155,5 @@ void RenderList::Reset()
 
 	// clear list of components
 	m_RenderComponents.clear();
+	m_LightComponents.clear();
 }
