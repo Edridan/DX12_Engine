@@ -280,6 +280,17 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 		std::vector<int> meshMaterials(shape->mesh.material_ids);
 		meshMaterials.erase(std::unique(meshMaterials.begin(), meshMaterials.end()), meshMaterials.end());
 
+		auto itr = meshMaterials.begin();
+		while (itr != meshMaterials.end())
+		{
+			if ((*itr) == -1)
+			{
+				itr = meshMaterials.erase(itr);
+				continue;
+			}
+			++itr;
+		}
+
 		// compute stride and flags for the mesh
 		if (origin.normal_index != -1)
 		{
@@ -338,55 +349,55 @@ FORCEINLINE void Mesh::LoadMeshFromFile(const std::string & i_Filepath)
 		std::string materialName = "Generated:" + m_Filepath + "_" + m_Name;
 
 		// To do : search before and 
-
-		Material::MaterialData matData;
-		matData.Filepath = materialName;	// put the identifier
-		matData.MaterialCount = meshMaterials.size();
-		matData.Materials = new Material::MaterialSpec[matData.MaterialCount];
-
-		
-
-		for (size_t i = 0; i < meshMaterials.size(); ++i)
+		if (!meshMaterials.empty())
 		{
-			if (meshMaterials[i] == -1)	continue;	// the mesh have no material
+			Material::MaterialData matData;
+			matData.Filepath = materialName;	// put the identifier
+			matData.MaterialCount = meshMaterials.size();
+			matData.Materials = new Material::MaterialSpec[matData.MaterialCount];
 
-			tinyobj::material_t mat = materials[meshMaterials[i]];
-			Material::MaterialSpec & m = matData.Materials[i];
-
-			// Name
-			m.Name = mat.name;
-
-			// To do : load textures
-			/*desc.map_Ka = LoadTexture(mat.ambient_texname, textureFolder, resourcesManager);
-			desc.map_Kd = LoadTexture(mat.diffuse_texname, textureFolder, resourcesManager);
-			desc.map_Ks = LoadTexture(mat.specular_texname, textureFolder, resourcesManager);*/
-
-			// retreive other data
-			m.Ka = mat.ambient;
-			m.Kd = mat.diffuse;
-			m.Ke = mat.emission;
-			m.Ks = mat.specular;
-		}
-
-		Material * material = resourceManager->LoadMaterialWithData(&matData);
-		
-		if (material->IsLoaded())
-		{
 			for (size_t i = 0; i < meshMaterials.size(); ++i)
 			{
-				tinyobj::material_t mat = materials[meshMaterials[i]];
-				DX12Material * m = material->GetDX12Material(mat.name);
+				if (meshMaterials[i] == -1)	continue;	// the mesh have no material
 
-				if (m != nullptr)
+				tinyobj::material_t mat = materials[meshMaterials[i]];
+				Material::MaterialSpec & m = matData.Materials[i];
+
+				// Name
+				m.Name = mat.name;
+
+				// To do : load textures
+				/*desc.map_Ka = LoadTexture(mat.ambient_texname, textureFolder, resourcesManager);
+				desc.map_Kd = LoadTexture(mat.diffuse_texname, textureFolder, resourcesManager);
+				desc.map_Ks = LoadTexture(mat.specular_texname, textureFolder, resourcesManager);*/
+
+				// retreive other data
+				m.Ka = mat.ambient;
+				m.Kd = mat.diffuse;
+				m.Ke = mat.emission;
+				m.Ks = mat.specular;
+			}
+
+			Material * material = resourceManager->LoadMaterialWithData(&matData);
+
+			if (material->IsLoaded())
+			{
+				for (size_t i = 0; i < meshMaterials.size(); ++i)
 				{
-					mData.Materials.push_back(m);
+					tinyobj::material_t mat = materials[meshMaterials[i]];
+					DX12Material * m = material->GetDX12Material(mat.name);
+
+					if (m != nullptr)
+					{
+						mData.Materials.push_back(m);
+					}
 				}
 			}
-		}
-		else
-		{
-			ASSERT_ERROR("Error when loading materials");
-			return;
+			else
+			{
+				ASSERT_ERROR("Error when loading materials");
+				return;
+			}
 		}
 		
 		// generate layout for the shape

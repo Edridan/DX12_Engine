@@ -209,14 +209,18 @@ FORCEINLINE void RenderComponent::DrawUIMaterial()
 			for (size_t i = 0; i < mat->GetMaterialCount() ;++i)
 			{
 				materials.push_back(mat->GetDX12Material(i)->GetName());
-				charMat[i] = materials[i].c_str();
 			}
 		}
 		else if (m_Material != nullptr)
 		{
 			selectedMat = 0;
 			materials.push_back(m_Mesh->GetName());
-			charMat[0] = materials[0].c_str();
+		}
+
+		// retreive the materials
+		for (size_t i = 0; i < materials.size(); ++i)
+		{
+			charMat[i] = materials[i].c_str();
 		}
 
 		ImGui::Combo("Shape", &selectedMat, charMat, Math::Min((int)materials.size(), 128));
