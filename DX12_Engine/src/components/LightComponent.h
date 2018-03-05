@@ -13,7 +13,7 @@ public:
 	struct LightDesc
 	{
 		DX12Light::ELightType		Type;
-		float						Color[4];
+		DirectX::XMFLOAT4			Color;
 	};
 
 	LightComponent(const LightDesc & i_Desc, Actor * i_Actor);

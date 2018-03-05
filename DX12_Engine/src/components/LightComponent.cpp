@@ -5,8 +5,10 @@ LightComponent::LightComponent(const LightDesc & i_Desc, Actor * i_Actor)
 	:ActorComponent(i_Actor, "Light Component")
 {
 	// generate light
-	SetColor(i_Desc.Color);
-	SetType(i_Desc.Type);
+	m_Light = new DX12Light;
+
+	m_Light->SetColor(i_Desc.Color);
+	m_Light->SetType(i_Desc.Type);
 }
 
 LightComponent::LightComponent(Actor * i_Actor)

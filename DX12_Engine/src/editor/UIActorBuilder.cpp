@@ -119,11 +119,11 @@ void UIActorBuilder::DrawWindow()
 				case 1:	// Light component
 					{
 						LightComponent::LightDesc lightDesc;
-						lightDesc.Color[0] = 1.f;
-						lightDesc.Color[1] = 1.f;
-						lightDesc.Color[2] = 1.f;
-						lightDesc.Color[3] = 1.f;
-						lightDesc.Type = LightComponent::ePointLight;
+						lightDesc.Color.x = 1.f;
+						lightDesc.Color.y = 1.f;
+						lightDesc.Color.z = 1.f;
+						lightDesc.Color.w = 1.f;
+						lightDesc.Type = DX12Light::ePointLight;
 						m_Actor->AttachLightComponent(lightDesc);
 					}
 					break;
