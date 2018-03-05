@@ -500,6 +500,9 @@
     <None Include="src\shaders\lib\Lib.hlsli">
       <Filter>Shaders\Lib</Filter>
     </None>
+    <None Include="src\shaders\lib\LightBuffer.hlsli">
+      <Filter>Shaders\Lib</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX12_Engine.rc">

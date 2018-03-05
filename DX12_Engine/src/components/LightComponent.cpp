@@ -18,38 +18,31 @@ LightComponent::~LightComponent()
 {
 }
 
-LightComponent::LightType LightComponent::GetType() const
+DX12Light * LightComponent::GetLight() const
 {
-	return m_Type;
-}
-
-const float * LightComponent::GetColor() const
-{
-	return m_Color;
-}
-
-inline void LightComponent::SetColor(const float i_Color[])
-{
-	// retreive the color
-	for (size_t i = 0; i < 4; ++i)
-	{
-		m_Color[i] = i_Color[i];
-	}
-}
-
-void LightComponent::SetType(LightType i_Type)
-{
-	m_Type = i_Type;
+	return m_Light;
 }
 
 #ifdef WITH_EDITOR
 #include "ui/UI.h"
 void LightComponent::DrawUIComponentInternal()
 {
-	static int selectedType = 0;
+	static int selectedType = (int)m_Light->GetType();
 	static const char * typesName[] = { "Point Light", "Spot Light", "Directionnal" };
+	DirectX::XMFLOAT4 lightColor = m_Light->GetColor();
+	float color[3] = { lightColor.x,lightColor.y, lightColor.z };
 
-	ImGui::Combo("Type", &selectedType, typesName, eLightTypeCount);
-	ImGui::ColorEdit3("Color", m_Color);
+	// type of the color
+	ImGui::Combo("Type", &selectedType, typesName, DX12Light::ELightType::eCount);
+	// color management
+	ImGui::ColorEdit3("Color", color);
+	if (color[0] != lightColor.x || color[1] != lightColor.y || color[2] != lightColor.z)
+	{
+		lightColor.x = color[0];
+		lightColor.y = color[1];
+		lightColor.z = color[2];
+		m_Light->SetColor(lightColor);
+	}
+
 }
 #endif

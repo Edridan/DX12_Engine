@@ -64,6 +64,7 @@ public:
 		eTransform,		// used for transform matrix 3D space
 		eGlobal,		// used for global buffer
 		eMaterial,		// used for material specs
+		eLight,			// used for light specs
 
 		// count
 		eConstantBufferCount,
@@ -157,6 +158,8 @@ public:
 	
 	bool							IsDX12DebugEnabled() const;
 	
+	// get primitive mesh
+	DX12Mesh *		GetRectMesh() const;
 	
 private:
 	DX12RenderEngine(HINSTANCE & i_HInstance);

@@ -7,6 +7,7 @@
 #include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RenderTarget.h"
 #include "dx12/DX12DepthBuffer.h"
+#include "dx12/DX12Light.h"
 #include "dx12/DX12ConstantBuffer.h"
 #include "resource/DX12ResourceManager.h"
 #include "resource/DX12Mesh.h"
@@ -27,6 +28,7 @@ const DX12RenderEngine::ConstantBufferDef			DX12RenderEngine::s_ConstantBufferSi
 	{256, 1024},		// transform
 	{256, 16},			// global buffer (always pointing on the same)
 	{256, 1024},		// materials
+	{256, 256},			// lights
 };
 
 const DX12RenderEngine::HeapProperty DX12RenderEngine::s_HeapProperties[] =
@@ -293,6 +295,9 @@ HRESULT DX12RenderEngine::InitializeRender()
 	m_ScissorRect.right = m_WindowSize.x;
 	m_ScissorRect.bottom = m_WindowSize.y;
 
+	// Generate PSO for lights
+	DX12Light::SetupPipelineStateObjects(m_Device, m_RectMesh);
+
 	return E_NOTIMPL;
 }
 
@@ -547,6 +552,11 @@ bool DX12RenderEngine::IsDX12DebugEnabled() const
 #endif
 }
 
+DX12Mesh * DX12RenderEngine::GetRectMesh() const
+{
+	return m_RectMesh;
+}
+
 IntVec2 DX12RenderEngine::GetRenderSize() const
 {
 	return m_WindowSize;
@@ -758,8 +768,6 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateImmediateContext()
 	desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
 	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
 	desc.DepthEnabled = false;
-	//desc.DepthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // a default depth stencil state
-	//desc.DepthStencilFormat = m_DepthBuffer->GetFormat();
 
 	m_ImmediatePipelineState = new DX12PipelineState(desc);
 

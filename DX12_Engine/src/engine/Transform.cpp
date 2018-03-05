@@ -1,4 +1,6 @@
-#include "engine/Transform.h"
+#include "Transform.h"
+
+#include "engine/Utils.h"
 
 Transform::Transform()
 	:m_Position(XMLoadFloat3(&XMFLOAT3(0.f, 0.f, 0.f)))
@@ -109,9 +111,9 @@ inline void Transform::RecomputeMatrix()
 	XMFLOAT3 tRot;
 	DirectX::XMStoreFloat3(&tRot, m_Rotation);
 
-	XMMATRIX rotXMat = XMMatrixRotationX(tRot.x);
-	XMMATRIX rotYMat = XMMatrixRotationY(tRot.y);
-	XMMATRIX rotZMat = XMMatrixRotationZ(tRot.z);
+	XMMATRIX rotXMat = XMMatrixRotationX(tRot.x * DegToRad);
+	XMMATRIX rotYMat = XMMatrixRotationY(tRot.y * DegToRad);
+	XMMATRIX rotZMat = XMMatrixRotationZ(tRot.z * DegToRad);
 
 	XMMATRIX rotMat = rotXMat * rotYMat * rotZMat;
 
@@ -127,7 +129,7 @@ inline void Transform::RecomputeMatrix()
 
 	XMMATRIX posMat = XMMatrixTranslation(tPos.x, tPos.y, tPos.z);
 
-	XMMATRIX mat = rotMat * scaleMat * posMat;
+	XMMATRIX mat = scaleMat * rotMat * posMat;
 
 	// compute matrix
 	XMStoreFloat4x4(&m_CacheMatrix, mat);
