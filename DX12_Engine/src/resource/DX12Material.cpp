@@ -166,8 +166,8 @@ FORCEINLINE void DX12Material::GeneratePipelineState(ID3D12Device * i_Device)
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
-	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/deferred/GBufferPixel.hlsl");
-	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/deferred/GBufferVertex.hlsl");
+	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/rendering/GBufferPS.hlsl");
+	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/rendering/GBufferVS.hlsl");
 
 	// create pipeline state object
 	D3D12_INPUT_LAYOUT_DESC inputLayout;

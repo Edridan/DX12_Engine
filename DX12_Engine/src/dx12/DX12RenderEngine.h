@@ -85,6 +85,7 @@ public:
 	};
 
 	DX12RenderTarget *			GetRenderTarget(ERenderTargetId i_Id) const;
+	DX12RenderTarget *			GetBackBuffer() const;
 	DX12DepthBuffer *			GetDepthBuffer() const;
 
 	// deferred contexts

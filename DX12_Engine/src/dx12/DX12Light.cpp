@@ -2,11 +2,12 @@
 
 #include "DX12RootSignature.h"
 #include "DX12PipelineState.h"
+#include "DX12RenderEngine.h"
+#include "DX12RenderTarget.h"
 #include "DX12Shader.h"
 #include "resource/DX12Mesh.h"
-#include "DX12RenderEngine.h"
 
-DX12PipelineState *		DX12Light::s_PipelineState[ELightType::eCount];
+DX12PipelineState *		DX12Light::s_PipelineState;
 DX12RootSignature *		DX12Light::s_RootSignature;
 
 DX12Light::DX12Light()
@@ -99,7 +100,7 @@ void DX12Light::PushPipelineState(ID3D12GraphicsCommandList * i_CommandList) con
 {
 	// setup the current step pass
 	i_CommandList->SetGraphicsRootSignature(s_RootSignature->GetRootSignature());
-	i_CommandList->SetPipelineState(s_PipelineState[m_Type]->GetPipelineState());
+	i_CommandList->SetPipelineState(s_PipelineState->GetPipelineState());
 }
 
 void DX12Light::PushLightDataToConstantBuffer() const
@@ -149,6 +150,7 @@ void DX12Light::SetupPipelineStateObjects(ID3D12Device * i_Device)
 		descriptorTableRanges[i].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the s_RootSignature signature descriptor tables
 	}
 
+	// add render targets 
 	s_RootSignature->AddDescriptorRange(&descriptorTableRanges[0], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// normal texture
 	s_RootSignature->AddDescriptorRange(&descriptorTableRanges[1], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// diffuse
 	s_RootSignature->AddDescriptorRange(&descriptorTableRanges[2], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// specular
@@ -161,22 +163,20 @@ void DX12Light::SetupPipelineStateObjects(ID3D12Device * i_Device)
 	// generate root signatures for each lights specs
 	DX12PipelineState::PipelineStateDesc desc;
 
-	DX12Shader * pointLightPS = new DX12Shader(DX12Shader::ePixel, L"src/shaders/lights/pointlightPS.hlsl");
+	// shader loading
+	//DX12Shader * VShader		= new DX12Shader(DX12Shader::eVertex, L"src/shaders/deferred/FrameCompositorVS.hlsl");
+	//DX12Shader * pointLightPS	= new DX12Shader(DX12Shader::ePixel, L"src/shaders/lights/pointlightPS.hlsl");
 
-	//desc.InputLayout = render.GetRectMesh()->GetInputLayoutDesc();
-	//desc.RootSignature = s_RootSignature;
-	//desc.VertexShader = pointLightPS;
-	//desc.PixelShader = PShader;
-	//desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	//desc.RenderTargetCount = 1;
-	//desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
-	//desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
-	//desc.DepthEnabled = false;
+	//desc.InputLayout			= render.GetRectMesh()->GetInputLayoutDesc();
+	//desc.RootSignature			= s_RootSignature;
+	//desc.VertexShader			= VShader;
+	//desc.PixelShader			= pointLightPS;
+	//desc.PrimitiveTopologyType	= D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	//desc.RenderTargetCount		= 1;
+	//desc.RenderTargetFormat[0]	= render.GetBackBuffer()->GetFormat();
+	//desc.BlendState				= CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
+	//desc.DepthEnabled			= false;
 
-	//m_ImmediatePipelineState = new DX12PipelineState(desc);
-
-
-	s_PipelineState[ELightType::ePointLight] = new DX12PipelineState();
-
+	//s_PipelineState = new DX12PipelineState(desc);
 }
 
