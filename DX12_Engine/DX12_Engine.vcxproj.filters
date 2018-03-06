@@ -73,9 +73,6 @@
     <Filter Include="Shaders\UI">
       <UniqueIdentifier>{1d97e091-60a8-4cd0-809b-d69bd5d442a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\Deferred">
-      <UniqueIdentifier>{ecdd2920-c1e1-4be7-abf0-7d34ea934f47}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shaders\Markup">
       <UniqueIdentifier>{85225fdb-0ab0-4f1f-be0d-7a72a8343e3b}</UniqueIdentifier>
     </Filter>
@@ -108,6 +105,9 @@
     </Filter>
     <Filter Include="Shaders\Lights">
       <UniqueIdentifier>{eb16999d-4645-4fb2-b1bf-cffbae5f68ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Rendering">
+      <UniqueIdentifier>{ecdd2920-c1e1-4be7-abf0-7d34ea934f47}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -500,9 +500,6 @@
     <None Include="src\shaders\lib\Lib.hlsli">
       <Filter>Shaders\Lib</Filter>
     </None>
-    <None Include="src\shaders\lib\LightBuffer.hlsli">
-      <Filter>Shaders\Lib</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DX12_Engine.rc">
@@ -516,26 +513,29 @@
     <FxCompile Include="src\shaders\ui\ImGuiVertex.hlsl">
       <Filter>Shaders\UI</Filter>
     </FxCompile>
-    <FxCompile Include="src\shaders\deferred\GBufferPixel.hlsl">
-      <Filter>Shaders\Deferred</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\deferred\GBufferVertex.hlsl">
-      <Filter>Shaders\Deferred</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\deferred\FrameCompositorPS.hlsl">
-      <Filter>Shaders\Deferred</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\deferred\FrameCompositorVS.hlsl">
-      <Filter>Shaders\Deferred</Filter>
-    </FxCompile>
     <FxCompile Include="src\shaders\debug\DebugGBufferPS.hlsl">
       <Filter>Shaders\Debug</Filter>
     </FxCompile>
     <FxCompile Include="src\shaders\debug\DebugGBufferVS.hlsl">
       <Filter>Shaders\Debug</Filter>
     </FxCompile>
-    <FxCompile Include="src\shaders\light\PointLightPS.hlsl">
+    <FxCompile Include="src\shaders\light\DeferredLightVS.hlsl">
       <Filter>Shaders\Lights</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\light\DeferredLightPS.hlsl">
+      <Filter>Shaders\Lights</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\rendering\FrameCompositorPS.hlsl">
+      <Filter>Shaders\Rendering</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\rendering\FrameCompositorVS.hlsl">
+      <Filter>Shaders\Rendering</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\rendering\GBufferPS.hlsl">
+      <Filter>Shaders\Rendering</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\rendering\GBufferVS.hlsl">
+      <Filter>Shaders\Rendering</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

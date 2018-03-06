@@ -296,7 +296,7 @@ HRESULT DX12RenderEngine::InitializeRender()
 	m_ScissorRect.bottom = m_WindowSize.y;
 
 	// Generate PSO for lights
-	DX12Light::SetupPipelineStateObjects(m_Device, m_RectMesh);
+	DX12Light::SetupPipelineStateObjects(m_Device);
 
 	return E_NOTIMPL;
 }
@@ -405,6 +405,11 @@ DX12RenderTarget * DX12RenderEngine::GetRenderTarget(ERenderTargetId i_Id) const
 {
 	ASSERT(i_Id < eRenderTargetCount);
 	return m_RenderTargets[i_Id];
+}
+
+DX12RenderTarget * DX12RenderEngine::GetBackBuffer() const
+{
+	return m_BackBuffer;
 }
 
 DX12DepthBuffer * DX12RenderEngine::GetDepthBuffer() const
@@ -754,8 +759,8 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateImmediateContext()
 	float clearColor[4] = { 0.4f, 0.4f, 0.4f, 1.0f };
 	GetConstantBuffer(eGlobal)->UpdateConstantBuffer(m_ImmediateContextBuffer, clearColor, 4 * sizeof(float));
 
-	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/deferred/FrameCompositorPS.hlsl");
-	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/deferred/FrameCompositorVS.hlsl");
+	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/rendering/FrameCompositorPS.hlsl");
+	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/rendering/FrameCompositorVS.hlsl");
 
 	DX12PipelineState::PipelineStateDesc desc;
 

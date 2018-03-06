@@ -65,7 +65,7 @@ private:
 	bool				m_NeedBufferUpdate;
 
 	// static data shared for each lights
-	static DX12PipelineState *				s_PipelineState[ELightType::eCount];
+	static DX12PipelineState *				s_PipelineState;
 	static DX12RootSignature *				s_RootSignature;	// root signature shared for each lights
 
 	// internal static call

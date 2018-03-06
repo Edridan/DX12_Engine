@@ -30,7 +30,7 @@ VS_OUTPUT main( const VS_INPUT input )
 	VS_OUTPUT output;
 
 	float4 pos = float4(input.pos, 1.f);
-	float4 norm = mul(model, float4(input.normal, 1.f));
+	float4 norm = mul(float4(input.normal, 1.f), model);
 
 	// Transform the vertex position into projected space.
 	pos = mul(pos, model);
