@@ -7,8 +7,9 @@
 #include <math.h>
 
 Camera::Camera(const XMMATRIX & i_Projection)
-	:m_Position(0.f, 0.f, 0.f, 0.f)
-	,m_Target(0.f, 0.f, 1.f, 0.f)
+	:m_Position(0.f, 0.f, 0.f, 1.f)
+	,m_Target(0.f, 0.f, 1.f, 1.f)
+	,m_Up(0.f, 1.f, 0.f, 0.f)
 	,m_Freecam(false)
 	,m_Pitch(0)
 	,m_Yaw(0)
@@ -17,8 +18,9 @@ Camera::Camera(const XMMATRIX & i_Projection)
 }
 
 Camera::Camera()
-	:m_Position(0.f, 0.f, 0.f, 0.f)
-	,m_Target(0.f, 0.f, 1.f, 0.f)
+	:m_Position(0.f, 0.f, 0.f, 1.f)
+	,m_Target(0.f, 0.f, 1.f, 1.f)
+	,m_Up(0.f, 1.f, 0.f, 0.f)
 	,m_Freecam(false)
 	,m_Pitch(0)
 	,m_Yaw(0)
@@ -27,8 +29,7 @@ Camera::Camera()
 	Window * wnd = Engine::GetInstance().GetWindow();
 
 	const float windowRatio = (float)((float)wnd->GetBackSize().x / (float)wnd->GetBackSize().y);
-	XMMATRIX tmpProj = XMMatrixPerspectiveFovLH(45.f * (Pi / 180.f), windowRatio, 0.1f, 1000.f);
-
+	XMMATRIX tmpProj = XMMatrixPerspectiveFovLH(45.f * DegToRad, windowRatio, 0.1f, 1000.f);
 	XMStoreFloat4x4(&m_Projection, tmpProj);
 }
 
@@ -39,9 +40,9 @@ Camera::~Camera()
 void Camera::Update(FLOAT i_ElapsedTime)
 {
 	// build view matrix
-	XMVECTOR cPos = XMLoadFloat4(&m_Position);
-	XMVECTOR cTarg = XMLoadFloat4(&m_Target);
-	XMVECTOR cUp = XMLoadFloat4(&m_Up);
+	XMVECTOR cPos	= XMLoadFloat4(&m_Position);
+	XMVECTOR cTarg	= XMLoadFloat4(&m_Target);
+	XMVECTOR cUp	= XMLoadFloat4(&m_Up);
 
 	if (m_Freecam)
 	{

@@ -245,7 +245,10 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 				
 				// retreive the material/mesh buffer
 				componentDesc.Mesh = mesh->GetMeshBuffer(0);
-				componentDesc.Material = mesh->GetMaterial(0, 0);
+				if (mesh->GetMaterialCount(0) > 0)
+					componentDesc.Material = mesh->GetMaterial(0, 0);
+				else
+					componentDesc.Material = manager->GetMaterialByName("Default")->GetDX12Material(0);
 
 				// load the main shape
 				AttachRenderComponent(componentDesc);

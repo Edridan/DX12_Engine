@@ -18,7 +18,7 @@ int WINAPI WinMain(
 	// define the engine setup
 	desc.HInstance				= hInstance;
 	desc.FramePerSecondTargeted = 60;
-	desc.CameraPosition = XMFLOAT4(0.f, 0.f, -5.f, 0.f);
+	desc.CameraPosition = XMFLOAT4(0.f, 0.f, 5.f, 0.f);
 
 	// create the engine singleton
 	Engine::Create();
@@ -32,8 +32,8 @@ int WINAPI WinMain(
 
 	// create objects...
 	Actor::ActorDesc cubeActor;
-	cubeActor.Name = L"Sphere";
-	cubeActor.Mesh = "resources/obj/sphere.obj";
+	cubeActor.Name = L"LumberJack";
+	cubeActor.Mesh = "resources/obj/lumberJack.obj";
 	
 	world->SpawnActor(cubeActor);
 
