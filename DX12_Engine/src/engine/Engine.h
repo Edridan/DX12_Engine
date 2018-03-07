@@ -48,8 +48,8 @@ public:
 		std::wstring WindowName		= L"DX12_Engine";
 		Window::Icon WindowIcon		= Window::Icon((LPWSTR)(IDI_ICON1), 32, 32);
 		// camera setup
-		XMFLOAT4 CameraPosition		= XMFLOAT4(0.f, 0.f, -1.f, 1.f);
-		XMFLOAT4 CameraTarget		= XMFLOAT4(0.f, 0.f, 0.f, 1.f);
+		XMFLOAT4 CameraPosition		= XMFLOAT4(0.f, 0.f, -1.f, 0.f);
+		XMFLOAT4 CameraTarget		= XMFLOAT4(0.f, 0.f, 0.f, 0.f);
 		bool UseCameraProjection	= false;
 		XMMATRIX CameraProjection	= XMMatrixIdentity();
 		// ui setup
