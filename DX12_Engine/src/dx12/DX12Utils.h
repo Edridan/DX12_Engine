@@ -32,9 +32,9 @@ const DirectX::XMFLOAT3 Vec3Up		= { 0.f, 1.f, 0.f };
 const DirectX::XMFLOAT3 Vec3Right	= { 1.f, 0.f, 0.f };
 
 const DirectX::XMFLOAT4 Vec4Zero	= { 0.f, 0.f, 0.f, 0.f };
-const DirectX::XMFLOAT4 Vec4One		= { 1.f, 1.f, 1.f, 1.f };
-const DirectX::XMFLOAT4 Vec4Up		= { 0.f, 1.f, 0.f, 1.f };
-const DirectX::XMFLOAT4 Vec4Right	= { 1.f, 0.f, 0.f, 1.f };
+const DirectX::XMFLOAT4 Vec4One		= { 1.f, 1.f, 1.f, 0.f };
+const DirectX::XMFLOAT4 Vec4Up		= { 0.f, 1.f, 0.f, 0.f };
+const DirectX::XMFLOAT4 Vec4Right	= { 1.f, 0.f, 0.f, 0.f };
 
 // Helpers
 // return the size of an DXGI_FORMAT element

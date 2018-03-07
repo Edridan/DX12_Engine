@@ -808,10 +808,10 @@ void DX12RenderEngine::GeneratePrimitiveShapes()
 	// create a rectangle mesh for final rendering of buffers
 	static const float VRect[] =
 	{
-		-1.0f, 1.0f, 0.0f,		0.0f, 1.0f,
-		1.0f, -1.0f, 0.0f,		1.0f, 0.0f,
-		-1.0f, -1.0f, 0.0f,		0.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,		1.0f, 1.0f
+		-1.0f, 1.0f, 0.0f,		0.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,		1.0f, 1.0f,
+		-1.0f, -1.0f, 0.0f,		0.0f, 1.0f,
+		1.0f, 1.0f, 0.0f,		1.0f, 0.0f
 	};
 
 	static const DWORD IRect[] =
