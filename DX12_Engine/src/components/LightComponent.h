@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "dx12/DX12Light.h"
+#include "engine/Light.h"
 #include "ActorComponent.h"
 
 class LightComponent : public ActorComponent
@@ -12,8 +12,9 @@ class LightComponent : public ActorComponent
 public:
 	struct LightDesc
 	{
-		DX12Light::ELightType		Type;
-		DirectX::XMFLOAT4			Color;
+		Light::ELightType		Type = Light::ePointLight;
+		DirectX::XMFLOAT4		Color = DirectX::XMFLOAT4(1.f, 1.f, 1.f, 1.f);
+		float					Range = 10.f;
 	};
 
 	LightComponent(const LightDesc & i_Desc, Actor * i_Actor);
@@ -21,10 +22,12 @@ public:
 	~LightComponent();
 
 	// light management
-	DX12Light *		GetLight() const;
+	Light::LightData *		GetLightData() const;
+	Light::ELightType		GetLightType() const;
 
 private:
-	DX12Light *			m_Light;	// light internal management
+	Light::LightData *		m_LightData;	// light internal management
+	Light::ELightType		m_Type;			// type of the light
 
 #ifdef WITH_EDITOR
 	// Inherited via ActorComponent

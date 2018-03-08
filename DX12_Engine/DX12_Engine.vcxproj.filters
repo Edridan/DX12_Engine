@@ -264,9 +264,6 @@
     <ClCompile Include="src\resource\Texture.cpp">
       <Filter>Source Files\Resource\Other</Filter>
     </ClCompile>
-    <ClCompile Include="src\dx12\DX12Light.cpp">
-      <Filter>Source Files\DX12</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">
@@ -443,8 +440,8 @@
     <ClInclude Include="src\resource\Material.h">
       <Filter>Header Files\Resource\Other</Filter>
     </ClInclude>
-    <ClInclude Include="src\dx12\DX12Light.h">
-      <Filter>Header Files\DX12</Filter>
+    <ClInclude Include="src\engine\Light.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -519,12 +516,6 @@
     <FxCompile Include="src\shaders\debug\DebugGBufferVS.hlsl">
       <Filter>Shaders\Debug</Filter>
     </FxCompile>
-    <FxCompile Include="src\shaders\light\DeferredLightVS.hlsl">
-      <Filter>Shaders\Lights</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\light\DeferredLightPS.hlsl">
-      <Filter>Shaders\Lights</Filter>
-    </FxCompile>
     <FxCompile Include="src\shaders\rendering\FrameCompositorPS.hlsl">
       <Filter>Shaders\Rendering</Filter>
     </FxCompile>
@@ -536,6 +527,12 @@
     </FxCompile>
     <FxCompile Include="src\shaders\rendering\GBufferVS.hlsl">
       <Filter>Shaders\Rendering</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\light\DeferredLightPS.hlsl">
+      <Filter>Shaders\Lights</Filter>
+    </FxCompile>
+    <FxCompile Include="src\shaders\light\DeferredLightVS.hlsl">
+      <Filter>Shaders\Lights</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -92,6 +92,22 @@ XMFLOAT4X4 Transform::GetTransposed()
 	return m_CacheTransposed;
 }
 
+XMFLOAT4 Transform::GetForward()
+{
+	if (!m_NeedToRecompute)
+	{
+		// retreive the matrix and the forward vector
+		XMFLOAT4X4 mat = GetMatrix();
+		return XMFLOAT4(mat._31, mat._32, mat._33, mat._34);
+	}
+
+	return XMFLOAT4(
+		cos(m_Rotation.m128_f32[1])*cos(m_Rotation.m128_f32[0]),	// x = cos(yaw)*cos(pitch)
+		sin(m_Rotation.m128_f32[1])*cos(m_Rotation.m128_f32[0]),	// y = sin(yaw)*cos(pitch)
+		sin(m_Rotation.m128_f32[0]),								// z = sin(pitch)
+		1.f);
+}
+
 Transform & Transform::operator=(const Transform i_Other)
 {
 	m_Position	= i_Other.m_Position;

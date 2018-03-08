@@ -29,6 +29,9 @@ public:
 	XMFLOAT4X4		GetMatrix();
 	XMFLOAT4X4		GetTransposed();
 
+	// transform compute information
+	XMFLOAT4		GetForward();
+
 	// operator
 	Transform &	operator=(const Transform i_Other);
 

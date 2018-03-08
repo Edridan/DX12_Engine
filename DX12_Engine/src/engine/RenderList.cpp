@@ -7,11 +7,16 @@
 #include "engine/Actor.h"
 
 RenderList::RenderList()
+	:m_MaxLight(MAX_LIGHT)
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
 	m_RenderComponents.reserve(0x100);
+	m_LightComponents.reserve(m_MaxLight);
 	m_RectMesh = render.GetRectMesh();	// retreive the mesh for draw full frame
+
+	// create light data storage
+	m_LightsData = new LightDesc;
 
 	// create default variable
 	Reset();
@@ -25,6 +30,9 @@ RenderList::~RenderList()
 		PRINT_DEBUG("[RenderList] Warning, there is still components ready to be rendered in a render list");
 		DEBUG_BREAK;
 	}
+	
+	// clean resources
+	delete m_LightsData;	// delete the array
 }
 
 void RenderList::SetupRenderList(const RenderListSetup & i_Setup)
@@ -53,17 +61,25 @@ void RenderList::RenderLight() const
 	// -- Render Lights -- //
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
+	// retreive the count of the light components
+	m_LightsData->LightCount = (int)m_LightComponents.size();
+
 	for (size_t i = 0; i < m_LightComponents.size(); ++i)
 	{
 		const LightComponent * lightComponent = m_LightComponents[i];
-		DX12Light * light		= lightComponent->GetLight();
-		Actor * actor			= lightComponent->GetActor();
+		Light::LightData * light	= lightComponent->GetLightData();
+		Actor * actor				= lightComponent->GetActor();
 
-		// render the light using pipeline state
-		light->PushPipelineState(m_ImmediateCommandList);
-		light->PushLightDataToConstantBuffer();	// push data if necessary
-		
+		// push the light data to the list
+		XMMATRIX actorWorldTransform = actor->GetWorldTransform();
+		//XMFLOAT3 lightPosition 
 	}
+
+	// setup pipeline state objects
+	
+	// update constant buffer
+
+	// draw rect mesh
 
 }
 
@@ -79,7 +95,7 @@ void RenderList::RenderGBuffer() const
 	// push all data on command list, also update if necessary the buffers
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 	
-	// -- Opaque geomtry -- //
+	// -- Opaque geometry -- //
 
 	// precompute needed matrices and store them into a constant buffer
 	TransformConstantBuffer constantBuffer;	// constant buffer copied into the GPU memory
@@ -137,6 +153,9 @@ void RenderList::PushRenderComponent(const RenderComponent * i_RenderComponent)
 
 void RenderList::PushLightComponent(const LightComponent * i_LightComponent)
 {
+	// max lights
+	if (m_LightComponents.size() > m_MaxLight)		return;
+
 	if (!i_LightComponent->IsValid())
 	{
 		PRINT_DEBUG("Error : light component unavailable");
@@ -144,6 +163,7 @@ void RenderList::PushLightComponent(const LightComponent * i_LightComponent)
 		return;
 	}
 
+	// push the component
 	m_LightComponents.push_back(i_LightComponent);
 }
 
