@@ -176,6 +176,7 @@ private:
 	HRESULT				UpdatePipeline();				// called in Render()
 	HRESULT				WaitForPreviousFrame();			// called in PrepareForRender()
 	HRESULT				GenerateImmediateContext();		// create immediate context, final rendering pipelines(later : post process management)
+	HRESULT				GenerateLightPipeline();		// create pipeline state for lights
 	HRESULT				GenerateDeferredContext();		// create different deferred context
 	void				GeneratePrimitiveShapes();		// create primitive 2D shapes
 	void				GenerateRenderTargets();		// create all render target instead of Back Buffer

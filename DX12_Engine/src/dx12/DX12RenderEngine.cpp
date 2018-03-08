@@ -7,7 +7,6 @@
 #include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RenderTarget.h"
 #include "dx12/DX12DepthBuffer.h"
-#include "dx12/DX12Light.h"
 #include "dx12/DX12ConstantBuffer.h"
 #include "resource/DX12ResourceManager.h"
 #include "resource/DX12Mesh.h"
@@ -282,6 +281,7 @@ HRESULT DX12RenderEngine::InitializeRender()
 	m_Debug = &DX12Debug::GetInstance();
 #endif
 
+
 	// -- Setup viewport and scissor -- //
 	m_Viewport.TopLeftX = 0;
 	m_Viewport.TopLeftY = 0;
@@ -296,7 +296,7 @@ HRESULT DX12RenderEngine::InitializeRender()
 	m_ScissorRect.bottom = m_WindowSize.y;
 
 	// Generate PSO for lights
-	DX12Light::SetupPipelineStateObjects(m_Device);
+
 
 	return E_NOTIMPL;
 }
@@ -779,6 +779,11 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateImmediateContext()
 	return S_OK;
 }
 
+FORCEINLINE HRESULT DX12RenderEngine::GenerateLightPipeline()
+{
+	return E_NOTIMPL;
+}
+
 FORCEINLINE HRESULT DX12RenderEngine::GenerateDeferredContext()
 {
 	// -- Create Context -- //
@@ -836,8 +841,6 @@ void DX12RenderEngine::GeneratePrimitiveShapes()
 
 	DX12ResourceManager * manager = Engine::GetInstance().GetRenderResourceManager();
 	m_RectMesh = manager->PushMesh(meshData);
-
-	//m_RectMesh = new DX12MeshBuffer(inputLayout, (BYTE*)VRect, 4u, IRect, 6u, L"Rect");
 }
 
 FORCEINLINE void DX12RenderEngine::GenerateRenderTargets()

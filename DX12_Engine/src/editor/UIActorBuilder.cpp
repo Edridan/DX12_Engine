@@ -123,7 +123,7 @@ void UIActorBuilder::DrawWindow()
 						lightDesc.Color.y = 1.f;
 						lightDesc.Color.z = 1.f;
 						lightDesc.Color.w = 1.f;
-						lightDesc.Type = DX12Light::ePointLight;
+						lightDesc.Type = Light::ELightType::ePointLight;
 						m_Actor->AttachLightComponent(lightDesc);
 					}
 					break;

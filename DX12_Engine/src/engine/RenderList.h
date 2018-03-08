@@ -7,6 +7,7 @@
 
 #include "dx12/d3dx12.h"
 #include "dx12/DX12Utils.h"
+#include "engine/Light.h"
 #include <DirectXMath.h>
 #include <vector>
 
@@ -44,7 +45,6 @@ public:
 		DirectX::XMFLOAT3		m_CameraForward;
 	};
 
-
 	// render list
 	RenderList();
 	~RenderList();
@@ -64,6 +64,25 @@ private:
 	// components to render
 	std::vector<const RenderComponent *>		m_RenderComponents;
 	std::vector<const LightComponent *>			m_LightComponents;
+
+	// light management
+	struct LightData
+	{
+		DirectX::XMFLOAT4		Color;
+		DirectX::XMFLOAT3		Position;
+		float					Range;
+		DirectX::XMFLOAT3		Attenate;
+		float					Pad;
+	};
+	
+	struct LightDesc
+	{
+		int			LightCount;
+		LightData	Data[MAX_LIGHT];
+	};
+
+	const size_t					m_MaxLight;
+	LightDesc *						m_LightsData;
 
 	DX12Mesh *			m_RectMesh;
 
