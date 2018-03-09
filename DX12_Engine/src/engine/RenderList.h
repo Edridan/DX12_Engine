@@ -34,7 +34,7 @@ public:
 	};
 
 	// Constant buffer definition
-	struct TransformConstantBuffer
+	__declspec(align(16)) struct TransformConstantBuffer
 	{
 		// 3D space computing
 		DirectX::XMFLOAT4X4		m_Model;
@@ -66,16 +66,16 @@ private:
 	std::vector<const LightComponent *>			m_LightComponents;
 
 	// light management
-	struct LightData
+	__declspec(align(16)) struct LightData
 	{
 		DirectX::XMFLOAT4		Color;
 		DirectX::XMFLOAT3		Position;
 		float					Range;
-		DirectX::XMFLOAT3		Attenate;
+		DirectX::XMFLOAT3		Attenuate;
 		float					Pad;
 	};
 	
-	struct LightDesc
+	__declspec(align(16)) struct LightDesc
 	{
 		int			LightCount;
 		LightData	Data[MAX_LIGHT];
@@ -85,6 +85,8 @@ private:
 	LightDesc *						m_LightsData;
 
 	DX12Mesh *			m_RectMesh;
+	ADDRESS_ID			m_LightConstantAddress;
+	ADDRESS_ID			m_LightCameraConstAddress;
 
 	// to do : render objects per materials and not loop between components
 	// materials management

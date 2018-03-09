@@ -24,10 +24,10 @@ DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
 const DX12RenderEngine::ConstantBufferDef			DX12RenderEngine::s_ConstantBufferSize[] =
 {
 	// {ElementSize, ElementCount}
-	{256, 1024},		// transform
-	{256, 16},			// global buffer (always pointing on the same)
-	{256, 1024},		// materials
-	{256, 256},			// lights
+	{256,	1024},		// transform
+	{256,	8},			// global buffer (always pointing on the same)
+	{256,	1024},		// materials
+	{2048,	1},			// lights
 };
 
 const DX12RenderEngine::HeapProperty DX12RenderEngine::s_HeapProperties[] =
@@ -264,6 +264,9 @@ HRESULT DX12RenderEngine::InitializeRender()
 	// -- Generate primitive meshes -- //
 	GenerateRenderTargets();
 
+	// -- Generate light pipeline -- //
+	GenerateLightPipeline();
+
 	// -- Debug GBuffer management -- //
 #ifdef DX12_DEBUG
 	DX12Debug::DX12DebugDesc debugDesc;
@@ -464,6 +467,16 @@ ID3D12Resource * DX12RenderEngine::CreateComittedResource(HeapProperty::Enum i_H
 void DX12RenderEngine::CreateComittedResource(const D3D12_HEAP_PROPERTIES * pHeapProperties, D3D12_HEAP_FLAGS HeapFlags, const D3D12_RESOURCE_DESC * pResourceDesc, D3D12_RESOURCE_STATES InitialResourceState, const D3D12_CLEAR_VALUE * pOptimizedClearValue, REFIID riidResource, void ** ppvResource)
 {
 	m_Device->CreateCommittedResource(pHeapProperties, HeapFlags, pResourceDesc, InitialResourceState, pOptimizedClearValue, riidResource, ppvResource);
+}
+
+DX12PipelineState * DX12RenderEngine::GetLightPipelineState() const
+{
+	return m_LightPipelineState;
+}
+
+DX12RootSignature * DX12RenderEngine::GetLightRootSignature() const
+{
+	return m_LightRootSignature;
 }
 
 int DX12RenderEngine::GetFrameIndex() const
@@ -781,7 +794,70 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateImmediateContext()
 
 FORCEINLINE HRESULT DX12RenderEngine::GenerateLightPipeline()
 {
-	return E_NOTIMPL;
+	// generate light pipeline
+	m_LightRootSignature = new DX12RootSignature;
+
+	// add static sampler for textures
+	D3D12_STATIC_SAMPLER_DESC sampler = {};
+
+	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+	sampler.MipLODBias = 0;
+	sampler.MaxAnisotropy = 0;
+	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+	sampler.MinLOD = 0.0f;
+	sampler.MaxLOD = D3D12_FLOAT32_MAX;
+	sampler.ShaderRegister = 0;
+	sampler.RegisterSpace = 0;
+	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+	m_LightRootSignature->AddStaticSampler(sampler);	// add static sampler
+
+	// add textures
+	D3D12_DESCRIPTOR_RANGE descriptorTableRanges[eRenderTargetCount];
+
+	for (UINT i = 0; i < eRenderTargetCount; ++i)
+	{
+		descriptorTableRanges[i].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // this is a range of shader resource views (descriptors)
+		descriptorTableRanges[i].NumDescriptors = 1; // we only have one texture right now, so the range is only 1
+		descriptorTableRanges[i].BaseShaderRegister = i; // start index of the shader registers in the range
+		descriptorTableRanges[i].RegisterSpace = 0; // space 0. can usually be zero
+		descriptorTableRanges[i].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
+	}
+
+	// range descriptors (render targets from GBuffer)
+	m_LightRootSignature->AddDescriptorRange(&descriptorTableRanges[0], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// normal texture
+	m_LightRootSignature->AddDescriptorRange(&descriptorTableRanges[1], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// diffuse
+	m_LightRootSignature->AddDescriptorRange(&descriptorTableRanges[2], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// specular
+	m_LightRootSignature->AddDescriptorRange(&descriptorTableRanges[3], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// position
+
+	// constant buffer
+	m_LightRootSignature->AddConstantBuffer(0, 0, D3D12_SHADER_VISIBILITY_PIXEL);	// transform buffer (b0)
+	m_LightRootSignature->AddConstantBuffer(1, 0, D3D12_SHADER_VISIBILITY_PIXEL);	// light data (b1)
+
+	m_LightRootSignature->Create(m_Device);
+
+	DX12PipelineState::PipelineStateDesc desc;
+
+	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/light/DeferredLightPS.hlsl");
+	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/light/DeferredLightVS.hlsl");
+
+	desc.InputLayout = m_RectMesh->GetInputLayoutDesc();
+	desc.RootSignature = m_LightRootSignature;
+	desc.VertexShader = VShader;
+	desc.PixelShader = PShader;
+	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	desc.RenderTargetCount = 1;
+	desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
+	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
+	desc.DepthEnabled = false;
+
+	m_LightPipelineState = new DX12PipelineState(desc);
+
+	return S_OK;
 }
 
 FORCEINLINE HRESULT DX12RenderEngine::GenerateDeferredContext()
@@ -913,34 +989,34 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 #ifdef DX12_DEBUG
 	if (!DebugIsEnabled())
 	{
-		// render immediate context here
-		context->GetCommandList()->SetGraphicsRootSignature(m_ImmediateRootSignature->GetRootSignature());
-		context->GetCommandList()->SetPipelineState(m_ImmediatePipelineState->GetPipelineState());
+		//// render immediate context here
+		//context->GetCommandList()->SetGraphicsRootSignature(m_ImmediateRootSignature->GetRootSignature());
+		//context->GetCommandList()->SetPipelineState(m_ImmediatePipelineState->GetPipelineState());
 
-		//context->GetCommandList()->SetComputeRootConstantBufferView(eRenderTargetCount, GetConstantBuffer(eGlobal)->GetUploadVirtualAddress(m_ImmediateContextBuffer));
+		////context->GetCommandList()->SetComputeRootConstantBufferView(eRenderTargetCount, GetConstantBuffer(eGlobal)->GetUploadVirtualAddress(m_ImmediateContextBuffer));
 
-		// bind textures
-		ID3D12DescriptorHeap * descriptors = nullptr;
+		//// bind textures
+		//ID3D12DescriptorHeap * descriptors = nullptr;
 
-		DX12RenderTarget * rt[eRenderTargetCount]
-		{
-			m_RenderTargets[eNormal],
-			m_RenderTargets[eDiffuse],
-			m_RenderTargets[eSpecular],
-			m_RenderTargets[ePosition]
-		};
+		//DX12RenderTarget * rt[eRenderTargetCount]
+		//{
+		//	m_RenderTargets[eNormal],
+		//	m_RenderTargets[eDiffuse],
+		//	m_RenderTargets[eSpecular],
+		//	m_RenderTargets[ePosition]
+		//};
 
-		for (UINT i = 0; i < eRenderTargetCount; ++i)
-		{
-			// bind render targets as textures
-			descriptors = rt[i]->GetShaderResourceDescriptorHeap()->GetDescriptorHeap();
-			// update the descriptor for the resources
-			context->GetCommandList()->SetDescriptorHeaps(1, &descriptors);
-			context->GetCommandList()->SetGraphicsRootDescriptorTable(i, rt[i]->GetShaderResourceDescriptorHeap()->GetGPUDescriptorHandle(m_FrameIndex));
-		}
+		//for (UINT i = 0; i < eRenderTargetCount; ++i)
+		//{
+		//	// bind render targets as textures
+		//	descriptors = rt[i]->GetShaderResourceDescriptorHeap()->GetDescriptorHeap();
+		//	// update the descriptor for the resources
+		//	context->GetCommandList()->SetDescriptorHeaps(1, &descriptors);
+		//	context->GetCommandList()->SetGraphicsRootDescriptorTable(i, rt[i]->GetShaderResourceDescriptorHeap()->GetGPUDescriptorHandle(m_FrameIndex));
+		//}
 
-		// render the mesh
-		m_RectMesh->PushOnCommandList(context->GetCommandList());
+		//// render the mesh
+		//m_RectMesh->PushOnCommandList(context->GetCommandList());
 	}
 	else
 	{

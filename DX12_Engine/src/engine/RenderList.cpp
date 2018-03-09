@@ -2,8 +2,12 @@
 
 #include "dx12/DX12Utils.h"
 #include "dx12/DX12RenderEngine.h"
+#include "dx12/DX12RootSignature.h"
+#include "dx12/DX12PipelineState.h"
 #include "dx12/DX12ConstantBuffer.h"
+#include "dx12/DX12RenderTarget.h"
 #include "components/RenderComponent.h"
+#include "resource/DX12Mesh.h"
 #include "engine/Actor.h"
 
 RenderList::RenderList()
@@ -14,6 +18,9 @@ RenderList::RenderList()
 	m_RenderComponents.reserve(0x100);
 	m_LightComponents.reserve(m_MaxLight);
 	m_RectMesh = render.GetRectMesh();	// retreive the mesh for draw full frame
+
+	m_LightConstantAddress		= render.GetConstantBuffer(DX12RenderEngine::eLight)->ReserveVirtualAddress();
+	m_LightCameraConstAddress	= render.GetConstantBuffer(DX12RenderEngine::eGlobal)->ReserveVirtualAddress();
 
 	// create light data storage
 	m_LightsData = new LightDesc;
@@ -31,6 +38,11 @@ RenderList::~RenderList()
 		DEBUG_BREAK;
 	}
 	
+	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
+
+	render.GetConstantBuffer(DX12RenderEngine::eLight)->ReleaseVirtualAddress(m_LightConstantAddress);
+	render.GetConstantBuffer(DX12RenderEngine::eGlobal)->ReleaseVirtualAddress(m_LightCameraConstAddress);
+
 	// clean resources
 	delete m_LightsData;	// delete the array
 }
@@ -69,18 +81,72 @@ void RenderList::RenderLight() const
 		const LightComponent * lightComponent = m_LightComponents[i];
 		Light::LightData * light	= lightComponent->GetLightData();
 		Actor * actor				= lightComponent->GetActor();
+		LightData & desc			= m_LightsData->Data[i];
 
 		// push the light data to the list
+
+		// position transform
 		XMMATRIX actorWorldTransform = actor->GetWorldTransform();
-		//XMFLOAT3 lightPosition 
+		XMFLOAT4X4 worldTransform;
+		XMStoreFloat4x4(&worldTransform, actorWorldTransform);
+
+		// fill light description
+		desc.Position = XMFLOAT3(&worldTransform._41);
+		desc.Range = light->Range;
+		desc.Color = light->DiffuseColor;
+		desc.Attenuate = XMFLOAT3(0.5f, 0.5f, 0.5f);
+		desc.Pad = 10;
 	}
 
-	// setup pipeline state objects
-	
 	// update constant buffer
+	// transform buffer
+	__declspec(align(16)) struct TransformBuffer
+	{
+		// 3D space computing
+		DirectX::XMFLOAT4X4		m_View;
+		DirectX::XMFLOAT4X4		m_Projection;
+	};
+
+	TransformBuffer buffer;
+	XMStoreFloat4x4(&buffer.m_View, XMMatrixTranspose(m_View));
+	XMStoreFloat4x4(&buffer.m_Projection, XMMatrixTranspose(m_Projection));
+
+	render.GetConstantBuffer(DX12RenderEngine::eGlobal)->UpdateConstantBuffer(m_LightCameraConstAddress, &buffer, sizeof(TransformBuffer));
+	render.GetConstantBuffer(DX12RenderEngine::eLight)->UpdateConstantBuffer(m_LightConstantAddress, m_LightsData, sizeof(int) + m_LightsData->LightCount * sizeof(LightData));
+
+	// setup pipeline state objects
+	DX12RootSignature * rootSignature = render.GetLightRootSignature();
+	DX12PipelineState * pipelineState = render.GetLightPipelineState();
+
+	// setup rendering pipeline for lights
+	m_ImmediateCommandList->SetGraphicsRootSignature(rootSignature->GetRootSignature());
+	m_ImmediateCommandList->SetPipelineState(pipelineState->GetPipelineState());
+
+	DX12RenderTarget * rt[DX12RenderEngine::eRenderTargetCount]
+	{
+		render.GetRenderTarget(DX12RenderEngine::eNormal),
+		render.GetRenderTarget(DX12RenderEngine::eDiffuse),
+		render.GetRenderTarget(DX12RenderEngine::eSpecular),
+		render.GetRenderTarget(DX12RenderEngine::ePosition)
+	};
+
+	ID3D12DescriptorHeap * descriptors = nullptr;
+
+	for (UINT i = 0; i < DX12RenderEngine::eRenderTargetCount; ++i)
+	{
+		// bind render targets as textures
+		descriptors = rt[i]->GetShaderResourceDescriptorHeap()->GetDescriptorHeap();
+		// update the descriptor for the resources
+		m_ImmediateCommandList->SetDescriptorHeaps(1, &descriptors);
+		m_ImmediateCommandList->SetGraphicsRootDescriptorTable(i, rt[i]->GetShaderResourceDescriptorHeap()->GetGPUDescriptorHandle(render.GetFrameIndex()));
+	}
+
+	// bind buffers
+	m_ImmediateCommandList->SetGraphicsRootConstantBufferView(4, render.GetConstantBuffer(DX12RenderEngine::eGlobal)->GetUploadVirtualAddress(m_LightCameraConstAddress));
+	m_ImmediateCommandList->SetGraphicsRootConstantBufferView(5, render.GetConstantBuffer(DX12RenderEngine::eLight)->GetUploadVirtualAddress(m_LightConstantAddress));
 
 	// draw rect mesh
-
+	m_RectMesh->PushOnCommandList(m_ImmediateCommandList);
 }
 
 void RenderList::RenderGBuffer() const

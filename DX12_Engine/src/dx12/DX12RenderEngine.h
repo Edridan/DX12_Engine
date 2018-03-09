@@ -132,6 +132,10 @@ public:
 		REFIID riidResource,
 		_COM_Outptr_opt_  void **ppvResource);
 
+	// light management
+	DX12PipelineState *			GetLightPipelineState() const;
+	DX12RootSignature *			GetLightRootSignature() const;
+
 	// Get/Set
 	int								GetFrameIndex() const;
 	int								GetFrameBufferCount() const;
@@ -214,6 +218,10 @@ private:
 	DX12RootSignature *		m_ImmediateRootSignature;
 	DX12PipelineState *		m_ImmediatePipelineState;
 	ADDRESS_ID				m_ImmediateContextBuffer;
+
+	// Light pipeline
+	DX12RootSignature *		m_LightRootSignature;
+	DX12PipelineState *		m_LightPipelineState;
 
 	// primitive rectangle mesh
 	DX12Mesh *				m_RectMesh;
