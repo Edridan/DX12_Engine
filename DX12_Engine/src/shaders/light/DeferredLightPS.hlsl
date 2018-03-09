@@ -69,6 +69,10 @@ struct VS_OUTPUT
 };
 
 /////////////////////////////////////////
+// helpers
+#include "../Lib/Math.hlsli"
+
+/////////////////////////////////////////
 // Light computation function
 void		ComputePointLight(in PointLight light, in PixelData pixel, out PixelResult result)
 {
@@ -78,24 +82,12 @@ void		ComputePointLight(in PointLight light, in PixelData pixel, out PixelResult
 	light_pos = mul(light_pos, view);
 	light_pos = mul(light_pos, projection);
 
-	float3 pixel_light_dir = light_pos - pixel.position;
-	float dist = length(pixel_light_dir);
-	pixel_light_dir = normalize(pixel_light_dir);
-
-	float light_amount = saturate(dot(pixel.normal, pixel_light_dir));
-	float4 li = light_amount * light.color;
-	float att = 1.0f / dot(light.attenuate, float3(1.0f, dist, dist * dist));
-
-	li *= att;
-
-	//Point specular
-	float3 to_camera = normalize(-pixel.position);
-	float3 reflection = reflect(-pixel_light_dir, pixel.normal);
-	float specular = pow(saturate(dot(reflection, to_camera)), 20);
-
-	result.diffuse = li;
-	result.specular = specular * att;
-	result.ambient = 0.1f;
+	float distance = length(pixel.position - light_pos);
+	float factor = min(max(0.f, 1.f - InvertLerp(0.f, 20.f, distance)), 1.f);
+	
+	result.ambient = light.color * factor;
+	result.specular = factor;
+	result.diffuse = float4(0.f, 0.f, 0.f, 0.f);
 }
 
 float4 main(const VS_OUTPUT input) : SV_TARGET
@@ -132,6 +124,6 @@ float4 main(const VS_OUTPUT input) : SV_TARGET
 
 	// return interpolated color
 	// color
-	float4 color = result.ambient + result.diffuse + result.specular ;
+	float4 color = result.ambient + result.diffuse + result.specular;
 	return color;
 }
