@@ -61,7 +61,7 @@ struct Color
 		return *this;
 	}
 
-	float * GetColorAsArray()
+	const float * GetColorAsArray() const
 	{
 		return (float*)this;
 	}

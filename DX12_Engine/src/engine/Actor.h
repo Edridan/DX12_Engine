@@ -31,6 +31,11 @@ public:
 		// actor rendering
 		std::string Mesh			= "";
 		UINT SubMeshId				= (UINT)-1;
+		// actor lighting
+		bool IsLight				= false;
+		Color LightColor			= color::White;
+		float LightRange			= 10.f;
+		Light::ELightType LightType = Light::ePointLight;
 	};
 
 	// public
