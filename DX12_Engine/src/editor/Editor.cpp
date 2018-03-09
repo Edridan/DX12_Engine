@@ -55,7 +55,7 @@ FORCEINLINE void Editor::BindKeyboardEvents()
 {
 	// generate inputs
 	Input::BindKeyEvent(Input::eKeyDown, m_Shortcuts.InputShowScene.KeyCode, "EditorShowSceneBuilder", m_Shortcuts.InputShowScene.KeyFlags, this, &Editor::SetSceneBuilderShow, nullptr);
-	Input::BindKeyEvent(Input::eKeyDown, m_Shortcuts.InputActorBuilder.KeyCode, "EditorShowActorBuilder", m_Shortcuts.InputActorBuilder.KeyFlags, this, &Editor::SetSceneBuilderShow, nullptr);
+	Input::BindKeyEvent(Input::eKeyDown, m_Shortcuts.InputActorBuilder.KeyCode, "EditorShowActorBuilder", m_Shortcuts.InputActorBuilder.KeyFlags, this, &Editor::SetActorBuilderShow, nullptr);
 }
 
 FORCEINLINE void Editor::UnbindKeyboardEvents()
@@ -98,6 +98,11 @@ void Editor::SetMaterialBuilderShow(void * i_Void)
 void Editor::SetSceneBuilderShow(void * i_Void)
 {
 	m_SceneBuilder->SetActive(!m_SceneBuilder->IsActive());
+}
+
+void Editor::SetActorBuilderShow(void * i_Void)
+{
+	m_ActorBuilder->SetActive(!m_ActorBuilder->IsActive());
 }
 
 void Editor::SetEditorShow(void * i_Void)

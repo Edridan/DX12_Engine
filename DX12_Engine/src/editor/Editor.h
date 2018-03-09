@@ -56,6 +56,7 @@ private:
 	// editor callback events
 	void			SetMaterialBuilderShow(void * i_Void);
 	void			SetSceneBuilderShow(void * i_Void);
+	void			SetActorBuilderShow(void * i_Void);
 	void			SetEditorShow(void * i_Void);
 
 	// editor management
