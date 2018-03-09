@@ -30,7 +30,8 @@ UISceneBuilder::UISceneBuilder(UIActorBuilder * i_ActorBuilder)
 	s_ActorDesc[2].Mesh = "Primitive:Plane";
 
 	// light actor
-	s_ActorDesc[3].Name = L"Light_Empty";	// To do
+	s_ActorDesc[3].Name = L"Light";	// To do
+	s_ActorDesc[3].IsLight = true;
 }
 
 UISceneBuilder::~UISceneBuilder()

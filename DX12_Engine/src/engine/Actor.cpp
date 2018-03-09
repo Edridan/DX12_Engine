@@ -277,42 +277,21 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 			{
 				ASSERT_ERROR("Unknown error");
 			}
-
-			//// load root mesh or all submeshes in different actors
-			//if (i_Desc.SubMeshId == (UINT)-1)
-			//{
-			//	componentDesc.Mesh = mesh->GetMeshBuffer();
-			//	//mesh->GetTextures(componentDesc.Textures);
-
-			//	// if the current mesh have some submesh
-			//	if (mesh->HaveSubMeshes())
-			//	{
-			//		// load them into other game objects
-			//		ActorDesc childDesc;
-
-			//		childDesc.Mesh = i_Desc.Mesh;
-			//		childDesc.Name = m_Name.append(L"_SubObject");
-			//		
-			//		for (size_t i = 0; i < mesh->SubMeshesCount(); ++i)
-			//		{
-			//			// load submeshes
-			//			childDesc.SubMeshId = (UINT)i;
-			//			m_World->SpawnActor(childDesc, this);
-			//		}
-			//	}
-			//}
-			//else
-			//{
-			//	componentDesc.Mesh = mesh->GetSubMeshes(i_Desc.SubMeshId);
-			//	//mesh->GetTextures(componentDesc.Textures, i_Desc.SubMeshId);
-			//}
-
 			//AttachRenderComponent(componentDesc);
 		}
 		else
 		{
 			PRINT_DEBUG("Error, unable to get mesh %s", i_Desc.Mesh.c_str());
 		}
+	}
+	if (i_Desc.IsLight)
+	{
+		LightComponent::LightDesc desc;
+		desc.Type = i_Desc.LightType;
+		desc.Range = i_Desc.LightRange;
+		desc.Color = XMFLOAT4(i_Desc.LightColor.GetColorAsArray());
+
+		AttachLightComponent(desc);
 	}
 }
 
