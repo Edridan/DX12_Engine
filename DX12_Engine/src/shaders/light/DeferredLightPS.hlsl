@@ -50,7 +50,6 @@ struct PixelResult
 cbuffer TransformBuffer : register(b0)
 {
 	// basics matrix for compute space position
-	matrix	model;
 	matrix	view;
 	matrix	projection;
 };
@@ -61,11 +60,6 @@ cbuffer LightData : register(b1)
 {
 	int				light_count;		// light to compute this frame
 	PointLight		lights[MAX_LIGHTS];	// lights data
-}
-
-cbuffer Camera : register(b2)
-{
-	float3			camera_pos;		// position of the camera in the world
 }
 
 struct VS_OUTPUT
@@ -81,7 +75,6 @@ void		ComputePointLight(in PointLight light, in PixelData pixel, out PixelResult
 	// transform light position into clip space
 	float4 light_pos = float4(light.position, 0.f);
 
-	light_pos = mul(light_pos, model);
 	light_pos = mul(light_pos, view);
 	light_pos = mul(light_pos, projection);
 
@@ -123,11 +116,18 @@ float4 main(const VS_OUTPUT input) : SV_TARGET
 	result.specular = float4(0.f, 0.f, 0.f, 0.f);
 	result.ambient = float4(0.01f, 0.01f, 0.01f, 0.01f);
 
-	// compute each lights
-	[unroll(MAX_LIGHTS)]
-	for (int i = 0; i < light_count; ++i)
+	if (light_count == 0)
 	{
-		ComputePointLight(lights[i], pixel, result);
+		result.diffuse = tex_diffuse.Sample(tex_sample, input.uv) * 0.1f;
+	}
+	else
+	{
+		// compute each lights
+		[unroll(MAX_LIGHTS)]
+		for (int i = 0; i < light_count; ++i)
+		{
+			ComputePointLight(lights[i], pixel, result);
+		}
 	}
 
 	// return interpolated color
