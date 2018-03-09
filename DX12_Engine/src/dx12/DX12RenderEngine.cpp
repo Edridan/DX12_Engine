@@ -845,6 +845,20 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateLightPipeline()
 	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/light/DeferredLightPS.hlsl");
 	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/light/DeferredLightVS.hlsl");
 
+	// blend state
+	CD3DX12_BLEND_DESC blendDesc;
+	blendDesc.AlphaToCoverageEnable = false;
+	blendDesc.IndependentBlendEnable = false;
+	blendDesc.RenderTarget[0].BlendEnable = true;
+	blendDesc.RenderTarget[0].LogicOpEnable = false;
+	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
 	desc.InputLayout = m_RectMesh->GetInputLayoutDesc();
 	desc.RootSignature = m_LightRootSignature;
 	desc.VertexShader = VShader;
@@ -852,7 +866,7 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateLightPipeline()
 	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	desc.RenderTargetCount = 1;
 	desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
-	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
+	desc.BlendState = blendDesc; // a default blent state.
 	desc.DepthEnabled = false;
 
 	m_LightPipelineState = new DX12PipelineState(desc);
@@ -977,7 +991,8 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	context->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 	// Clear the render target by using the ClearRenderTargetView command
-	static const float clearColor[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+	static const float clearColor[] = { 0.15f, 0.15f, 0.15f, 1.0f };
+	context->GetCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
 	// Setting up the command list
 	context->GetCommandList()->RSSetViewports(1, &DX12RenderEngine::GetInstance().GetViewport());
@@ -987,38 +1002,7 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	context->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // set the primitive topology
 
 #ifdef DX12_DEBUG
-	if (!DebugIsEnabled())
-	{
-		//// render immediate context here
-		//context->GetCommandList()->SetGraphicsRootSignature(m_ImmediateRootSignature->GetRootSignature());
-		//context->GetCommandList()->SetPipelineState(m_ImmediatePipelineState->GetPipelineState());
-
-		////context->GetCommandList()->SetComputeRootConstantBufferView(eRenderTargetCount, GetConstantBuffer(eGlobal)->GetUploadVirtualAddress(m_ImmediateContextBuffer));
-
-		//// bind textures
-		//ID3D12DescriptorHeap * descriptors = nullptr;
-
-		//DX12RenderTarget * rt[eRenderTargetCount]
-		//{
-		//	m_RenderTargets[eNormal],
-		//	m_RenderTargets[eDiffuse],
-		//	m_RenderTargets[eSpecular],
-		//	m_RenderTargets[ePosition]
-		//};
-
-		//for (UINT i = 0; i < eRenderTargetCount; ++i)
-		//{
-		//	// bind render targets as textures
-		//	descriptors = rt[i]->GetShaderResourceDescriptorHeap()->GetDescriptorHeap();
-		//	// update the descriptor for the resources
-		//	context->GetCommandList()->SetDescriptorHeaps(1, &descriptors);
-		//	context->GetCommandList()->SetGraphicsRootDescriptorTable(i, rt[i]->GetShaderResourceDescriptorHeap()->GetGPUDescriptorHandle(m_FrameIndex));
-		//}
-
-		//// render the mesh
-		//m_RectMesh->PushOnCommandList(context->GetCommandList());
-	}
-	else
+	if (DebugIsEnabled())
 	{
 		m_Debug->DrawDebugGBuffer(context->GetCommandList());
 	}

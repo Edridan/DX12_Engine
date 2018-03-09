@@ -76,9 +76,6 @@
     <Filter Include="Shaders\Markup">
       <UniqueIdentifier>{85225fdb-0ab0-4f1f-be0d-7a72a8343e3b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\Debug">
-      <UniqueIdentifier>{71bf94fd-dd8f-4aab-a540-c8b120df704a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Components">
       <UniqueIdentifier>{087a8027-497b-4f17-8ad8-10834a46ae5e}</UniqueIdentifier>
     </Filter>
@@ -108,6 +105,9 @@
     </Filter>
     <Filter Include="Shaders\Rendering">
       <UniqueIdentifier>{ecdd2920-c1e1-4be7-abf0-7d34ea934f47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Debug">
+      <UniqueIdentifier>{71bf94fd-dd8f-4aab-a540-c8b120df704a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -477,9 +477,6 @@
       <Filter>Shaders\Lib</Filter>
     </None>
     <None Include="src\shaders\lib\TransformBuffer.hlsli">
-      <Filter>Shaders\Lib</Filter>
-    </None>
-    <None Include="src\shaders\lib\EffectLib.hlsli">
       <Filter>Shaders\Lib</Filter>
     </None>
     <None Include="src\shaders\lib\Material.hlsli">

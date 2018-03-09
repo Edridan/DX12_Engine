@@ -220,7 +220,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\fonts\Arial.fnt" />
-    <None Include="src\shaders\lib\EffectLib.hlsli" />
     <None Include="src\shaders\lib\GlobalBuffer.hlsli" />
     <None Include="src\shaders\lib\Lib.hlsli" />
     <None Include="src\shaders\lib\Material.hlsli" />
