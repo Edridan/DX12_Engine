@@ -955,6 +955,12 @@ FORCEINLINE void DX12RenderEngine::GenerateRenderTargets()
 	DX12RenderTarget::RenderTargetDesc rtDesc;
 	rtDesc.BufferSize			= m_WindowSize;
 	rtDesc.IsShaderResource		= true;
+	// default clear value
+	rtDesc.ClearValue[0]		= 0.f;
+	rtDesc.ClearValue[1]		= 0.f;
+	rtDesc.ClearValue[2]		= 0.f;
+	rtDesc.ClearValue[3]		= 0.f;
+
 
 	for (UINT i = 0; i < eRenderTargetCount; ++i)
 	{
@@ -991,7 +997,7 @@ FORCEINLINE HRESULT DX12RenderEngine::InitializeImmediateContext()
 	context->GetCommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 	// Clear the render target by using the ClearRenderTargetView command
-	static const float clearColor[] = { 0.15f, 0.15f, 0.15f, 1.0f };
+	static const float clearColor[] = { 0.3f, 0.3f, 0.3f, 0.0f };
 	context->GetCommandList()->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 
 	// Setting up the command list
