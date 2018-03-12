@@ -77,16 +77,15 @@ struct VS_OUTPUT
 void		ComputePointLight(in PointLight light, in PixelData pixel, out PixelResult result)
 {
 	// transform light position into clip space
-	float4 light_pos = float4(light.position, 0.f);
+	float4 light_pos = float4(light.position, 1.f);
 
 	light_pos = mul(light_pos, view);
 	light_pos = mul(light_pos, projection);
 
-	float distance = length(pixel.position - light_pos);
-	float factor = min(max(0.f, 1.f - InvertLerp(0.f, 20.f, distance)), 1.f);
-	
-	result.ambient = light.color * factor;
-	result.specular = factor;
+	float3 light_dir = normalize(light_pos - pixel.position.xyz);
+
+	result.ambient = float4(light_dir, 1.f);
+	result.specular = float4(0.f, 0.f, 0.f, 0.f);
 	result.diffuse = float4(0.f, 0.f, 0.f, 0.f);
 }
 
@@ -102,28 +101,38 @@ float4 main(const VS_OUTPUT input) : SV_TARGET
 	pixel.normal			= tex_normal.Sample(tex_sample, input.uv);
 	pixel.position			= tex_position.Sample(tex_sample, input.uv);
 
-	PixelResult result;
-
-	result.diffuse = tex_diffuse.Sample(tex_sample, input.uv);
-	result.specular = float4(0.f, 0.f, 0.f, 0.f);
-	result.ambient = float4(0.01f, 0.01f, 0.01f, 0.01f);
-
-	if (light_count == 0)
+	// compute pixel if necessary (diffuse exist)
+	if (pixel.diffuse_color.a != 0.f)
 	{
-		result.diffuse = tex_diffuse.Sample(tex_sample, input.uv) * 0.1f;
-	}
-	else
-	{
-		// compute each lights
-		[unroll(MAX_LIGHTS)]
-		for (int i = 0; i < light_count; ++i)
+		PixelResult result;
+
+		result.diffuse = float4(0.f, 0.f, 0.f, 0.f);
+		result.specular = float4(0.f, 0.f, 0.f, 0.f);
+		result.ambient = float4(0.f, 0.f, 0.f, 0.f);
+
+		if (light_count == 0)
 		{
-			ComputePointLight(lights[i], pixel, result);
+			result.diffuse = tex_diffuse.Sample(tex_sample, input.uv);
 		}
+		else
+		{
+			// compute each lights
+			[unroll(MAX_LIGHTS)]
+			for (int i = 0; i < light_count; ++i)
+			{
+				PixelResult lightResult;
+				ComputePointLight(lights[i], pixel, lightResult);
+
+				result.diffuse += lightResult.diffuse;
+				result.specular += lightResult.specular;
+				result.ambient += lightResult.ambient;
+			}
+		}
+
+		// return interpolated color
+		float4 color = result.ambient + result.diffuse + result.specular;
+		return color;
 	}
 
-	// return interpolated color
-	// color
-	float4 color = result.ambient + result.diffuse + result.specular;
-	return color;
+	return pixel.diffuse_color;
 }
