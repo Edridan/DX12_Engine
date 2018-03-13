@@ -15,7 +15,7 @@ struct VS_OUTPUT
 	// data for pipeline
 	float4 position :		SV_POSITION;
 	// GBuffer needed data
-	float4 view_position :	POSITION;
+	float4 world_position :	POSITION;
 	float3 normal :			NORMAL;
 	float depth :			DEPTH_VIEW_SPACE;
 };
@@ -46,7 +46,7 @@ PS_OUTPUT main(const VS_OUTPUT input)
 
 	/////////////////////////////////////////////
 	// update the position buffer
-	output.position = input.view_position;
+	output.position = input.world_position;
 
 	/////////////////////////////////////////////
 	// update the depth buffer

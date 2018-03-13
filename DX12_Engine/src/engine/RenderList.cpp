@@ -58,6 +58,7 @@ void RenderList::SetupRenderList(const RenderListSetup & i_Setup)
 	m_ImmediateCommandList	= i_Setup.ImmediateCommandList;
 	m_DeferredCommandList	= i_Setup.DeferredCommandList;
 	m_Projection			= i_Setup.ProjectionMatrix;
+	m_CameraPosition		= i_Setup.CameraPosition;
 	m_View					= i_Setup.ViewMatrix;
 }
 
@@ -111,11 +112,13 @@ void RenderList::RenderLight() const
 		// 3D space computing
 		DirectX::XMFLOAT4X4		m_View;
 		DirectX::XMFLOAT4X4		m_Projection;
+		DirectX::XMFLOAT4		m_CameraPos;
 	};
 
 	TransformBuffer buffer;
 	XMStoreFloat4x4(&buffer.m_View, XMMatrixTranspose(m_View));
 	XMStoreFloat4x4(&buffer.m_Projection, XMMatrixTranspose(m_Projection));
+	buffer.m_CameraPos = m_CameraPosition;
 
 	render.GetConstantBuffer(DX12RenderEngine::eGlobal)->UpdateConstantBuffer(m_LightCameraConstAddress, &buffer, sizeof(TransformBuffer));
 	render.GetConstantBuffer(DX12RenderEngine::eLight)->UpdateConstantBuffer(m_LightConstantAddress, m_LightsData, sizeof(int) + m_LightsData->LightCount * sizeof(LightData));

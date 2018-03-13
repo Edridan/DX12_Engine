@@ -28,6 +28,7 @@ public:
 		// matrix for rendering
 		XMMATRIX		ViewMatrix;
 		XMMATRIX		ProjectionMatrix;
+		XMFLOAT4		CameraPosition;
 		// dx12
 		ID3D12GraphicsCommandList *		DeferredCommandList = nullptr;	// command list to render
 		ID3D12GraphicsCommandList *		ImmediateCommandList = nullptr;	// command list to render
@@ -109,6 +110,7 @@ private:
 	// rendering purpose
 	XMMATRIX	m_View;
 	XMMATRIX	m_Projection;
+	XMFLOAT4	m_CameraPosition;
 	// dx12
 	ID3D12GraphicsCommandList *	m_ImmediateCommandList;
 	ID3D12GraphicsCommandList *	m_DeferredCommandList;

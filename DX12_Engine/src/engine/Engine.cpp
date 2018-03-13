@@ -195,7 +195,6 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	// preload the resources
 	m_RenderResourceManager->PushResourceOnGPUWithWait();
 
-
 	m_Exit = false;
 }
 
@@ -285,6 +284,7 @@ void Engine::Run()
 			// camera related
 			setup.ProjectionMatrix	= XMLoadFloat4x4(&cam->GetProjMatrix());
 			setup.ViewMatrix		= XMLoadFloat4x4(&cam->GetViewMatrix());
+			setup.CameraPosition	= m_CurrentWorld->GetCurrentCamera()->m_Position;
 
 			// setup render list
 			m_RenderList->Reset();	// reset the render list of the previous frame
