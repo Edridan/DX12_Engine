@@ -32,6 +32,22 @@ struct PointLight
 	float		padding[5];	// padding
 };
 
+// spot light struct definition
+struct SpotLight
+{
+	// ---
+	float4		color;
+	// ---
+	float3		position;
+	float		constant;
+	// ---
+	float		lin;		// linear
+	float		quad;		// quadratic
+	float		range;		// range
+	// ---		offset : 11 remaining : 5 (16)
+	float		padding[5];	// padding
+};
+
 // Pixel specs (for on particular pixel)
 struct PixelData
 {
@@ -48,6 +64,7 @@ cbuffer TransformBuffer : register(b0)
 	// basics matrix for compute space position
 	matrix	view;
 	matrix	projection;
+	float4	camera_pos;
 };
 
 
@@ -70,12 +87,9 @@ struct VS_OUTPUT
 
 /////////////////////////////////////////
 // Light computation function
-float3		ComputePointLight(in PointLight light, in PixelData pixel, float3 view_dir)
+float3		ComputePointLight(in PointLight light, in PixelData pixel)
 {
-	// transform light position into clip space
 	float4 light_pos = float4(light.position, 1.f);
-	light_pos = mul(light_pos, view);
-	light_pos = mul(light_pos, projection);
 
 	// retreive the light direction and range between the 
 	const float3 light_diff = light_pos.xyz - pixel.position.xyz;
@@ -85,11 +99,13 @@ float3		ComputePointLight(in PointLight light, in PixelData pixel, float3 view_d
 	{
 		// diffuse light calculation
 		const float3 light_dir = normalize(light_diff);
-		float3 light_diffuse = max(dot(pixel.normal.xyz, light_dir), 0.f) * pixel.diffuse_color.rgb * light.color.rgb;
+		const float diff = max(dot(pixel.normal.xyz, light_diff), 0.f);
+		const float3 light_diffuse = pixel.diffuse_color.rgb * diff * light.color.rgb;
 
 		// specular calculation
-		const float3 half_way_dir = normalize(light_dir + view_dir);
-		const float spec = pow(max(dot(pixel.normal.xyz, half_way_dir), 0.f), 16.f);
+		const float3 view_dir = normalize(camera_pos.xyz - pixel.position.xyz);
+		const float3 reflect_dir = reflect(-light_dir, pixel.normal.xyz);
+		const float spec = pow(max(dot(pixel.normal.xyz, reflect_dir), 0.f), 32.f);
 		float4 specular = light.color * spec * pixel.specular_color;
 
 		// attenuation
@@ -101,9 +117,6 @@ float3		ComputePointLight(in PointLight light, in PixelData pixel, float3 view_d
 
 float4 main(const VS_OUTPUT input) : SV_TARGET
 {
-	// setup the variable
-	float4	eyePos = {0.f, 0.f, 0.f, 1.f};	// everything is in view space
-
 	// fill the material
 	PixelData pixel;
 	pixel.diffuse_color		= tex_diffuse.Sample(tex_sample, input.uv);
@@ -114,8 +127,6 @@ float4 main(const VS_OUTPUT input) : SV_TARGET
 	// compute pixel if necessary (diffuse exist)
 	if (pixel.diffuse_color.a != 0.f)
 	{
-
-		float3 view_dir = normalize(eye_pos.xyz - pixel.position.xyz);
 		float3 lighting = float3(0.f, 0.f, 0.f);
 
 		if (light_count == 0)
@@ -128,7 +139,7 @@ float4 main(const VS_OUTPUT input) : SV_TARGET
 			[unroll(MAX_LIGHTS)]
 			for (int i = 0; i < light_count; ++i)
 			{
-				lighting += ComputePointLight(lights[i], pixel, view_dir);
+				lighting += ComputePointLight(lights[i], pixel);
 			}
 		}
 
