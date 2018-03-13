@@ -39,7 +39,7 @@ int WINAPI WinMain(
 	Actor::ActorDesc lightActor;
 	lightActor.Name		= L"Light";
 	lightActor.IsLight	= true;
-	world->SpawnActor(lightActor, Transform(XMFLOAT3(0.f, 0.05f, 0.f)));
+	world->SpawnActor(lightActor, Transform(XMFLOAT3(0.f, 0.5f, 0.f)));
 
 	engine.Run();
 }
