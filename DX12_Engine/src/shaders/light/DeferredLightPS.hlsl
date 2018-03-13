@@ -5,7 +5,6 @@
 // define amount of lights
 #define			MAX_LIGHTS		64
 
-
 // texture sampler for lights calculation
 Texture2D tex_normal		: register(t0);
 Texture2D tex_diffuse		: register(t1);
@@ -14,6 +13,9 @@ Texture2D tex_position		: register(t3);
 //Texture2D tex_depth		: register(t4);	// To do
 SamplerState tex_sample		: register(s0);
 
+// global unchanged var
+static const float4 eye_pos = float4(0.f, 0.f, 0.f, 1.f);
+
 // point light struct definition
 struct PointLight
 {
@@ -21,10 +23,13 @@ struct PointLight
 	float4		color;
 	// ---
 	float3		position;
-	float		range;
+	float		constant;
 	// ---
-	float3		attenuate;
-	float		pad;
+	float		lin;		// linear
+	float		quad;		// quadratic
+	float		range;		// range
+	// ---		offset : 11 remaining : 5 (16)
+	float		padding[5];	// padding
 };
 
 // Pixel specs (for on particular pixel)
@@ -35,15 +40,6 @@ struct PixelData
 	float4		normal;
 	float4		position;
 };
-
-// result data for a pixel
-struct PixelResult
-{
-	float4	diffuse;
-	float4	specular;
-	float4	ambient;
-};
-
 
 /////////////////////////////////////////
 // constant buffer definition
@@ -74,19 +70,33 @@ struct VS_OUTPUT
 
 /////////////////////////////////////////
 // Light computation function
-void		ComputePointLight(in PointLight light, in PixelData pixel, out PixelResult result)
+float3		ComputePointLight(in PointLight light, in PixelData pixel, float3 view_dir)
 {
 	// transform light position into clip space
 	float4 light_pos = float4(light.position, 1.f);
-
 	light_pos = mul(light_pos, view);
 	light_pos = mul(light_pos, projection);
 
-	float3 light_dir = normalize(light_pos - pixel.position.xyz);
+	// retreive the light direction and range between the 
+	const float3 light_diff = light_pos.xyz - pixel.position.xyz;
+	const float distance = length(light_diff);
 
-	result.ambient = float4(light_dir, 1.f);
-	result.specular = float4(0.f, 0.f, 0.f, 0.f);
-	result.diffuse = float4(0.f, 0.f, 0.f, 0.f);
+	if (distance < light.range)
+	{
+		// diffuse light calculation
+		const float3 light_dir = normalize(light_diff);
+		float3 light_diffuse = max(dot(pixel.normal.xyz, light_dir), 0.f) * pixel.diffuse_color.rgb * light.color.rgb;
+
+		// specular calculation
+		const float3 half_way_dir = normalize(light_dir + view_dir);
+		const float spec = pow(max(dot(pixel.normal.xyz, half_way_dir), 0.f), 16.f);
+		float4 specular = light.color * spec * pixel.specular_color;
+
+		// attenuation
+		float attenuation = 1.f / (light.constant + light.lin * distance + light.quad * (distance * distance));
+		return (specular.rgb * attenuation) + (light_diffuse.rgb * attenuation);
+	}
+	return float3(0.f, 0.f, 0.f);
 }
 
 float4 main(const VS_OUTPUT input) : SV_TARGET
@@ -104,15 +114,13 @@ float4 main(const VS_OUTPUT input) : SV_TARGET
 	// compute pixel if necessary (diffuse exist)
 	if (pixel.diffuse_color.a != 0.f)
 	{
-		PixelResult result;
 
-		result.diffuse = float4(0.f, 0.f, 0.f, 0.f);
-		result.specular = float4(0.f, 0.f, 0.f, 0.f);
-		result.ambient = float4(0.f, 0.f, 0.f, 0.f);
+		float3 view_dir = normalize(eye_pos.xyz - pixel.position.xyz);
+		float3 lighting = float3(0.f, 0.f, 0.f);
 
 		if (light_count == 0)
 		{
-			result.diffuse = tex_diffuse.Sample(tex_sample, input.uv);
+			lighting = tex_diffuse.Sample(tex_sample, input.uv).rgb;
 		}
 		else
 		{
@@ -120,18 +128,12 @@ float4 main(const VS_OUTPUT input) : SV_TARGET
 			[unroll(MAX_LIGHTS)]
 			for (int i = 0; i < light_count; ++i)
 			{
-				PixelResult lightResult;
-				ComputePointLight(lights[i], pixel, lightResult);
-
-				result.diffuse += lightResult.diffuse;
-				result.specular += lightResult.specular;
-				result.ambient += lightResult.ambient;
+				lighting += ComputePointLight(lights[i], pixel, view_dir);
 			}
 		}
 
 		// return interpolated color
-		float4 color = result.ambient + result.diffuse + result.specular;
-		return color;
+		return float4(lighting, 1.f);
 	}
 
 	return pixel.diffuse_color;

@@ -68,11 +68,18 @@ private:
 	// light management
 	__declspec(align(16)) struct LightData
 	{
+		DirectX::XMFLOAT4		Padding[4];	// padding (matrix4 size for each lights data)
+	};
+
+	__declspec(align(16)) struct PointLightData
+	{
 		DirectX::XMFLOAT4		Color;
 		DirectX::XMFLOAT3		Position;
+		float					Constant;
+		float					Linear;
+		float					Quadratic;
 		float					Range;
-		DirectX::XMFLOAT3		Attenuate;
-		float					Pad;
+		float					Padding[5];	// padding
 	};
 	
 	__declspec(align(16)) struct LightDesc

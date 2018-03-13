@@ -22,6 +22,8 @@ World::World(const WorldDesc & i_WorldDesc)
 	m_CurrentCamera->m_Target		= i_WorldDesc.CameraTarget;
 	m_CurrentCamera->m_Up			= Vec4Up;
 
+	m_CurrentCamera->ComputePitchYaw();
+
 	if (i_WorldDesc.UseCameraProjection)
 	{
 		m_CurrentCamera->SetProjectionMatrix(i_WorldDesc.CameraProjection);

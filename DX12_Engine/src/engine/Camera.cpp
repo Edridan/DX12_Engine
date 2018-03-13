@@ -157,3 +157,19 @@ bool Camera::FreecamIsEnabled() const
 {
 	return m_Freecam;
 }
+
+void Camera::ComputePitchYaw()
+{
+	// build view matrix
+	XMVECTOR cPos = XMLoadFloat4(&m_Position);
+	XMVECTOR cTarg = XMLoadFloat4(&m_Target);
+
+	DirectX::XMVECTOR cForward = cTarg - cPos;
+
+	DirectX::XMFLOAT3 vForward;
+	XMStoreFloat3(&vForward, cForward);
+
+	// retreive the current pitch/yaw based on forward vector
+	m_Yaw = atan2f(vForward.x, vForward.z) * RadToDeg;
+	m_Pitch = asinf(-vForward.y) * RadToDeg;
+}
