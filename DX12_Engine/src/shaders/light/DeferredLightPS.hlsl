@@ -99,20 +99,26 @@ float3		ComputePointLight(in PointLight light, in PixelData pixel)
 	{
 		// diffuse light calculation
 		const float3 light_dir = normalize(light_diff);
-		const float diff = max(dot(pixel.normal.xyz, light_diff), 0.f);
+		const float diff = max(dot(pixel.normal.xyz, light_dir), 0.f);
 		const float3 light_diffuse = pixel.diffuse_color.rgb * diff * light.color.rgb;
 
 		// specular calculation
 		const float3 view_dir = normalize(camera_pos.xyz - pixel.position.xyz);
-		const float3 reflect_dir = reflect(-light_dir, pixel.normal.xyz);
-		const float spec = pow(max(dot(pixel.normal.xyz, reflect_dir), 0.f), 32.f);
-		float4 specular = light.color * spec * pixel.specular_color;
+		const float3 reflect_dir = reflect(-light_dir, pixel.normal.xyz); 
+		const float spec = pow(max(dot(view_dir, reflect_dir), 0.f), 32.f);
+		const float4 specular = light.color * spec * pixel.specular_color;
 
 		// attenuation
 		float attenuation = 1.f / (light.constant + light.lin * distance + light.quad * (distance * distance));
 		return (specular.rgb * attenuation) + (light_diffuse.rgb * attenuation);
 	}
+
 	return float3(0.f, 0.f, 0.f);
+}
+
+float3		ComputeSpotLight(in SpotLight light, in PixelData pixel)
+{
+
 }
 
 float4 main(const VS_OUTPUT input) : SV_TARGET
