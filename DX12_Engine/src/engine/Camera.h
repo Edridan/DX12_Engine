@@ -32,6 +32,9 @@ public:
 	void	SetFreecamEnabled(bool i_Enabled);
 	bool	FreecamIsEnabled() const;
 
+	// compute values
+	void	ComputePitchYaw();
+
 private:
 	// Matrix
 	XMFLOAT4X4	m_Projection;

@@ -264,6 +264,9 @@
     <ClCompile Include="src\resource\Texture.cpp">
       <Filter>Source Files\Resource\Other</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\Light.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\tinyobjloader\tiny_obj_loader.h">

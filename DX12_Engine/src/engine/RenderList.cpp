@@ -10,9 +10,14 @@
 #include "resource/DX12Mesh.h"
 #include "engine/Actor.h"
 
+
+
 RenderList::RenderList()
 	:m_MaxLight(MAX_LIGHT)
 {
+	// compilation assert
+	static_assert(sizeof(RenderList::LightData) == sizeof(PointLightData), "The light data structures need to be the same size (until some errors during lights computation will comes)");
+
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
 	m_RenderComponents.reserve(0x100);
@@ -79,9 +84,9 @@ void RenderList::RenderLight() const
 	for (size_t i = 0; i < m_LightComponents.size(); ++i)
 	{
 		const LightComponent * lightComponent = m_LightComponents[i];
-		Light::LightData * light	= lightComponent->GetLightData();
+		Light * light				= lightComponent->GetLight();
 		Actor * actor				= lightComponent->GetActor();
-		LightData & desc			= m_LightsData->Data[i];
+		PointLightData * desc		= (PointLightData *)&m_LightsData->Data[i];
 
 		// push the light data to the list
 
@@ -91,11 +96,12 @@ void RenderList::RenderLight() const
 		XMStoreFloat4x4(&worldTransform, actorWorldTransform);
 
 		// fill light description
-		desc.Position = XMFLOAT3(&worldTransform._41);
-		desc.Range = light->Range;
-		desc.Color = light->DiffuseColor;
-		desc.Attenuate = XMFLOAT3(0.5f, 0.5f, 0.5f);
-		desc.Pad = 10;
+		desc->Position	= XMFLOAT3(&worldTransform._41);
+		desc->Color		= light->GetColor();
+		desc->Constant	= light->GetConstant();
+		desc->Linear	= light->GetLinear();
+		desc->Quadratic = light->GetQuadratic();
+		desc->Range		= light->GetRange();
 	}
 
 	// update constant buffer

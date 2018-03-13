@@ -14,7 +14,11 @@ public:
 	{
 		Light::ELightType		Type = Light::ePointLight;
 		DirectX::XMFLOAT4		Color = DirectX::XMFLOAT4(1.f, 1.f, 1.f, 1.f);
-		float					Range = 10.f;
+		float					Range = 10.f;	// TO DO
+		float					Quadratic = 0.44f;
+		float					Linear = 0.35f;
+		float					Constant = 1.f;
+
 	};
 
 	LightComponent(const LightDesc & i_Desc, Actor * i_Actor);
@@ -22,11 +26,11 @@ public:
 	~LightComponent();
 
 	// light management
-	Light::LightData *		GetLightData() const;
+	Light *					GetLight() const;
 	Light::ELightType		GetLightType() const;
 
 private:
-	Light::LightData *		m_LightData;	// light internal management
+	Light *					m_Light;	// light internal management
 	Light::ELightType		m_Type;			// type of the light
 
 #ifdef WITH_EDITOR
