@@ -1,6 +1,5 @@
 // console UI window
 
-
 #pragma once
 
 #include "UIWindow.h"

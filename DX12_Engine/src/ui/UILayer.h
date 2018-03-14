@@ -18,7 +18,7 @@ public:
 	struct LayerStyleDesc
 	{
 		// global ui style
-		float Alpha				= 10.0f;
+		float Alpha				= 1.0f;
 		bool AntiAliasedLines	= true;
 		bool AntiAliasedShapes	= true;
 		// window style

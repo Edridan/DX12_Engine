@@ -173,6 +173,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 #ifdef _DEBUG
 	PRINT_DEBUG("DX12 engine [version 0.1]");
 	PRINT_DEBUG("Initilization... OK");
+	PRINT_DEBUG("ImGui version %s", IMGUI_VERSION);
 #endif
 
 	// enable input

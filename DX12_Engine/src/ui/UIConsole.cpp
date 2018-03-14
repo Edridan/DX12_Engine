@@ -8,10 +8,11 @@
 
 UIConsole::UIConsole()
 	:UIWindow("Console", 0)
-	,m_BufferSize(1024)
+	, m_BufferSize(1024)
 {
 	m_History.reserve(HISTORY_BUFFER_SIZE);
 	m_CommandBuffer = new char[1024];
+	m_CommandBuffer[0] = '\n';
 }
 
 UIConsole::~UIConsole()
