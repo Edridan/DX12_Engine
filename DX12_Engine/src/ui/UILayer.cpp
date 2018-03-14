@@ -17,6 +17,9 @@ UILayer::UILayer(Window * i_Window)
 {
 	if (ImGuiD3D12::ImguiIsInitialized())	return;
 
+	// initialize and create context
+	ASSERT(ImGui::CreateContext() != nullptr);
+
 	ImGuiIO & io = ImGui::GetIO();
 
 	// Keyboard mapping ImGui will use those indices to peek into the io
@@ -59,6 +62,8 @@ UILayer::UILayer(Window * i_Window)
 	// the imgui is initialized
 	m_Initialized = true;
 
+	PRINT_DEBUG("Initilazing Imgui : %s", IMGUI_VERSION);
+
 	// set the default
 	LayerStyleDesc desc;
 	SetUIStyle(desc);
@@ -76,6 +81,8 @@ UILayer::UILayer(Window * i_Window, const LayerStyleDesc & i_Style)
 UILayer::~UILayer()
 {
 	m_Windows.clear();
+
+	ImGui::DestroyContext();	// clear context
 }
 
 void UILayer::SetEnable(const bool i_Enable)
