@@ -59,20 +59,19 @@ struct PixelData
 
 /////////////////////////////////////////
 // constant buffer definition
-cbuffer TransformBuffer : register(b0)
+cbuffer SceneData : register(b0)
 {
 	// basics matrix for compute space position
-	matrix	view;
-	matrix	projection;
-	float4	camera_pos;
+	float3	camera_pos;
+	int		light_count;		// light to compute this frame
 };
 
 
 // contains data to render point lights
 cbuffer LightData : register(b1)
 {
-	int				light_count;		// light to compute this frame
 	PointLight		lights[MAX_LIGHTS];	// lights data
+	PointLight		light;	// lights data
 }
 
 struct VS_OUTPUT

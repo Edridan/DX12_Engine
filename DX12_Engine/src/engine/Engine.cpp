@@ -285,7 +285,7 @@ void Engine::Run()
 			// camera related
 			setup.ProjectionMatrix	= XMLoadFloat4x4(&cam->GetProjMatrix());
 			setup.ViewMatrix		= XMLoadFloat4x4(&cam->GetViewMatrix());
-			setup.CameraPosition	= m_CurrentWorld->GetCurrentCamera()->m_Position;
+			setup.CameraPosition	= XMFLOAT3(&m_CurrentWorld->GetCurrentCamera()->m_Position.x);
 
 			// setup render list
 			m_RenderList->Reset();	// reset the render list of the previous frame

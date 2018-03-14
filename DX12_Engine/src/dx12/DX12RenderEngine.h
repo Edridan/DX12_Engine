@@ -235,6 +235,8 @@ private:
 	{
 		UINT		ElementSize;
 		UINT		ElementCount;
+		wchar_t *	Name;
+		bool		IsDuplicated;
 	};
 	static const ConstantBufferDef	s_ConstantBufferSize[EConstantBufferId::eConstantBufferCount];	// setup this array to manage the size of the constant buffer
 	DX12ConstantBuffer *			m_ConstantBuffer[EConstantBufferId::eConstantBufferCount];	// constant buffer are created here and used/managed from other space
