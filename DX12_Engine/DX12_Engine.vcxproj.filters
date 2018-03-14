@@ -109,6 +109,12 @@
     <Filter Include="Shaders\Debug">
       <UniqueIdentifier>{71bf94fd-dd8f-4aab-a540-c8b120df704a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Editor\NodeEditor">
+      <UniqueIdentifier>{633533fc-3f9d-4525-bf5b-11fd302a1aba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Editor\Node">
+      <UniqueIdentifier>{2f29a894-e7fa-4508-a640-2ff0a7d670e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\tinyobjloader\tiny_obj_loader.cc">
@@ -266,6 +272,9 @@
     </ClCompile>
     <ClCompile Include="src\engine\Light.cpp">
       <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\editor\Node\Node.cpp">
+      <Filter>Source Files\Editor\Node</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -445,6 +454,12 @@
     </ClInclude>
     <ClInclude Include="src\engine\Light.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\editor\Node\NodeLink.h">
+      <Filter>Header Files\Editor\NodeEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\editor\Node\Node.h">
+      <Filter>Header Files\Editor\NodeEditor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

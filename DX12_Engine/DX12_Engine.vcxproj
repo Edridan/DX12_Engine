@@ -108,6 +108,7 @@
     <ClCompile Include="src\dx12\DX12Shader.cpp" />
     <ClCompile Include="src\dx12\DX12Utils.cpp" />
     <ClCompile Include="src\editor\Editor.cpp" />
+    <ClCompile Include="src\editor\Node\Node.cpp" />
     <ClCompile Include="src\editor\UIActorBuilder.cpp" />
     <ClCompile Include="src\editor\UIMaterialBuilder.cpp" />
     <ClCompile Include="src\editor\UISceneBuilder.cpp" />
@@ -167,6 +168,8 @@
     <ClInclude Include="src\dx12\DX12Shader.h" />
     <ClInclude Include="src\dx12\DX12Utils.h" />
     <ClInclude Include="src\editor\Editor.h" />
+    <ClInclude Include="src\editor\Node\Node.h" />
+    <ClInclude Include="src\editor\Node\NodeLink.h" />
     <ClInclude Include="src\editor\UIActorBuilder.h" />
     <ClInclude Include="src\editor\UIMaterialBuilder.h" />
     <ClInclude Include="src\editor\UISceneBuilder.h" />
