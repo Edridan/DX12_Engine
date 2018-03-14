@@ -11,6 +11,7 @@
 class UIMaterialBuilder;
 class UISceneBuilder;
 class UIActorBuilder;
+class UIWindow;
 class UILayer;
 
 #include "engine/Input.h"
@@ -52,6 +53,7 @@ private:
 	void		UnbindKeyboardEvents();
 	void		CloseEditor();
 	void		OpenEditor();
+	void		PushEditorWindow(UIWindow * i_Window);
 
 	// editor callback events
 	void			SetMaterialBuilderShow(void * i_Void);
@@ -64,6 +66,8 @@ private:
 	UISceneBuilder *		m_SceneBuilder;
 	UIActorBuilder *		m_ActorBuilder;
 	bool					m_IsEnabled;
+
+	std::vector<UIWindow*>	m_Windows;
 
 	// engine
 	EditorShortCuts			m_Shortcuts;

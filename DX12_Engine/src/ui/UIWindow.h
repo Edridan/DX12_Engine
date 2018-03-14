@@ -5,12 +5,6 @@
 
 #include <string>
 
-// class predef
-namespace ImGui
-{
-	class ImDrawList;
-};
-
 class UIWindow
 {
 public:
