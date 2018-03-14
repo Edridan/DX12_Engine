@@ -290,6 +290,7 @@ Actor::Actor(const ActorDesc & i_Desc, World * i_World)
 		desc.Type = i_Desc.LightType;
 		desc.Range = i_Desc.LightRange;
 		desc.Color = XMFLOAT4(i_Desc.LightColor.GetColorAsArray());
+		desc.Color.w = 1.f;
 
 		AttachLightComponent(desc);
 	}
