@@ -10,6 +10,7 @@
 #include "dx12/DX12ConstantBuffer.h"
 #include "resource/DX12ResourceManager.h"
 #include "resource/DX12Mesh.h"
+#include "engine/Light.h"
 #include "engine/Engine.h"
 
 #ifdef DX12_DEBUG
@@ -24,10 +25,10 @@ DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
 const DX12RenderEngine::ConstantBufferDef			DX12RenderEngine::s_ConstantBufferSize[] =
 {
 	// {ElementSize, ElementCount}
-	{256,	1024,	L"Transform",	true},		// transform
-	{256,	8,		L"Global",		true},			// global buffer (always pointing on the same)
-	{256,	1024,	L"Material",	true},		// materials
-	{2048,	1,		L"Lights",		true},			// lights
+	{256,				1024,	L"Transform",	true},		// transform
+	{256,				8,		L"Global",		true},			// global buffer (always pointing on the same)
+	{256,				1024,	L"Material",	true},		// materials
+	{MAX_LIGHT * 128,	1,		L"Lights",		true},			// lights
 };
 
 const DX12RenderEngine::HeapProperty DX12RenderEngine::s_HeapProperties[] =
