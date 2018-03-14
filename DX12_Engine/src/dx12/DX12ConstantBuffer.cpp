@@ -2,7 +2,7 @@
 #include "dx12/DX12RenderEngine.h"
 
 
-DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize, bool i_IsDucpliacted /* = true */)
+DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize, const wchar_t * i_Name /* = L"Unnamed" */, bool i_IsDucpliacted /* = true */)
 	:m_ElementSize((i_ElementSize + 255) & ~255)	// align element size on 256 bytes
 	,m_BufferSize(i_BufferSize)
 	,m_IsDuplicated(i_IsDucpliacted)
@@ -40,7 +40,7 @@ DX12ConstantBuffer::DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize
 			nullptr, // we do not have use an optimized clear value for constant buffers
 			IID_PPV_ARGS(&m_ConstantBufferUploadHeap[i])));
 
-		m_ConstantBufferUploadHeap[i]->SetName(L"Constant Buffer Upload Resource Heap");
+		m_ConstantBufferUploadHeap[i]->SetName(i_Name);
 
 		CD3DX12_RANGE readRange(0, 0);    // We do not intend to read from this resource on the CPU. (so end is less than or equal to begin)
 		DX12_ASSERT(m_ConstantBufferUploadHeap[i]->Map(0, &readRange, reinterpret_cast<void**>(&m_ConstantBufferGPUAdress[i])));
@@ -136,6 +136,7 @@ void DX12ConstantBuffer::UpdateConstantBuffer(ADDRESS_ID i_Address, const void *
 	const int frameIndex = GetFrameIndex();
 
 	ASSERT(i_Address < m_BufferSize);
+	ASSERT(i_Size < m_ElementSize);
 
 	if (m_ConstantBufferReservedAddress[i_Address] == true)
 	{

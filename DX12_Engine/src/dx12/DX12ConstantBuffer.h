@@ -8,7 +8,7 @@
 class DX12ConstantBuffer
 {
 public:
-	DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize, bool i_IsDucpliacted = true /* if true : create a constant buffer for each frame index */);
+	DX12ConstantBuffer(UINT64 i_BufferSize, UINT64 i_ElementSize, const wchar_t * i_Name = L"Unnamed", bool i_IsDucpliacted = true /* if true : create a constant buffer for each frame index */);
 	~DX12ConstantBuffer();
 
 	// buffer map

@@ -10,8 +10,6 @@
 #include "resource/DX12Mesh.h"
 #include "engine/Actor.h"
 
-
-
 RenderList::RenderList()
 	:m_MaxLight(MAX_LIGHT)
 {
@@ -79,9 +77,6 @@ void RenderList::RenderLight() const
 	// -- Render Lights -- //
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
-	// retreive the count of the light components
-	m_LightsData->LightCount = (int)m_LightComponents.size();
-
 	for (size_t i = 0; i < m_LightComponents.size(); ++i)
 	{
 		const LightComponent * lightComponent = m_LightComponents[i];
@@ -107,21 +102,21 @@ void RenderList::RenderLight() const
 
 	// update constant buffer
 	// transform buffer
-	__declspec(align(16)) struct TransformBuffer
+	__declspec(align(16)) struct SceneDataBuffer
 	{
-		// 3D space computing
-		DirectX::XMFLOAT4X4		m_View;
-		DirectX::XMFLOAT4X4		m_Projection;
-		DirectX::XMFLOAT4		m_CameraPos;
+		// data for light computation
+		DirectX::XMFLOAT3		m_CameraPos;
+		int						m_LightCount;
 	};
 
-	TransformBuffer buffer;
-	XMStoreFloat4x4(&buffer.m_View, XMMatrixTranspose(m_View));
-	XMStoreFloat4x4(&buffer.m_Projection, XMMatrixTranspose(m_Projection));
+	SceneDataBuffer buffer;
+	//XMStoreFloat4x4(&buffer.m_View, XMMatrixTranspose(m_View));
+	//XMStoreFloat4x4(&buffer.m_Projection, XMMatrixTranspose(m_Projection));
 	buffer.m_CameraPos = m_CameraPosition;
+	buffer.m_LightCount = (int)m_LightComponents.size();
 
-	render.GetConstantBuffer(DX12RenderEngine::eGlobal)->UpdateConstantBuffer(m_LightCameraConstAddress, &buffer, sizeof(TransformBuffer));
-	render.GetConstantBuffer(DX12RenderEngine::eLight)->UpdateConstantBuffer(m_LightConstantAddress, m_LightsData, sizeof(int) + m_LightsData->LightCount * sizeof(LightData));
+	render.GetConstantBuffer(DX12RenderEngine::eGlobal)->UpdateConstantBuffer(m_LightCameraConstAddress, &buffer, sizeof(SceneDataBuffer));
+	render.GetConstantBuffer(DX12RenderEngine::eLight)->UpdateConstantBuffer(m_LightConstantAddress, m_LightsData, ((int)m_LightComponents.size()) * sizeof(LightData));
 
 	// setup pipeline state objects
 	DX12RootSignature * rootSignature = render.GetLightRootSignature();

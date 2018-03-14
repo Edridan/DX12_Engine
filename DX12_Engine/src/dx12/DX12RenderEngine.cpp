@@ -24,10 +24,10 @@ DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
 const DX12RenderEngine::ConstantBufferDef			DX12RenderEngine::s_ConstantBufferSize[] =
 {
 	// {ElementSize, ElementCount}
-	{256,	1024},		// transform
-	{256,	8},			// global buffer (always pointing on the same)
-	{256,	1024},		// materials
-	{2048,	1},			// lights
+	{256,	1024,	L"Transform",	true},		// transform
+	{256,	8,		L"Global",		true},			// global buffer (always pointing on the same)
+	{256,	1024,	L"Material",	true},		// materials
+	{2048,	1,		L"Lights",		true},			// lights
 };
 
 const DX12RenderEngine::HeapProperty DX12RenderEngine::s_HeapProperties[] =
@@ -223,7 +223,9 @@ HRESULT DX12RenderEngine::InitializeRender()
 		// create constant buffer of 256 slots of 256 bytes
 		m_ConstantBuffer[i] = new DX12ConstantBuffer(
 			s_ConstantBufferSize[i].ElementCount,
-			s_ConstantBufferSize[i].ElementSize
+			s_ConstantBufferSize[i].ElementSize,
+			s_ConstantBufferSize[i].Name,
+			s_ConstantBufferSize[i].IsDuplicated
 		);
 	}
 

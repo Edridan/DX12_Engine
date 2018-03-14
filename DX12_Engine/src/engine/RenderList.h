@@ -28,7 +28,7 @@ public:
 		// matrix for rendering
 		XMMATRIX		ViewMatrix;
 		XMMATRIX		ProjectionMatrix;
-		XMFLOAT4		CameraPosition;
+		XMFLOAT3		CameraPosition;
 		// dx12
 		ID3D12GraphicsCommandList *		DeferredCommandList = nullptr;	// command list to render
 		ID3D12GraphicsCommandList *		ImmediateCommandList = nullptr;	// command list to render
@@ -69,7 +69,7 @@ private:
 	// light management
 	__declspec(align(16)) struct LightData
 	{
-		DirectX::XMFLOAT4		Padding[4];	// padding (matrix4 size for each lights data)
+		DirectX::XMFLOAT4		Padding[8];	// padding (matrix4 size for each lights data)
 	};
 
 	__declspec(align(16)) struct PointLightData
@@ -80,12 +80,11 @@ private:
 		float					Linear;
 		float					Quadratic;
 		float					Range;
-		float					Padding[5];	// padding
+		float					Padding[21];	// padding		5 + 16
 	};
 	
 	__declspec(align(16)) struct LightDesc
 	{
-		int			LightCount;
 		LightData	Data[MAX_LIGHT];
 	};
 
@@ -110,7 +109,7 @@ private:
 	// rendering purpose
 	XMMATRIX	m_View;
 	XMMATRIX	m_Projection;
-	XMFLOAT4	m_CameraPosition;
+	XMFLOAT3	m_CameraPosition;
 	// dx12
 	ID3D12GraphicsCommandList *	m_ImmediateCommandList;
 	ID3D12GraphicsCommandList *	m_DeferredCommandList;
