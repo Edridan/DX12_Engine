@@ -43,7 +43,7 @@ private:
 			Name[31] = '\0';
 		}
 
-		inline ImVec2 GetInputSlotPos(int i_SlotNo) const 
+		inline ImVec2 GetInputSlotPos(int i_SlotNo) const
 		{
 			return ImVec2(Pos.x, Pos.y + Size.y * ((float)i_SlotNo + 1) / ((float)InputsCount + 1));
 		}
