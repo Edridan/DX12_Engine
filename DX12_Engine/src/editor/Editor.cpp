@@ -30,6 +30,10 @@ Editor::Editor(const EditorDesc & i_Desc)
 	m_ActorBuilder = new UIActorBuilder;
 	m_SceneBuilder = new UISceneBuilder(m_ActorBuilder);
 
+	PushEditorWindow(m_MaterialBuilder);
+	PushEditorWindow(m_ActorBuilder);
+	PushEditorWindow(m_SceneBuilder);
+
 	m_Shortcuts.InputShowMaterial	= i_Desc.InputShowMaterial;
 	m_Shortcuts.InputShowScene		= i_Desc.InputShowScene;
 	m_Shortcuts.InputActorBuilder	= i_Desc.InputActorBuilder;
@@ -56,21 +60,28 @@ FORCEINLINE void Editor::BindKeyboardEvents()
 	// generate inputs
 	Input::BindKeyEvent(Input::eKeyDown, m_Shortcuts.InputShowScene.KeyCode, "EditorShowSceneBuilder", m_Shortcuts.InputShowScene.KeyFlags, this, &Editor::SetSceneBuilderShow, nullptr);
 	Input::BindKeyEvent(Input::eKeyDown, m_Shortcuts.InputActorBuilder.KeyCode, "EditorShowActorBuilder", m_Shortcuts.InputActorBuilder.KeyFlags, this, &Editor::SetActorBuilderShow, nullptr);
+	Input::BindKeyEvent(Input::eKeyDown, m_Shortcuts.InputShowMaterial.KeyCode, "EditorShowMaterialBuilder", m_Shortcuts.InputShowMaterial.KeyFlags, this, &Editor::SetMaterialBuilderShow, nullptr);
 }
 
 FORCEINLINE void Editor::UnbindKeyboardEvents()
 {
 	Input::UnbindKeyEvent(Input::eKeyDown, m_Shortcuts.InputShowScene.KeyCode, "EditorShowSceneBuilder");
 	Input::UnbindKeyEvent(Input::eKeyDown, m_Shortcuts.InputActorBuilder.KeyCode, "EditorShowActorBuilder");
+	Input::UnbindKeyEvent(Input::eKeyDown, m_Shortcuts.InputShowMaterial.KeyCode, "EditorShowMaterialBuilder");
 }
 
 void Editor::CloseEditor()
 {
 	ASSERT(m_IsEnabled == true);
 
+	for (size_t i = 0; i < m_Windows.size(); ++i)
+	{
+		m_Layer->PopUIWindowFromLayer(m_Windows[i]);
+	}
+
 	// popup the windows from the layer
-	m_Layer->PopUIWindowFromLayer(m_SceneBuilder);
-	m_Layer->PopUIWindowFromLayer(m_ActorBuilder);
+	//m_Layer->PopUIWindowFromLayer(m_SceneBuilder);
+	//m_Layer->PopUIWindowFromLayer(m_ActorBuilder);
 
 	UnbindKeyboardEvents();
 
@@ -82,12 +93,21 @@ void Editor::OpenEditor()
 	ASSERT(m_IsEnabled == false);
 
 	// push windows on the layer
-	m_Layer->PushUIWindowOnLayer(m_SceneBuilder);
-	m_Layer->PushUIWindowOnLayer(m_ActorBuilder);
+	for (size_t i = 0; i < m_Windows.size(); ++i)
+	{
+		m_Layer->PushUIWindowOnLayer(m_Windows[i]);
+	}
+	//m_Layer->PushUIWindowOnLayer(m_SceneBuilder);
+	//m_Layer->PushUIWindowOnLayer(m_ActorBuilder);
 	
 	BindKeyboardEvents();
 
 	m_IsEnabled = true;
+}
+
+void Editor::PushEditorWindow(UIWindow * i_Window)
+{
+	m_Windows.push_back(i_Window);
 }
 
 void Editor::SetMaterialBuilderShow(void * i_Void)

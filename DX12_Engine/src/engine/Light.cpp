@@ -83,6 +83,9 @@ void Light::SetRange(float i_Range)
 	m_Range = i_Range;
 
 	// To do: compute other light params
+	m_Constant = 1.f;
+	m_Linear = 2.f / m_Range;
+	m_Quadratic = 1.f / (m_Range * m_Range);
 }
 
 FORCEINLINE void Light::ComputeLightData()
