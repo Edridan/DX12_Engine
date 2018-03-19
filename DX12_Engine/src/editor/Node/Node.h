@@ -28,9 +28,15 @@ public:
 		eNone,
 	};
 
-	struct InputSlot
+	struct NodeParam
 	{
 		ENodeSlotType		Type;
+		bool				Free;
+	};
+
+	struct InputParam : public NodeParam
+	{
+		
 		// initial value for basic types
 		union
 		{
@@ -76,6 +82,9 @@ public:
 	void				PushInputLink(NodeLink * i_Link, int i_InputSlot);
 	void				PushOutputLink(NodeLink * i_Link, int i_OutSlot);
 
+	void				PopInputLink(int i_InputSlot);
+	void				PopOutputLink(int i_OutputSlot);
+
 	void				PopInputLink(NodeLink * i_Link);
 	void				PopOutputLink(NodeLink * i_Link);
 
@@ -90,8 +99,8 @@ private:
 	int			m_InputsCount, m_OutputsCount;
 
 	// slots for the node
-	InputSlot *			m_InputSlots;
-	ENodeSlotType *		m_OutputSlots;
+	InputParam *	m_InputSlots;
+	NodeParam *		m_OutputSlots;
 
 	// links
 	NodeLink **			m_InputLinks;
