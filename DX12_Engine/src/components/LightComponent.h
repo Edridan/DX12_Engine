@@ -19,9 +19,8 @@ public:
 		float					Linear = 0.35f;
 		float					Constant = 1.f;
 		// spot light edges
-		float					Theta = 50.f;
-		float					InnerCutoff = 12.5f;
-		float					OuterCutoff = 12.5f;
+		float					SpotAngle = 75.f;
+		float					SoftEdge = 0.05f;
 
 	};
 
@@ -38,6 +37,7 @@ private:
 
 #ifdef WITH_EDITOR
 	// Inherited via ActorComponent
+	float		m_SpotLightAngle;
 	virtual void DrawUIComponentInternal() override;
 #endif
 };

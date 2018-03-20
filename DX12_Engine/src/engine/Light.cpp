@@ -1,6 +1,7 @@
 #include "Light.h"
 
 #include "engine/Debug.h"
+#include "engine/Utils.h"
 
 Light::Light()
 	:m_LightType(eLightTypeCount)	// uninitialized
@@ -32,17 +33,12 @@ float Light::GetRange() const
 	return m_Range;
 }
 
-float Light::GetTheta() const
+float Light::GetSpotAngle() const
 {
-	return m_Theta;
+	return m_SpotAngle;
 }
 
-float Light::GetInnerCutoff() const
-{
-	return m_InnerCutoff;
-}
-
-float Light::GetOuterCutoff() const
+float Light::GetEdgeCutoff() const
 {
 	return m_OuterCutoff;
 }
@@ -62,6 +58,11 @@ float Light::GetConstant() const
 	return m_Constant;
 }
 
+float Light::GetSpotAngleInDegree() const
+{
+	return m_SpotAngle * RadToDeg;
+}
+
 void Light::SetType(const ELightType & i_Type)
 {
 	m_LightType = i_Type;
@@ -77,17 +78,19 @@ void Light::SetIntensity(float i_Intensity)
 	m_Intensity = i_Intensity;
 }
 
-void Light::SetTheta(float i_Theta)
+void Light::SetSpotAngleInDegree(float i_Angle)
 {
-	m_Theta = i_Theta;
+	m_SpotAngle = cos((i_Angle / 2.f) * DegToRad);
 }
 
-void Light::SetInnerCutoff(float i_Cutoff)
+void Light::SetSpotAngle(float i_Angle)
 {
+	m_SpotAngle = i_Angle;
 }
 
-void Light::SetOuterCutoff(float i_Cutoff)
+void Light::SetSoftEdges(float i_SoftEdges)
 {
+	m_OuterCutoff = i_SoftEdges;
 }
 
 void Light::SetConstant(float i_Constant)

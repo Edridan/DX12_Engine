@@ -85,7 +85,7 @@ private:
 		float					Quadratic;
 		float					Range;
 		// ---
-		float					Padding[20];	// padding		4 + 16
+		float					Padding[20];	// padding
 	};
 
 	__declspec(align(16)) struct SpotLightData
@@ -102,12 +102,11 @@ private:
 		float					Range;
 		// ---
 		DirectX::XMFLOAT3		Direction;
-		float					Theta;
+		float					SpotAngle;
 		// ---
 		float					OuterCutoff;
-		float					InnerCutoff;
 		// ---
-		float					Padding[14];	// padding		0 + 16
+		float					Padding[15];	// padding
 	};
 	
 	__declspec(align(16)) struct LightDesc
