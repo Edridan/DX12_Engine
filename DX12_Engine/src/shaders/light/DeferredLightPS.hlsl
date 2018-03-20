@@ -65,6 +65,18 @@ struct SpotLight
 	float		outer_cutoff;
 };
 
+// directionnal light struct definition
+struct DirectionnalLight
+{
+	int			type;	// first val always type
+	float3		position;
+	// ---
+	float4		color;
+	// ---
+	float3		direction;
+	//float		
+};
+
 // Pixel specs (for on particular pixel)
 struct PixelData
 {
@@ -168,6 +180,15 @@ float3		ComputeSpotLight(in SpotLight light, in PixelData pixel)
 		float attenuation = 1.f / (light.constant + light.lin * distance + light.quad * (distance * distance));
 		ret_value = (specular * intensity * attenuation) + (light_diffuse * intensity * attenuation);
 	}
+
+	return ret_value;
+}
+
+float3		ComputeDirectionnalLight(in DirectionnalLight light, in PixelData pixel)
+{
+	float3 ret_value = float3(0.f, 0.f, 0.f);
+
+
 
 	return ret_value;
 }
