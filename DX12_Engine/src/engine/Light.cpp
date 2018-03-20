@@ -32,6 +32,21 @@ float Light::GetRange() const
 	return m_Range;
 }
 
+float Light::GetTheta() const
+{
+	return m_Theta;
+}
+
+float Light::GetInnerCutoff() const
+{
+	return m_InnerCutoff;
+}
+
+float Light::GetOuterCutoff() const
+{
+	return m_OuterCutoff;
+}
+
 float Light::GetQuadratic() const
 {
 	return m_Quadratic;
@@ -60,6 +75,19 @@ void Light::SetColor(const XMFLOAT4 & i_Color)
 void Light::SetIntensity(float i_Intensity)
 {
 	m_Intensity = i_Intensity;
+}
+
+void Light::SetTheta(float i_Theta)
+{
+	m_Theta = i_Theta;
+}
+
+void Light::SetInnerCutoff(float i_Cutoff)
+{
+}
+
+void Light::SetOuterCutoff(float i_Cutoff)
+{
 }
 
 void Light::SetConstant(float i_Constant)
