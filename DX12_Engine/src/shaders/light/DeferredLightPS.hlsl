@@ -122,12 +122,12 @@ float3		ComputePointLight(in PointLight light, in PixelData pixel)
 		// specular calculation
 		const float3 view_dir = normalize(camera_pos.xyz - pixel.position.xyz);
 		const float3 reflect_dir = reflect(-light_dir, pixel.normal.xyz); 
-		const float spec = pow(max(dot(view_dir, reflect_dir), 0.f), 32.f);
-		const float4 specular = light.color * spec * pixel.specular_color;
+		const float spec = pow(max(dot(view_dir, reflect_dir), 0.f), pixel.specular_color.a);
+		const float3 specular = light.color.rgb * spec * pixel.specular_color.rgb;
 
 		// attenuation
 		float attenuation = 1.f / (light.constant + light.lin * distance + light.quad * (distance * distance));
-		ret_value = (specular.rgb * attenuation) + (light_diffuse.rgb * attenuation);
+		ret_value = (specular * attenuation) + (light_diffuse * attenuation);
 	}
 	  
 	return ret_value;
@@ -157,8 +157,8 @@ float3		ComputeSpotLight(in SpotLight light, in PixelData pixel)
 		// specular calculation
 		const float3 view_dir = normalize(camera_pos.xyz - pixel.position.xyz);
 		const float3 reflect_dir = reflect(-light_dir, pixel.normal.xyz);
-		const float spec = pow(max(dot(view_dir, reflect_dir), 0.f), 32.f);
-		const float4 specular = light.color * spec * pixel.specular_color;
+		const float spec = pow(max(dot(view_dir, reflect_dir), 0.f), pixel.specular_color.a);
+		const float3 specular = light.color.rgb * spec * pixel.specular_color.rgb;
 
 		// soft edges
 		const float epsilon = light.outer_cutoff;
@@ -166,7 +166,7 @@ float3		ComputeSpotLight(in SpotLight light, in PixelData pixel)
 
 		//// attenuation
 		float attenuation = 1.f / (light.constant + light.lin * distance + light.quad * (distance * distance));
-		ret_value = (specular.rgb * intensity * attenuation) + (light_diffuse.rgb * intensity * attenuation);
+		ret_value = (specular * intensity * attenuation) + (light_diffuse * intensity * attenuation);
 	}
 
 	return ret_value;

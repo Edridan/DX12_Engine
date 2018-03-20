@@ -187,7 +187,7 @@ void Engine::Initialize(EngineDesc & i_Desc)
 	matData.Materials[0].Ke = color::Pink;
 	matData.Materials[0].Ks = color::Pink;
 	matData.Materials[0].Kd = color::Pink;
-	matData.Materials[0].Ns = 1000.f;
+	matData.Materials[0].Ns = 32.f;
 	matData.Materials[0].Name = "Default";
 	matData.MaterialCount = 1;
 
