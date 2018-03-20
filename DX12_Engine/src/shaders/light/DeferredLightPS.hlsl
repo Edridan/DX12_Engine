@@ -60,10 +60,9 @@ struct SpotLight
 	float		range;		// range
 	// ---
 	float3		direction;
-	float		theta;
+	float		spot_angle;
 	// -- First 16 bytes
 	float		outer_cutoff;
-	float		inner_cutoff;
 };
 
 // Pixel specs (for on particular pixel)
@@ -130,7 +129,7 @@ float3		ComputePointLight(in PointLight light, in PixelData pixel)
 		float attenuation = 1.f / (light.constant + light.lin * distance + light.quad * (distance * distance));
 		ret_value = (specular.rgb * attenuation) + (light_diffuse.rgb * attenuation);
 	}
-
+	  
 	return ret_value;
 }
 
@@ -149,7 +148,7 @@ float3		ComputeSpotLight(in SpotLight light, in PixelData pixel)
 	float3 ret_value = float3(0.f, 0.f, 0.f);
 
 	// radian angles
-	if (theta > light.theta)
+	if (theta > light.spot_angle)
 	{
 		// diffuse
 		const float diff = max(dot(pixel.normal.xyz, light_dir), 0.0);
@@ -162,13 +161,12 @@ float3		ComputeSpotLight(in SpotLight light, in PixelData pixel)
 		const float4 specular = light.color * spec * pixel.specular_color;
 
 		// soft edges
-		const float theta = dot(light_dir, normalize(-light.direction));
-		const float epsilon = (light.theta - light.outer_cutoff);
-		const float intensity = clamp((theta - light.outer_cutoff) / epsilon, 0.f, 1.f);
+		const float epsilon = light.outer_cutoff;
+		const float intensity = clamp((theta - light.spot_angle) / epsilon, 0.f, 1.f);
 
-		// attenuation
+		//// attenuation
 		float attenuation = 1.f / (light.constant + light.lin * distance + light.quad * (distance * distance));
-		ret_value = (specular.rgb * attenuation * intensity) + (light_diffuse.rgb * attenuation * intensity);
+		ret_value = (specular.rgb * intensity * attenuation) + (light_diffuse.rgb * intensity * attenuation);
 	}
 
 	return ret_value;

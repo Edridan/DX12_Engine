@@ -33,13 +33,12 @@ public:
 
 	// pointlight/spotlight data
 	float				GetRange() const;
-	float				GetTheta() const;
-	float				GetInnerCutoff() const;
-	float				GetOuterCutoff() const;
+	float				GetSpotAngle() const;
+	float				GetEdgeCutoff() const;
 	float				GetQuadratic() const;
 	float				GetLinear() const;
 	float				GetConstant() const;
-	
+	float				GetSpotAngleInDegree() const;
 
 	// light management
 	void				SetType(const ELightType & i_Type);
@@ -47,9 +46,9 @@ public:
 	void				SetRange(float i_Range);
 	void				SetIntensity(float i_Intensity);
 	// spotlight
-	void				SetTheta(float i_Theta);
-	void				SetInnerCutoff(float i_Cutoff);
-	void				SetOuterCutoff(float i_Cutoff);
+	void				SetSpotAngleInDegree(float i_Angle);
+	void				SetSpotAngle(float i_Angle);
+	void				SetSoftEdges(float i_SoftEdges);
 	// attenuation 
 	void				SetConstant(float i_Constant);	// compute attenuation based on these params
 	void				SetLinear(float i_Linear);
@@ -66,9 +65,8 @@ private:
 	// point/spotlight data
 	float					m_Range;
 	// spotlight data
-	float					m_Theta;
-	float					m_InnerCutoff;
-	float					m_OuterCutoff;
+	float					m_SpotAngle;
+	float					m_OuterCutoff;	// for soft edges
 	// attenuation data
 	float					m_Constant;
 	float					m_Quadratic;

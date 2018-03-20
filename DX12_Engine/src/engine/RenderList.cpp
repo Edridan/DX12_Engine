@@ -126,9 +126,8 @@ void RenderList::RenderLight() const
 			desc->Range			= light->GetRange();
 
 			desc->Direction		= XMFLOAT3(&worldTransform._31);
-			desc->InnerCutoff	= light->GetInnerCutoff();
-			desc->OuterCutoff	= light->GetOuterCutoff();
-			desc->Theta			= light->GetTheta();
+			desc->SpotAngle		= light->GetSpotAngle();
+			desc->OuterCutoff	= light->GetEdgeCutoff();
 			desc->Type			= light->GetType();
 		}
 		break;
