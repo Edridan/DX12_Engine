@@ -14,7 +14,9 @@ RenderList::RenderList()
 	:m_MaxLight(MAX_LIGHT)
 {
 	// compilation assert
-	static_assert(sizeof(RenderList::LightData) == sizeof(PointLightData), "The light data structures need to be the same size (until some errors during lights computation will comes)");
+	static_assert(sizeof(RenderList::LightData) == sizeof(PointLightData), "The point light data structures need to be the same size (until some errors during lights computation will comes)");
+	static_assert(sizeof(RenderList::LightData) == sizeof(SpotLightData), "The spot light data structures need to be the same size (until some errors during lights computation will comes)");
+
 
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
@@ -82,22 +84,65 @@ void RenderList::RenderLight() const
 		const LightComponent * lightComponent = m_LightComponents[i];
 		Light * light				= lightComponent->GetLight();
 		Actor * actor				= lightComponent->GetActor();
-		PointLightData * desc		= (PointLightData *)&m_LightsData->Data[i];
 
-		// push the light data to the list
+		switch (lightComponent->GetLightType())
+		{
+			// fill data for the point light
+		case Light::ELightType::ePointLight:
+		{
+			PointLightData * desc = (PointLightData *)&m_LightsData->Data[i];
 
-		// position transform
-		XMMATRIX actorWorldTransform = actor->GetWorldTransform();
-		XMFLOAT4X4 worldTransform;
-		XMStoreFloat4x4(&worldTransform, actorWorldTransform);
+			// position transform
+			XMMATRIX actorWorldTransform = actor->GetWorldTransform();
+			XMFLOAT4X4 worldTransform;
+			XMStoreFloat4x4(&worldTransform, actorWorldTransform);
 
-		// fill light description
-		desc->Position	= XMFLOAT3(&worldTransform._41);
-		desc->Color		= light->GetColor();
-		desc->Constant	= light->GetConstant();
-		desc->Linear	= light->GetLinear();
-		desc->Quadratic = light->GetQuadratic();
-		desc->Range		= light->GetRange();
+			// fill light description
+			desc->Position		= XMFLOAT3(&worldTransform._41);
+			desc->Color			= light->GetColor();
+			desc->Constant		= light->GetConstant();
+			desc->Linear		= light->GetLinear();
+			desc->Quadratic		= light->GetQuadratic();
+			desc->Range			= light->GetRange();
+			desc->Type			= light->GetType();
+		}
+		break;
+			// fill data for the spot light
+		case Light::ELightType::eSpotLight:
+		{
+			SpotLightData * desc = (SpotLightData *)&m_LightsData->Data[i];
+
+			// position transform
+			XMMATRIX actorWorldTransform = actor->GetWorldTransform();
+			XMFLOAT4X4 worldTransform;
+			XMStoreFloat4x4(&worldTransform, actorWorldTransform);
+
+			// fill light description
+			desc->Position		= XMFLOAT3(&worldTransform._41);
+			desc->Color			= light->GetColor();
+			desc->Constant		= light->GetConstant();
+			desc->Linear		= light->GetLinear();
+			desc->Quadratic		= light->GetQuadratic();
+			desc->Range			= light->GetRange();
+
+			desc->Direction		= XMFLOAT3(&worldTransform._31);
+			desc->InnerCutoff	= light->GetInnerCutoff();
+			desc->OuterCutoff	= light->GetOuterCutoff();
+			desc->Theta			= light->GetTheta();
+			desc->Type			= light->GetType();
+		}
+		break;
+			// fill data for directionnal lights
+		case Light::ELightType::eDirectionalLight:
+		{
+			TO_DO;
+		}
+		break;
+			// error if fall in that case
+		default:
+			ASSERT_ERROR("Error on light type");
+			break;
+		}
 	}
 
 	// update constant buffer

@@ -74,13 +74,40 @@ private:
 
 	__declspec(align(16)) struct PointLightData
 	{
-		DirectX::XMFLOAT4		Color;
+		// ---
+		int						Type;
 		DirectX::XMFLOAT3		Position;
+		// ---
+		DirectX::XMFLOAT4		Color;
+		// ---
 		float					Constant;
 		float					Linear;
 		float					Quadratic;
 		float					Range;
-		float					Padding[21];	// padding		5 + 16
+		// ---
+		float					Padding[20];	// padding		4 + 16
+	};
+
+	__declspec(align(16)) struct SpotLightData
+	{
+		// ---
+		int						Type;
+		DirectX::XMFLOAT3		Position;
+		// ---
+		DirectX::XMFLOAT4		Color;
+		// ---
+		float					Constant;
+		float					Linear;
+		float					Quadratic;
+		float					Range;
+		// ---
+		DirectX::XMFLOAT3		Direction;
+		float					Theta;
+		// ---
+		float					OuterCutoff;
+		float					InnerCutoff;
+		// ---
+		float					Padding[14];	// padding		0 + 16
 	};
 	
 	__declspec(align(16)) struct LightDesc

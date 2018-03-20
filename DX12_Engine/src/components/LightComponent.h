@@ -18,6 +18,10 @@ public:
 		float					Quadratic = 0.44f;
 		float					Linear = 0.35f;
 		float					Constant = 1.f;
+		// spot light edges
+		float					Theta = 50.f;
+		float					InnerCutoff = 12.5f;
+		float					OuterCutoff = 12.5f;
 
 	};
 
@@ -31,7 +35,6 @@ public:
 
 private:
 	Light *					m_Light;	// light internal management
-	Light::ELightType		m_Type;			// type of the light
 
 #ifdef WITH_EDITOR
 	// Inherited via ActorComponent
