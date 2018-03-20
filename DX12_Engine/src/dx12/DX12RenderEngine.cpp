@@ -942,16 +942,16 @@ FORCEINLINE void DX12RenderEngine::GenerateRenderTargets()
 
 	std::wstring rtName[eRenderTargetCount];
 
-	rtName[eNormal] = L"Normal";
-	rtName[eSpecular] = L"Specular";
-	rtName[eDiffuse] = L"Diffuse";
-	rtName[ePosition] = L"Position";
+	rtName[eNormal]		= L"Normal";
+	rtName[eSpecular]	= L"Specular";
+	rtName[ePosition]	= L"Position";
+	rtName[eDiffuse]	= L"Diffuse";
 
 
 	DXGI_FORMAT rtFormat[eRenderTargetCount];
-	rtFormat[eNormal]		= DXGI_FORMAT_R32G32B32A32_FLOAT;
+	rtFormat[eNormal]		= DXGI_FORMAT_R16G16B16A16_FLOAT;
+	rtFormat[eSpecular]		= DXGI_FORMAT_R16G16B16A16_FLOAT;
 	rtFormat[ePosition]		= DXGI_FORMAT_R32G32B32A32_FLOAT;
-	rtFormat[eSpecular]		= DXGI_FORMAT_B8G8R8A8_UNORM;
 	rtFormat[eDiffuse]		= DXGI_FORMAT_B8G8R8A8_UNORM;
 	
 	// same description for each render target
