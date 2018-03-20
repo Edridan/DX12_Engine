@@ -19,7 +19,7 @@ public:
 	{
 		// material data
 		Color Ka = color::Pink, Kd = color::Pink, Ks = color::Pink, Ke = color::Pink;
-		float Ns = 1000.f;
+		float Ns = 32.f;
 		DX12Texture *	map_Kd = nullptr, *map_Ks = nullptr, *map_Ka = nullptr;
 		// data info
 		std::string	Name, Filepath;

@@ -7,8 +7,32 @@
 // - Depth		(int64)
 
 // include render light lib
-#include "../lib/Material.hlsli"
 #include "../lib/GlobalBuffer.hlsli"
+
+// Material buffer
+/*
+	eAmbient,
+	eSpecular,
+	eDiffuse,
+*/
+// texture sampler for material
+Texture2D tex_ambient		: register(t0);
+Texture2D tex_specular		: register(t1);
+Texture2D tex_diffuse		: register(t2);
+SamplerState tex_sample		: register(s0);
+
+cbuffer MaterialBuffer : register(b2)	// the material buffer is instanced on the buffer 1
+{
+	// default material implementation
+	float4	ka;
+	float4	kd;
+	float4	ks;
+	float4	ke;
+	bool	map_a;
+	bool	map_d;
+	bool	map_s;
+	float	ns;	// shininess
+};
 
 struct VS_OUTPUT
 {
@@ -43,6 +67,7 @@ PS_OUTPUT main(const VS_OUTPUT input)
 	/////////////////////////////////////////////
 	// update the specular buffer
 	output.specular = ks;
+	output.specular.a = ns;	// save the specular exponent to the alpha
 
 	/////////////////////////////////////////////
 	// update the position buffer
