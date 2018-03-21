@@ -360,6 +360,17 @@ void World::TickWorld(float i_Elapsed)
 	}
 }
 
+#ifdef WITH_EDITOR
+void World::TickCamera(float i_Elapsed)
+{
+	// save elapsed time
+	m_FrameTime = i_Elapsed;
+
+	// update camera
+	m_CurrentCamera->Update(i_Elapsed);
+}
+#endif
+
 void World::RenderWorld(RenderList * i_RenderList) const
 {
 	// take all root actors

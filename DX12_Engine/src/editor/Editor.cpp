@@ -79,10 +79,6 @@ void Editor::CloseEditor()
 		m_Layer->PopUIWindowFromLayer(m_Windows[i]);
 	}
 
-	// popup the windows from the layer
-	//m_Layer->PopUIWindowFromLayer(m_SceneBuilder);
-	//m_Layer->PopUIWindowFromLayer(m_ActorBuilder);
-
 	UnbindKeyboardEvents();
 
 	m_IsEnabled = false;
@@ -97,8 +93,6 @@ void Editor::OpenEditor()
 	{
 		m_Layer->PushUIWindowOnLayer(m_Windows[i]);
 	}
-	//m_Layer->PushUIWindowOnLayer(m_SceneBuilder);
-	//m_Layer->PushUIWindowOnLayer(m_ActorBuilder);
 	
 	BindKeyboardEvents();
 
