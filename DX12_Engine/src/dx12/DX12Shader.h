@@ -17,11 +17,14 @@ public:
 	{
 		const std::wstring &		Code;
 		const D3D_SHADER_MACRO *	Defines = nullptr;
-
 	};
+
+	// static helper
+	static DX12Shader * LoadShaderFromBlob(EShaderType i_Type, const wchar_t * i_Filename);
 
 	// DX12Shader
 	DX12Shader(EShaderType i_Type, const wchar_t *i_Filename, const D3D_SHADER_MACRO * i_Defines = nullptr);
+	DX12Shader(EShaderType i_Type, ID3DBlob* i_Blob);
 	DX12Shader(EShaderType i_Type, const ShaderCode & i_Code);
 	~DX12Shader();
 

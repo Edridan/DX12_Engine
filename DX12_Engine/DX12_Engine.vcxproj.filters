@@ -531,12 +531,6 @@
     <FxCompile Include="src\shaders\debug\DebugGBufferVS.hlsl">
       <Filter>Shaders\Debug</Filter>
     </FxCompile>
-    <FxCompile Include="src\shaders\rendering\FrameCompositorPS.hlsl">
-      <Filter>Shaders\Rendering</Filter>
-    </FxCompile>
-    <FxCompile Include="src\shaders\rendering\FrameCompositorVS.hlsl">
-      <Filter>Shaders\Rendering</Filter>
-    </FxCompile>
     <FxCompile Include="src\shaders\rendering\GBufferPS.hlsl">
       <Filter>Shaders\Rendering</Filter>
     </FxCompile>
