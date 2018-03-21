@@ -34,6 +34,8 @@ Editor::Editor(const EditorDesc & i_Desc)
 	PushEditorWindow(m_ActorBuilder);
 	PushEditorWindow(m_SceneBuilder);
 
+	m_MaterialBuilder->SetActive(false);
+
 	m_Shortcuts.InputShowMaterial	= i_Desc.InputShowMaterial;
 	m_Shortcuts.InputShowScene		= i_Desc.InputShowScene;
 	m_Shortcuts.InputActorBuilder	= i_Desc.InputActorBuilder;

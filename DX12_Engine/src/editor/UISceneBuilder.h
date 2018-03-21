@@ -49,6 +49,10 @@ private:
 	Actor *					m_SelectedActor;
 	Actor *					m_ActorToSetup;
 
+	// dragging management
+	Actor *					m_ActorToDrag;
+	bool					m_MouseIsOnItem;
+
 	// internal data
 	static const char *			s_ActorSpawnType[];
 	static Actor::ActorDesc *	s_ActorDesc;

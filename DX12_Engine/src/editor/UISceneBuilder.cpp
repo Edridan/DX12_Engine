@@ -17,6 +17,8 @@ UISceneBuilder::UISceneBuilder(UIActorBuilder * i_ActorBuilder)
 	,m_ActorBuilder(i_ActorBuilder)
 	,m_SelectedActor(nullptr)
 	,m_ActorToSetup(nullptr)
+	,m_ActorToDrag(nullptr)
+	,m_MouseIsOnItem(false)
 {
 	// empty actor
 	s_ActorDesc[0].Name = L"Empty";
@@ -95,7 +97,36 @@ FORCEINLINE void UISceneBuilder::DrawActor(Actor * i_Actor)
 
 	bool isOpen = ImGui::TreeNode(actorId.c_str(),actorName.c_str());
 
-	if (ImGui::IsItemHovered())
+	if (m_ActorToDrag != nullptr && m_ActorToDrag != i_Actor)
+	{
+		if (ImGui::IsMouseHoveringRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()))
+		{
+			m_MouseIsOnItem = true;
+
+			// Draw a line between the button and the mouse cursor
+			ImDrawList* draw_list = ImGui::GetWindowDrawList();
+			ImGuiIO & io = ImGui::GetIO();
+
+			ImU32 rectColor = ImGui::GetColorU32(ImGuiCol_Button);
+
+			if (m_ActorToDrag->IsChild(i_Actor) || i_Actor->IsChild(m_ActorToDrag))
+			{
+				m_ActorToDrag->IsChild(i_Actor);
+				i_Actor->IsChild(m_ActorToDrag);
+				rectColor = ImGui::GetColorU32(ImVec4(1.f, 0.2f, 0.15f, 0.8f));
+			}
+			draw_list->PushClipRectFullScreen();
+			draw_list->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), rectColor, 1.f, 15, 4.f);
+			draw_list->PopClipRect();
+
+			if (!ImGui::IsMouseDown(0))
+			{
+				m_World->AttachActor(i_Actor, m_ActorToDrag);
+				m_ActorToDrag = nullptr;
+			}
+		}
+	}
+	else if (ImGui::IsItemHovered())
 	{
 		if (ImGui::IsMouseClicked(0))
 		{
@@ -109,6 +140,22 @@ FORCEINLINE void UISceneBuilder::DrawActor(Actor * i_Actor)
 			ImGui::OpenPopup("setup_actor");
 			m_ActorToSetup = i_Actor;	// actor to setup
 		}
+	}
+
+	if (ImGui::IsItemActive())
+	{
+		if (m_ActorToDrag == nullptr)
+		{
+			m_ActorToDrag = i_Actor;
+		}
+
+		// Draw a line between the button and the mouse cursor
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+		ImGuiIO & io = ImGui::GetIO();
+
+		draw_list->PushClipRectFullScreen();
+		draw_list->AddLine(io.MouseClickedPos[0], io.MousePos, ImGui::GetColorU32(ImGuiCol_Button), 4.0f);
+		draw_list->PopClipRect();
 	}
 
 	// draw children if needed
@@ -170,6 +217,15 @@ void UISceneBuilder::DrawWindow()
 		{
 			ImGui::OpenPopup("add_actor");
 		}
+	}
+
+	if (m_ActorToDrag != nullptr && !ImGui::IsMouseDown(0))
+	{
+		if (!m_ActorToDrag->IsRoot() && !m_MouseIsOnItem)
+		{
+			m_World->DetachActor(m_ActorToDrag);
+		}
+		m_ActorToDrag = nullptr;
 	}
 
 	// add actor to the scene

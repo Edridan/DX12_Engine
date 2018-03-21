@@ -17,6 +17,8 @@ UIActorBuilder::~UIActorBuilder()
 void UIActorBuilder::SetActor(Actor * i_Actor)
 {
 	m_Actor = i_Actor;
+
+
 }
 
 Actor * UIActorBuilder::GetActor() const
@@ -78,6 +80,8 @@ void UIActorBuilder::DrawWindow()
 
 	String::Utf8ToUtf16(WNewActorName, name);
 	m_Actor->SetName(WNewActorName);
+
+	ImGui::Text("ID : %llu", m_Actor->GetId());
 
 	// draw the transform of the object
 	ImGui::Separator();
