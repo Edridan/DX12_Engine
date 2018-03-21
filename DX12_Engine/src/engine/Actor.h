@@ -51,6 +51,7 @@ public:
 	bool	NeedTick() const;
 	bool	IsHidden() const;
 	bool	NeedRendering() const;
+	bool	IsChild(const Actor * i_Actor) const;
 
 	UINT	ChildCount() const;
 	Actor *	GetChild(UINT i_Index) const;

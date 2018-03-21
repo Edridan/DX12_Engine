@@ -74,8 +74,8 @@ Light::ELightType LightComponent::GetLightType() const
 
 void LightComponent::DrawUIComponentInternal()
 {
-	static int selectedType = (int)GetLightType();
 	static const char * typesName[] = { "Point Light", "Spot Light", "Directionnal" };
+	int selectedType = (int)GetLightType();
 	DirectX::XMFLOAT4 lightColor = m_Light->GetColor();
 	float color[3] = { lightColor.x,lightColor.y, lightColor.z };
 
