@@ -16,7 +16,7 @@ RenderList::RenderList()
 	// compilation assert
 	static_assert(sizeof(RenderList::LightData) == sizeof(PointLightData), "The point light data structures need to be the same size (until some errors during lights computation will comes)");
 	static_assert(sizeof(RenderList::LightData) == sizeof(SpotLightData), "The spot light data structures need to be the same size (until some errors during lights computation will comes)");
-
+	static_assert(sizeof(RenderList::LightData) == sizeof(DirectionnalLightData), "The spot light data structures need to be the same size (until some errors during lights computation will comes)");
 
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
@@ -134,7 +134,18 @@ void RenderList::RenderLight() const
 			// fill data for directionnal lights
 		case Light::ELightType::eDirectionalLight:
 		{
-			TO_DO;
+			DirectionnalLightData * desc = (DirectionnalLightData *)&m_LightsData->Data[i];
+
+			// position transform
+			XMMATRIX actorWorldTransform = actor->GetWorldTransform();
+			XMFLOAT4X4 worldTransform;
+			XMStoreFloat4x4(&worldTransform, actorWorldTransform);
+
+			desc->Position		= XMFLOAT3(&worldTransform._41);
+			desc->Color			= light->GetColor();
+
+			desc->Direction		= XMFLOAT3(&worldTransform._31);
+			desc->Type			= light->GetType();
 		}
 		break;
 			// error if fall in that case

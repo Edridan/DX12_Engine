@@ -116,10 +116,8 @@ struct VS_OUTPUT
 // Light computation function
 float3		ComputePointLight(in PointLight light, in PixelData pixel)
 {
-	float4 light_pos = float4(light.position, 1.f);
-
 	// retreive the light direction and range between the 
-	const float3 light_diff = light_pos.xyz - pixel.position.xyz;
+	const float3 light_diff = light.position - pixel.position.xyz;
 	const float distance = length(light_diff);
 
 	float3 ret_value = float3(0.f, 0.f, 0.f);
@@ -147,10 +145,8 @@ float3		ComputePointLight(in PointLight light, in PixelData pixel)
 
 float3		ComputeSpotLight(in SpotLight light, in PixelData pixel)
 {
-	float4 light_pos = float4(light.position, 1.f);
-
 	// retreive the light direction and range between the 
-	const float3 light_diff = light_pos.xyz - pixel.position.xyz;
+	const float3 light_diff = light.position - pixel.position.xyz;
 	const float distance = length(light_diff);
 	const float3 light_dir = normalize(light_diff);
 
@@ -186,11 +182,10 @@ float3		ComputeSpotLight(in SpotLight light, in PixelData pixel)
 
 float3		ComputeDirectionnalLight(in DirectionnalLight light, in PixelData pixel)
 {
-	float3 ret_value = float3(0.f, 0.f, 0.f);
-
-
-
-	return ret_value;
+	// compute directionnal light
+	const float3 light_dir = normalize(-light.direction);
+	const float diff = max(dot(pixel.normal.xyz, light_dir), 0.0);
+	return pixel.diffuse_color.rgb * diff * light.color.rgb;
 }
 
 float4 main(const VS_OUTPUT input) : SV_TARGET
@@ -226,6 +221,7 @@ float4 main(const VS_OUTPUT input) : SV_TARGET
 					lighting += ComputeSpotLight((SpotLight)lights[i], pixel);
 					break;
 				case DIRECTIONNAL_LIGHT:
+					lighting += ComputeDirectionnalLight((DirectionnalLight)lights[i], pixel);
 					break;
 				}
 				

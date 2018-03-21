@@ -95,11 +95,7 @@ void LightComponent::DrawUIComponentInternal()
 
 	if (selectedType != m_Light->GetType())
 	{
-		switch (selectedType)
-		{
-		case Light::ELightType::ePointLight:	m_Light->SetType(Light::ePointLight);		break;
-		case Light::ELightType::eSpotLight:		m_Light->SetType(Light::eSpotLight);		break;
-		}
+		m_Light->SetType((Light::ELightType)selectedType);
 	}
 
 	switch (selectedType)
