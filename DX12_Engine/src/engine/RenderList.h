@@ -108,6 +108,19 @@ private:
 		// ---
 		float					Padding[15];	// padding
 	};
+
+	__declspec(align(16)) struct DirectionnalLightData
+	{
+		// ---
+		int						Type;
+		DirectX::XMFLOAT3		Position;
+		// ---
+		DirectX::XMFLOAT4		Color;
+		// ---
+		DirectX::XMFLOAT3		Direction;
+		// ---
+		float					Padding[21];	// padding
+	};
 	
 	__declspec(align(16)) struct LightDesc
 	{
