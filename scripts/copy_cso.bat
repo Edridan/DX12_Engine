@@ -1,1 +1,1 @@
-xcopy /Y x64\Debug\*.cso DX12_Engine\resources\build\shaders
+xcopy /Y ..\x64\Debug\*.cso ..\DX12_Engine\resources\build\shaders
