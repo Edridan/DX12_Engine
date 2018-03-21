@@ -17,6 +17,25 @@
 #include "DX12Debug.h"
 #endif // DX12_DEBUG
 
+// this is used for win time on loading
+// this will check if the file exist
+// if not is loading the base shader file
+// execute the script (copy_cso.bat) and enable it in define
+#define LOAD_CSO		1
+
+#if LOAD_CSO
+#define LOAD_SHADER(shader, type, source, cso)																	\
+do{																												\
+	shader = DX12Shader::LoadShaderFromBlob(type, cso);															\
+	if (shader == nullptr)																						\
+	{																											\
+		PRINT_DEBUG("Unable to load shader cso, be sure to launch copy_cso.bat to save load time\n");			\
+		shader = new DX12Shader(type, source);																	\
+	}																											\
+}while(false)
+#else
+#define LOAD_SHADER(shader, type, source, cso)		shader = new DX12Shader(type, source)
+#endif
 
 // Static definition implementation
 DX12RenderEngine * DX12RenderEngine::s_Instance = nullptr;
@@ -261,9 +280,6 @@ HRESULT DX12RenderEngine::InitializeRender()
 	// -- Generate primitive meshes for rendering -- //
 	GeneratePrimitiveShapes();
 
-	// -- Generate all contexts -- //
-	GenerateImmediateContext();
-
 	// -- Generate primitive meshes -- //
 	GenerateRenderTargets();
 
@@ -312,7 +328,6 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateContexts()
 	// generate default pipeline states objects
 	// this is going to create default pipeline state for drawing default objects
 	// this features : vertex coloring, one texture handling
-	GenerateImmediateContext();
 	GenerateDeferredContext();
 
 	return S_OK;
@@ -728,70 +743,6 @@ HRESULT DX12RenderEngine::WaitForPreviousFrame()
 
 FORCEINLINE HRESULT DX12RenderEngine::GenerateImmediateContext()
 {
-	m_ImmediateRootSignature = new DX12RootSignature;
-
-	// add static sampler for textures
-	D3D12_STATIC_SAMPLER_DESC sampler = {};
-
-	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-	sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-	sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-	sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
-	sampler.MipLODBias = 0;
-	sampler.MaxAnisotropy = 0;
-	sampler.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-	sampler.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
-	sampler.MinLOD = 0.0f;
-	sampler.MaxLOD = D3D12_FLOAT32_MAX;
-	sampler.ShaderRegister = 0;
-	sampler.RegisterSpace = 0;
-	sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-
-	m_ImmediateRootSignature->AddStaticSampler(sampler);	// add static sampler
-
-	// add textures
-	D3D12_DESCRIPTOR_RANGE descriptorTableRanges[eRenderTargetCount];
-
-	for (UINT i = 0; i < eRenderTargetCount; ++i)
-	{
-		descriptorTableRanges[i].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV; // this is a range of shader resource views (descriptors)
-		descriptorTableRanges[i].NumDescriptors = 1; // we only have one texture right now, so the range is only 1
-		descriptorTableRanges[i].BaseShaderRegister = i; // start index of the shader registers in the range
-		descriptorTableRanges[i].RegisterSpace = 0; // space 0. can usually be zero
-		descriptorTableRanges[i].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND; // this appends the range to the end of the root signature descriptor tables
-	}
-
-	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[0], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// normal texture
-	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[1], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// diffuse
-	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[2], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// specular
-	m_ImmediateRootSignature->AddDescriptorRange(&descriptorTableRanges[3], 1, D3D12_SHADER_VISIBILITY_PIXEL);	// position
-
-	m_ImmediateRootSignature->AddConstantBuffer(0, 0, D3D12_SHADER_VISIBILITY_PIXEL);
-
-	m_ImmediateRootSignature->Create(m_Device);
-
-	// reserve a constant buffer
-	m_ImmediateContextBuffer = GetConstantBuffer(eGlobal)->ReserveVirtualAddress();
-	float clearColor[4] = { 0.4f, 0.4f, 0.4f, 1.0f };
-	GetConstantBuffer(eGlobal)->UpdateConstantBuffer(m_ImmediateContextBuffer, clearColor, 4 * sizeof(float));
-
-	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/rendering/FrameCompositorPS.hlsl");
-	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/rendering/FrameCompositorVS.hlsl");
-
-	DX12PipelineState::PipelineStateDesc desc;
-
-	desc.InputLayout = m_RectMesh->GetInputLayoutDesc();
-	desc.RootSignature = m_ImmediateRootSignature;
-	desc.VertexShader = VShader;
-	desc.PixelShader = PShader;
-	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	desc.RenderTargetCount = 1;
-	desc.RenderTargetFormat[0] = m_BackBuffer->GetFormat();
-	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // a default blent state.
-	desc.DepthEnabled = false;
-
-	m_ImmediatePipelineState = new DX12PipelineState(desc);
-
 	return S_OK;
 }
 
@@ -845,7 +796,9 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateLightPipeline()
 
 	DX12PipelineState::PipelineStateDesc desc;
 
-	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/light/DeferredLightPS.hlsl");
+	DX12Shader * PShader = nullptr;
+	LOAD_SHADER(PShader, DX12Shader::ePixel, L"src/shaders/light/DeferredLightPS.hlsl", L"resources/build/shaders/DeferredLightPS.cso");
+
 	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/light/DeferredLightVS.hlsl");
 
 	// blend state

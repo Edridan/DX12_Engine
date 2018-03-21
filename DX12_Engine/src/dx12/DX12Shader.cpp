@@ -1,9 +1,24 @@
 #include "dx12/DX12Shader.h"
 
 #include "engine/Debug.h"
+#include "engine/Utils.h"
+#include "dx12/DX12Utils.h"
 #include <d3dcompiler.h>
 #include <string> 
 #include <string.h>
+
+DX12Shader * DX12Shader::LoadShaderFromBlob(EShaderType i_Type, const wchar_t * i_Filename)
+{
+	ID3DBlob * blob;
+	HRESULT hr = D3DReadFileToBlob(i_Filename, &blob);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	return new DX12Shader(i_Type, blob);
+}
 
 DX12Shader::DX12Shader(EShaderType i_Type, const wchar_t * i_Filename, const D3D_SHADER_MACRO * i_Defines)
 	:m_ShaderType(i_Type)
@@ -57,6 +72,20 @@ DX12Shader::DX12Shader(EShaderType i_Type, const wchar_t * i_Filename, const D3D
 
 	m_IsLoaded = true;
 }
+
+DX12Shader::DX12Shader(EShaderType i_Type, ID3DBlob * i_Blob)
+	:m_ShaderType(i_Type)
+	,m_Name(L"FromBlob")
+	,m_IsLoaded(false)
+{
+	// fill out shader bytecode structure for shader
+	m_ShaderByteCode = {};
+	m_ShaderByteCode.BytecodeLength = i_Blob->GetBufferSize();
+	m_ShaderByteCode.pShaderBytecode = i_Blob->GetBufferPointer();
+
+	m_IsLoaded = true;
+}
+
 
 DX12Shader::DX12Shader(EShaderType i_Type, const ShaderCode & i_Code)
 	:m_ShaderType(i_Type)

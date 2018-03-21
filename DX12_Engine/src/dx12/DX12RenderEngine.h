@@ -215,8 +215,6 @@ private:
 	DX12Context *				m_Context[EContextId::eContextCount];
 
 	// Immediate context pipeline state
-	DX12RootSignature *		m_ImmediateRootSignature;
-	DX12PipelineState *		m_ImmediatePipelineState;
 	ADDRESS_ID				m_ImmediateContextBuffer;
 
 	// Light pipeline
