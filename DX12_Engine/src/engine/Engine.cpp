@@ -241,7 +241,15 @@ void Engine::Run()
 
 		// tick the world (update all actors and components)
 		ASSERT(m_CurrentWorld != nullptr);
-		m_CurrentWorld->TickWorld(m_ElapsedTime);
+		if (m_IsInGame)
+		{
+			// here we update the game
+			m_CurrentWorld->TickWorld(m_ElapsedTime);
+		}
+		else
+		{
+			m_CurrentWorld->TickCamera(m_ElapsedTime);
+		}
 
 		// update and prepare the ui
 		{
