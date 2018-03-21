@@ -1,0 +1,1 @@
+del /S /Q ..\DX12_Engine\resources\build\*
