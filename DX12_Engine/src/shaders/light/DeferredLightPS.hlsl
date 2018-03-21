@@ -5,47 +5,76 @@
 // define amount of lights
 #define			MAX_LIGHTS		64
 
+#define POINT_LIGHT				0
+#define SPOT_LIGHT				1
+#define	DIRECTIONNAL_LIGHT		2
+
 // texture sampler for lights calculation
 Texture2D tex_normal		: register(t0);
 Texture2D tex_diffuse		: register(t1);
 Texture2D tex_specular		: register(t2);
 Texture2D tex_position		: register(t3);
 //Texture2D tex_depth		: register(t4);	// To do
-SamplerState tex_sample		: register(s0);
+SamplerState tex_sample		: register(s0); 
 
-// global unchanged var
-static const float4 eye_pos = float4(0.f, 0.f, 0.f, 1.f);
+// size of this structure mush be 128 bytes
+struct LightData
+{
+	int			type;			// light type
+	// pack next one data : (do not use array because of the padding)
+	float3		padding_1;	// first float4 completion
+	float4		padding_2;
+	float4		padding_3;
+	float4		padding_4;
+	float4		padding_5;
+	float4		padding_6;
+	float4		padding_7;
+	float4		padding_8;
+};
 
 // point light struct definition
 struct PointLight
 {
+	int			type;	// first val always type
+    float3		position;
 	// ---
 	float4		color;
 	// ---
-	float3		position;
 	float		constant;
-	// ---
 	float		lin;		// linear
 	float		quad;		// quadratic
 	float		range;		// range
-	// ---		offset : 11 remaining : 5 (16)
-	float		padding[5];	// padding
 };
 
 // spot light struct definition
 struct SpotLight
 {
+	int			type;	// first val always type
+    float3		position;
 	// ---
 	float4		color;
 	// ---
-	float3		position;
 	float		constant;
-	// ---
 	float		lin;		// linear
 	float		quad;		// quadratic
 	float		range;		// range
-	// ---		offset : 11 remaining : 5 (16)
-	float		padding[5];	// padding
+	// ---
+	float3		direction;
+	float		spot_angle;
+	// -- First 16 bytes
+	float		outer_cutoff;
+};
+
+// directionnal light struct definition
+struct DirectionnalLight
+{
+	int			type;	// first val always type
+	float3		position;
+	// ---
+	float4		color;
+	// ---
+	float3		direction;
+	//float		
 };
 
 // Pixel specs (for on particular pixel)
@@ -70,8 +99,7 @@ cbuffer SceneData : register(b0)
 // contains data to render point lights
 cbuffer LightData : register(b1)
 {
-	PointLight		lights[MAX_LIGHTS];	// lights data
-	PointLight		light;	// lights data
+	LightData		lights[MAX_LIGHTS];	// lights data
 }
 
 struct VS_OUTPUT
@@ -88,11 +116,11 @@ struct VS_OUTPUT
 // Light computation function
 float3		ComputePointLight(in PointLight light, in PixelData pixel)
 {
-	float4 light_pos = float4(light.position, 1.f);
-
 	// retreive the light direction and range between the 
-	const float3 light_diff = light_pos.xyz - pixel.position.xyz;
+	const float3 light_diff = light.position - pixel.position.xyz;
 	const float distance = length(light_diff);
+
+	float3 ret_value = float3(0.f, 0.f, 0.f);
 
 	if (distance < light.range)
 	{
@@ -104,20 +132,60 @@ float3		ComputePointLight(in PointLight light, in PixelData pixel)
 		// specular calculation
 		const float3 view_dir = normalize(camera_pos.xyz - pixel.position.xyz);
 		const float3 reflect_dir = reflect(-light_dir, pixel.normal.xyz); 
-		const float spec = pow(max(dot(view_dir, reflect_dir), 0.f), 32.f);
-		const float4 specular = light.color * spec * pixel.specular_color;
+		const float spec = pow(max(dot(view_dir, reflect_dir), 0.f), pixel.specular_color.a);
+		const float3 specular = light.color.rgb * spec * pixel.specular_color.rgb;
 
 		// attenuation
 		float attenuation = 1.f / (light.constant + light.lin * distance + light.quad * (distance * distance));
-		return (specular.rgb * attenuation) + (light_diffuse.rgb * attenuation);
+		ret_value = (specular * attenuation) + (light_diffuse * attenuation);
 	}
-
-	return float3(0.f, 0.f, 0.f);
+	  
+	return ret_value;
 }
 
 float3		ComputeSpotLight(in SpotLight light, in PixelData pixel)
 {
+	// retreive the light direction and range between the 
+	const float3 light_diff = light.position - pixel.position.xyz;
+	const float distance = length(light_diff);
+	const float3 light_dir = normalize(light_diff);
 
+	// check if lighting is inside the spotlight cone
+	const float theta = dot(light_dir, normalize(-light.direction));
+
+	float3 ret_value = float3(0.f, 0.f, 0.f);
+
+	// radian angles
+	if (theta > light.spot_angle)
+	{
+		// diffuse
+		const float diff = max(dot(pixel.normal.xyz, light_dir), 0.0);
+		const float3 light_diffuse = pixel.diffuse_color.rgb * diff * light.color.rgb;
+
+		// specular calculation
+		const float3 view_dir = normalize(camera_pos.xyz - pixel.position.xyz);
+		const float3 reflect_dir = reflect(-light_dir, pixel.normal.xyz);
+		const float spec = pow(max(dot(view_dir, reflect_dir), 0.f), pixel.specular_color.a);
+		const float3 specular = light.color.rgb * spec * pixel.specular_color.rgb;
+
+		// soft edges
+		const float epsilon = light.outer_cutoff;
+		const float intensity = clamp((theta - light.spot_angle) / epsilon, 0.f, 1.f);
+
+		//// attenuation
+		float attenuation = 1.f / (light.constant + light.lin * distance + light.quad * (distance * distance));
+		ret_value = (specular * intensity * attenuation) + (light_diffuse * intensity * attenuation);
+	}
+
+	return ret_value;
+}
+
+float3		ComputeDirectionnalLight(in DirectionnalLight light, in PixelData pixel)
+{
+	// compute directionnal light
+	const float3 light_dir = normalize(-light.direction);
+	const float diff = max(dot(pixel.normal.xyz, light_dir), 0.0);
+	return pixel.diffuse_color.rgb * diff * light.color.rgb;
 }
 
 float4 main(const VS_OUTPUT input) : SV_TARGET
@@ -144,7 +212,19 @@ float4 main(const VS_OUTPUT input) : SV_TARGET
 			[unroll(MAX_LIGHTS)]
 			for (int i = 0; i < light_count; ++i)
 			{
-				lighting += ComputePointLight(lights[i], pixel);
+				switch (lights[i].type)
+				{
+				case POINT_LIGHT:
+					lighting += ComputePointLight((PointLight)lights[i], pixel);
+					break;
+				case SPOT_LIGHT:
+					lighting += ComputeSpotLight((SpotLight)lights[i], pixel);
+					break;
+				case DIRECTIONNAL_LIGHT:
+					lighting += ComputeDirectionnalLight((DirectionnalLight)lights[i], pixel);
+					break;
+				}
+				
 			}
 		}
 

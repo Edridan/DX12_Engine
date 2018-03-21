@@ -67,6 +67,10 @@ private:
 
 	// call by engine class (this tick each actor that need a tick)
 	void		TickWorld(float i_Elapsed);
+#ifdef WITH_EDITOR
+	void		TickCamera(float i_Elapsed);
+#endif
+
 	void		RenderWorld(RenderList * i_RenderList) const;
 
 	// internal call

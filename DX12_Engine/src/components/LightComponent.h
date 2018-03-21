@@ -18,6 +18,9 @@ public:
 		float					Quadratic = 0.44f;
 		float					Linear = 0.35f;
 		float					Constant = 1.f;
+		// spot light edges
+		float					SpotAngle = 75.f;
+		float					SoftEdge = 0.05f;
 
 	};
 
@@ -31,10 +34,10 @@ public:
 
 private:
 	Light *					m_Light;	// light internal management
-	Light::ELightType		m_Type;			// type of the light
 
 #ifdef WITH_EDITOR
 	// Inherited via ActorComponent
+	float		m_SpotLightAngle;
 	virtual void DrawUIComponentInternal() override;
 #endif
 };

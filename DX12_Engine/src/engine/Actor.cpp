@@ -20,7 +20,7 @@ XMMATRIX Actor::GetWorldTransform()
 
 	if (m_Parent != nullptr)
 	{
-		thisMat = m_Parent->GetWorldTransform() * thisMat;
+		thisMat = thisMat * m_Parent->GetWorldTransform();
 	}
 	
 	return thisMat;
@@ -54,6 +54,22 @@ bool Actor::IsHidden() const
 bool Actor::NeedRendering() const
 {
 	return ((m_RenderComponent != nullptr) || (m_LightComponent != nullptr)) && (!m_Hidden);
+}
+
+bool Actor::IsChild(const Actor * i_Actor) const
+{
+	for (size_t i = 0; i < m_Children.size(); ++i)
+	{
+		if (m_Children[i] == i_Actor)	return true;
+		else
+		{
+			if (m_Children[i]->HaveChild())
+			{
+				if (m_Children[i]->IsChild(i_Actor))	return true;
+			}
+		}
+	}
+	return false;
 }
 
 UINT Actor::ChildCount() const

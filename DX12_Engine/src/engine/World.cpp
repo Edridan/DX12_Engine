@@ -172,6 +172,12 @@ bool World::AttachActor(Actor * i_Parent, Actor * i_Child)
 	if (i_Parent == nullptr || i_Child == nullptr)
 		return false;
 
+	if (i_Parent == i_Child)
+		return false;
+
+	if (i_Child->IsChild(i_Parent) || i_Parent->IsChild(i_Child))
+		return false;
+
 	// we need to remove the actor from the childs
 	if (i_Child->IsRoot())
 	{
@@ -226,6 +232,8 @@ bool World::DetachActor(Actor * i_ActorToDetach)
 		}
 
 		parent->m_Children.erase(itr);
+
+		i_ActorToDetach->m_Parent = nullptr;
 	}
 
 	// push the actor to the root actors
@@ -359,6 +367,17 @@ void World::TickWorld(float i_Elapsed)
 		}
 	}
 }
+
+#ifdef WITH_EDITOR
+void World::TickCamera(float i_Elapsed)
+{
+	// save elapsed time
+	m_FrameTime = i_Elapsed;
+
+	// update camera
+	m_CurrentCamera->Update(i_Elapsed);
+}
+#endif
 
 void World::RenderWorld(RenderList * i_RenderList) const
 {

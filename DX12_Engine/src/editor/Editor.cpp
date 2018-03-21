@@ -34,6 +34,8 @@ Editor::Editor(const EditorDesc & i_Desc)
 	PushEditorWindow(m_ActorBuilder);
 	PushEditorWindow(m_SceneBuilder);
 
+	m_MaterialBuilder->SetActive(false);
+
 	m_Shortcuts.InputShowMaterial	= i_Desc.InputShowMaterial;
 	m_Shortcuts.InputShowScene		= i_Desc.InputShowScene;
 	m_Shortcuts.InputActorBuilder	= i_Desc.InputActorBuilder;
@@ -79,10 +81,6 @@ void Editor::CloseEditor()
 		m_Layer->PopUIWindowFromLayer(m_Windows[i]);
 	}
 
-	// popup the windows from the layer
-	//m_Layer->PopUIWindowFromLayer(m_SceneBuilder);
-	//m_Layer->PopUIWindowFromLayer(m_ActorBuilder);
-
 	UnbindKeyboardEvents();
 
 	m_IsEnabled = false;
@@ -97,8 +95,6 @@ void Editor::OpenEditor()
 	{
 		m_Layer->PushUIWindowOnLayer(m_Windows[i]);
 	}
-	//m_Layer->PushUIWindowOnLayer(m_SceneBuilder);
-	//m_Layer->PushUIWindowOnLayer(m_ActorBuilder);
 	
 	BindKeyboardEvents();
 

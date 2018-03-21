@@ -15,9 +15,10 @@ public:
 	// defines/enum
 	enum ELightType
 	{
-		ePointLight,
-		eSpotLight,
-		eDirectionalLight,
+		ePointLight			= 0,
+		eSpotLight			= 1,
+		eDirectionalLight	= 2,
+		// other
 		eLightTypeCount,
 	};
 
@@ -32,19 +33,27 @@ public:
 
 	// pointlight/spotlight data
 	float				GetRange() const;
+	float				GetSpotAngle() const;
+	float				GetEdgeCutoff() const;
 	float				GetQuadratic() const;
 	float				GetLinear() const;
 	float				GetConstant() const;
+	float				GetSpotAngleInDegree() const;
 
 	// light management
 	void				SetType(const ELightType & i_Type);
 	void				SetColor(const XMFLOAT4 & i_Color);
 	void				SetRange(float i_Range);
 	void				SetIntensity(float i_Intensity);
-	// pointlight/spotlight 
+	// spotlight
+	void				SetSpotAngleInDegree(float i_Angle);
+	void				SetSpotAngle(float i_Angle);
+	void				SetSoftEdges(float i_SoftEdges);
+	// attenuation 
 	void				SetConstant(float i_Constant);	// compute attenuation based on these params
 	void				SetLinear(float i_Linear);
 	void				SetQuadratic(float i_Quadratic);
+	
 
 	// To do: compute data to already created data (and just copy them into the list)
 
@@ -55,6 +64,9 @@ private:
 	float					m_Intensity;
 	// point/spotlight data
 	float					m_Range;
+	// spotlight data
+	float					m_SpotAngle;
+	float					m_OuterCutoff;	// for soft edges
 	// attenuation data
 	float					m_Constant;
 	float					m_Quadratic;
