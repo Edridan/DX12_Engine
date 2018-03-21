@@ -799,7 +799,8 @@ FORCEINLINE HRESULT DX12RenderEngine::GenerateLightPipeline()
 	DX12Shader * PShader = nullptr;
 	LOAD_SHADER(PShader, DX12Shader::ePixel, L"src/shaders/light/DeferredLightPS.hlsl", L"resources/build/shaders/DeferredLightPS.cso");
 
-	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/light/DeferredLightVS.hlsl");
+	DX12Shader * VShader = nullptr;
+	LOAD_SHADER(VShader, DX12Shader::eVertex, L"src/shaders/light/DeferredLightVS.hlsl", L"resources/build/shaders/DeferredLightVS.cso");
 
 	// blend state
 	CD3DX12_BLEND_DESC blendDesc;
