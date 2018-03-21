@@ -20,7 +20,7 @@ XMMATRIX Actor::GetWorldTransform()
 
 	if (m_Parent != nullptr)
 	{
-		thisMat = m_Parent->GetWorldTransform() * thisMat;
+		thisMat = thisMat * m_Parent->GetWorldTransform();
 	}
 	
 	return thisMat;
