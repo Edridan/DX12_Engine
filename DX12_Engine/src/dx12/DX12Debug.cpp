@@ -8,6 +8,7 @@
 #include "dx12/DX12PipelineState.h"
 #include "dx12/DX12RenderTarget.h"
 #include "dx12/DX12DepthBuffer.h"
+#include "dx12/DX12Utils.h"
 
 // singleton management
 DX12Debug * DX12Debug::s_Instance = nullptr;
@@ -101,8 +102,11 @@ DX12Debug::DX12Debug(const DX12DebugDesc & i_Setup)
 
 	m_GBufferDebugRS->Create(device);
 
-	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/debug/DebugGBufferPS.hlsl");
-	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/debug/DebugGBufferVS.hlsl");
+	DX12Shader * PShader = nullptr;
+	LOAD_SHADER(PShader, DX12Shader::ePixel, L"src/shaders/debug/DebugGBufferPS.hlsl", L"resources/build/shaders/DebugGBufferPS.cso");
+
+	DX12Shader * VShader = nullptr;
+	LOAD_SHADER(VShader, DX12Shader::eVertex, L"src/shaders/debug/DebugGBufferVS.hlsl", L"resources/build/shaders/DebugGBufferVS.cso");
 
 	DX12PipelineState::PipelineStateDesc desc;
 

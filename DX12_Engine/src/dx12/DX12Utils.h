@@ -11,6 +11,27 @@
 // macros definition
 #define DEBUG_DX12_ENABLE		1
 
+// this is used for win time on loading
+// this will check if the file exist
+// if not is loading the base shader file
+// execute the script (copy_cso.bat) and enable it in define
+#define LOAD_CSO		1
+
+#if LOAD_CSO
+#define LOAD_SHADER(shader, type, source, cso)																	\
+do{																												\
+	shader = DX12Shader::LoadShaderFromBlob(type, cso);															\
+	if (shader == nullptr)																						\
+	{																											\
+		PRINT_DEBUG("Unable to load shader cso, be sure to launch copy_cso.bat to save load time\n");			\
+		shader = new DX12Shader(type, source);																	\
+	}																											\
+}while(false)
+#else
+#define LOAD_SHADER(shader, type, source, cso)		shader = new DX12Shader(type, source)
+#endif
+
+
 // debug management
 #if (DEBUG_DX12_ENABLE) && defined(_DEBUG)
 #define DX12_DEBUG

@@ -4,6 +4,7 @@
 #include "DX12RenderEngine.h"
 #include "DX12Shader.h"
 #include "DX12Context.h"
+#include "DX12Utils.h"
 #include "engine/Engine.h"
 #include "resource/DX12Texture.h"
 
@@ -99,8 +100,11 @@ HRESULT ImGuiD3D12::InitializeDX12ImGui()
 	// and the font texture
 
 	// retreive default shader set
-	VertexShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/ui/ImGuiVertex.hlsl");
-	PixelShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/ui/ImGuiPixel.hlsl");
+	VertexShader = nullptr;
+	LOAD_SHADER(VertexShader, DX12Shader::eVertex, L"src/shaders/ui/ImGuiVertex.hlsl", L"resources/build/shaders/ImGuiVertex.cso");
+	
+	PixelShader = nullptr;
+	LOAD_SHADER(PixelShader, DX12Shader::ePixel, L"src/shaders/ui/ImGuiPixel.hlsl", L"resources/build/shaders/ImGuiPixel.cso");
 
 	if ((!VertexShader->IsLoaded()) || (!PixelShader->IsLoaded()))
 	{
