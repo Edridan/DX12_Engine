@@ -39,6 +39,16 @@ World::~World()
 {
 }
 
+void World::LoadWorld(const std::string & i_File, bool i_CleanBeforeLoad)
+{
+	if (i_CleanBeforeLoad)
+		Clear();
+}
+
+void World::SaveWorld(const std::string & i_OutputFile) const
+{
+}
+
 float World::GetFrameTime() const
 {
 	return m_FrameTime;

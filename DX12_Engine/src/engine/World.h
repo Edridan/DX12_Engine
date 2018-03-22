@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "Actor.h"
@@ -28,6 +29,11 @@ public:
 
 	World(const WorldDesc & i_WorldDesc);
 	~World();
+
+	// load world
+	void	LoadWorld(const std::string & i_File, bool i_CleanBeforeLoad = true);
+	void	SaveWorld(const std::string & i_OutputFile) const;
+
 
 	// world public functions can be called by actors
 	float	GetFrameTime() const;	// get the last elapsed time

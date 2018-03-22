@@ -327,6 +327,9 @@ Actor::Actor(World * i_World)
 
 Actor::~Actor()
 {
+	// delete components
+	if (m_RenderComponent != nullptr)		delete m_RenderComponent;
+	if (m_LightComponent != nullptr)		delete m_LightComponent;
 }
 
 void Actor::Tick(float i_Elapsed)
