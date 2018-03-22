@@ -6,6 +6,7 @@
 #include "dx12/DX12RenderTarget.h"
 #include "dx12/DX12DepthBuffer.h"
 #include "dx12/DX12ConstantBuffer.h"
+#include "dx12/DX12Utils.h"
 
 DX12Material::DX12Material()
 	:DX12Resource()
@@ -166,8 +167,12 @@ FORCEINLINE void DX12Material::GeneratePipelineState(ID3D12Device * i_Device)
 {
 	DX12RenderEngine & render = DX12RenderEngine::GetInstance();
 
-	DX12Shader * PShader = new DX12Shader(DX12Shader::ePixel, L"src/shaders/rendering/GBufferPS.hlsl");
-	DX12Shader * VShader = new DX12Shader(DX12Shader::eVertex, L"src/shaders/rendering/GBufferVS.hlsl");
+	
+	DX12Shader * PShader = nullptr;
+	LOAD_SHADER(PShader, DX12Shader::ePixel, L"src/shaders/rendering/GBufferPS.hlsl", L"resources/build/shaders/GBufferPS.cso");
+
+	DX12Shader * VShader = nullptr;
+	LOAD_SHADER(VShader, DX12Shader::eVertex, L"src/shaders/rendering/GBufferVS.hlsl", L"resources/build/shaders/GBufferVS.cso");
 
 	// create pipeline state object
 	D3D12_INPUT_LAYOUT_DESC inputLayout;
