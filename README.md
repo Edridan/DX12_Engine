@@ -1,7 +1,7 @@
 # DX12_Engine
 A DX12 mini game engine made for learning DirectX12 and rendering/game engine in general.
 
-This is a WIP engine, and the code is not clean or final. I'm currently working on this project.
+This is an abandonned project, since I moved to another Vulkan Engine project
 
 Currently the engine is featuring :
  * A little basic editor (using ImGui)
@@ -10,7 +10,7 @@ Currently the engine is featuring :
  * Ability to load .obj meshes
  
 
-# WIP
+# To Do :
 - Editor is actually working. Currently featuring :
  * Scene Editor
  * Actor Editor
@@ -20,8 +20,7 @@ Working on features :
 - Add a physic engine to the game engine (ReactPhysics) 
 - Material management, now and because of the new implementation I've made, textures are currently not supported.
 
-# Future
-- Implementing Multi Threaded Rendering
+# Wanted
 - Ability to save scene with game component
 - Make the engine more "game friendly"
 
