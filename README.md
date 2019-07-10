@@ -1,7 +1,7 @@
 # DX12_Engine
 A DX12 mini game engine made for learning DirectX12 and rendering/game engine in general.
 
-This is an abandonned project, since I moved to another Vulkan Engine project
+This is an abandoned project, since I moved to another Vulkan Engine project
 
 Currently the engine is featuring :
  * A little basic editor (using ImGui)
